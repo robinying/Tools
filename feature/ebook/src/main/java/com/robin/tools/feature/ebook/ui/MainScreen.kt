@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -24,22 +25,35 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen(viewModel: ConversionViewModel, modifier: Modifier = Modifier) {
+fun MainScreen(viewModel: ConversionViewModel, onBack: () -> Unit = {}, modifier: Modifier = Modifier) {
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         uri?.let { viewModel.convertFile(it) }
     }
 
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Ebook to PDF") },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                    }
+                }
+            )
+        }
+    ) { innerPadding ->
     Column(
         modifier = modifier
             .fillMaxSize()
+            .padding(innerPadding)
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text("Ebook to PDF", style = MaterialTheme.typography.headlineLarge)
         Spacer(Modifier.height(32.dp))
 
         when (val state = uiState) {
@@ -86,6 +100,7 @@ fun MainScreen(viewModel: ConversionViewModel, modifier: Modifier = Modifier) {
                     Text("再试一次")
                 }
             }
+        }
         }
     }
 }

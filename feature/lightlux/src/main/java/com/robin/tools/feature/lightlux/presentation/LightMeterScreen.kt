@@ -1,10 +1,16 @@
 package com.robin.tools.feature.lightlux.presentation
 
+import android.content.Context
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.*
@@ -15,6 +21,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -26,14 +33,38 @@ import com.robin.tools.feature.lightlux.data.MainViewModel
 @Composable
 fun LightMeterScreen(
     viewModel: MainViewModel,
-    onNavigateToSnapshots: () -> Unit
+    onNavigateToSnapshots: () -> Unit,
+    onBack: () -> Unit = {},
 ) {
     val currentLux by viewModel.currentLux.collectAsStateWithLifecycle()
     val chartData by viewModel.realtimeChartData.collectAsStateWithLifecycle()
     val saveStatus by viewModel.saveStatus.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+    DisposableEffect(context) {
+        val sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
+        val lightSensor = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT)
+        if (lightSensor != null) {
+            val listener = object : SensorEventListener {
+                override fun onSensorChanged(event: SensorEvent) {
+                    viewModel.updateLuxFromSensor(event.values[0])
+                }
+                override fun onAccuracyChanged(sensor: Sensor, accuracy: Int) {}
+            }
+            sensorManager.registerListener(listener, lightSensor, SensorManager.SENSOR_DELAY_NORMAL)
+            onDispose {
+                sensorManager.unregisterListener(listener)
+            }
+        } else {
+            onDispose { }
+        }
+    }
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text("Light Meter") }, actions = {
+            TopAppBar(title = { Text("Light Meter") }, navigationIcon = {
+                IconButton(onClick = onBack) {
+                    Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                }
+            }, actions = {
                 IconButton(onClick = onNavigateToSnapshots) { Icon(Icons.Default.History, "History") }
             })
         }
