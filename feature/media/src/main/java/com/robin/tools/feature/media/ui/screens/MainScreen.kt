@@ -4,6 +4,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Slideshow
 import androidx.compose.material.icons.filled.VideoLibrary
@@ -21,62 +22,76 @@ import android.widget.Toast
 import com.robin.tools.feature.media.R
 import com.robin.tools.feature.media.utils.FileUtils
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
+    onBack: () -> Unit = {},
     onVideoCompressClick: () -> Unit,
     onImageCompressClick: () -> Unit,
     onGifConvertClick: () -> Unit
 ) {
     val context = LocalContext.current
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .systemBarsPadding()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = context.getString(R.string.media_compression_tool),
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(bottom = 32.dp)
-        )
-
-        CompressionCard(
-            title = context.getString(R.string.video_compress),
-            description = context.getString(R.string.video_compress_desc),
-            icon = Icons.Default.VideoLibrary,
-            onClick = onVideoCompressClick
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        CompressionCard(
-            title = context.getString(R.string.image_compress),
-            description = context.getString(R.string.image_compress_desc),
-            icon = Icons.Default.Image,
-            onClick = onImageCompressClick
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        CompressionCard(
-            title = context.getString(R.string.video_to_gif),
-            description = context.getString(R.string.video_to_gif_desc),
-            icon = Icons.Default.Slideshow,
-            onClick = onGifConvertClick
-        )
-
-        Spacer(modifier = Modifier.weight(1f))
-
-        TextButton(
-            onClick = {
-                FileUtils.clearCache(context)
-                Toast.makeText(context, context.getString(R.string.cache_cleared), Toast.LENGTH_SHORT).show()
-            }
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text(context.getString(R.string.media_compression_tool)) },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                    }
+                }
+            )
+        }
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(context.getString(R.string.clear_cache), color = MaterialTheme.colorScheme.secondary)
+            Text(
+                text = context.getString(R.string.media_compression_tool),
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(bottom = 32.dp)
+            )
+
+            CompressionCard(
+                title = context.getString(R.string.video_compress),
+                description = context.getString(R.string.video_compress_desc),
+                icon = Icons.Default.VideoLibrary,
+                onClick = onVideoCompressClick
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            CompressionCard(
+                title = context.getString(R.string.image_compress),
+                description = context.getString(R.string.image_compress_desc),
+                icon = Icons.Default.Image,
+                onClick = onImageCompressClick
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            CompressionCard(
+                title = context.getString(R.string.video_to_gif),
+                description = context.getString(R.string.video_to_gif_desc),
+                icon = Icons.Default.Slideshow,
+                onClick = onGifConvertClick
+            )
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            TextButton(
+                onClick = {
+                    FileUtils.clearCache(context)
+                    Toast.makeText(context, context.getString(R.string.cache_cleared), Toast.LENGTH_SHORT).show()
+                }
+            ) {
+                Text(context.getString(R.string.clear_cache), color = MaterialTheme.colorScheme.secondary)
+            }
         }
     }
 }

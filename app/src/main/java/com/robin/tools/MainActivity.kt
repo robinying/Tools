@@ -27,6 +27,7 @@ import com.robin.tools.feature.media.data.CompressionType
 import com.robin.tools.feature.media.ui.screens.CompressionScreen
 import com.robin.tools.feature.media.ui.screens.MainScreen as MediaMainScreen
 import com.robin.tools.ui.theme.ToolsTheme
+import com.robin.tools.util.SwipeBackContainer
 
 sealed class AppScreen {
     object Home : AppScreen()
@@ -64,28 +65,36 @@ class MainActivity : ComponentActivity() {
                             onLightLuxClick = { currentScreen = AppScreen.LightLux }
                         )
                         is AppScreen.Media -> {
-                            val type = screen.type
-                            if (type != null) {
-                                CompressionScreen(
-                                    type = type,
-                                    onBack = { currentScreen = AppScreen.Home }
-                                )
-                            } else {
-                                MediaMainScreen(
-                                    onVideoCompressClick = { currentScreen = AppScreen.Media(CompressionType.VIDEO) },
-                                    onImageCompressClick = { currentScreen = AppScreen.Media(CompressionType.IMAGE) },
-                                    onGifConvertClick = { currentScreen = AppScreen.Media(CompressionType.GIF) }
-                                )
+                            SwipeBackContainer(onBack = { currentScreen = AppScreen.Home }) {
+                                val type = screen.type
+                                if (type != null) {
+                                    CompressionScreen(
+                                        type = type,
+                                        onBack = { currentScreen = AppScreen.Home }
+                                    )
+                                } else {
+                                    MediaMainScreen(
+                                        onVideoCompressClick = { currentScreen = AppScreen.Media(CompressionType.VIDEO) },
+                                        onImageCompressClick = { currentScreen = AppScreen.Media(CompressionType.IMAGE) },
+                                        onGifConvertClick = { currentScreen = AppScreen.Media(CompressionType.GIF) },
+                                        onBack = { currentScreen = AppScreen.Home }
+                                    )
+                                }
                             }
                         }
                         is AppScreen.Ebook -> {
-                            EbookScreen(viewModel = ConversionViewModel(applicationContext))
+                            SwipeBackContainer(onBack = { currentScreen = AppScreen.Home }) {
+                                EbookScreen(viewModel = ConversionViewModel(applicationContext), onBack = { currentScreen = AppScreen.Home })
+                            }
                         }
                         is AppScreen.LightLux -> {
-                            LightLuxScreen(
-                                mainViewModel = lightMainViewModel,
-                                snapshotViewModel = lightSnapshotViewModel
-                            )
+                            SwipeBackContainer(onBack = { currentScreen = AppScreen.Home }) {
+                                LightLuxScreen(
+                                    mainViewModel = lightMainViewModel,
+                                    snapshotViewModel = lightSnapshotViewModel,
+                                    onBack = { currentScreen = AppScreen.Home }
+                                )
+                            }
                         }
                     }
                 }

@@ -6,7 +6,8 @@ import com.robin.tools.feature.lightlux.data.*
 @Composable
 fun LightLuxScreen(
     mainViewModel: MainViewModel,
-    snapshotViewModel: SnapshotListViewModel
+    snapshotViewModel: SnapshotListViewModel,
+    onBack: () -> Unit = {}
 ) {
     var currentScreen by remember { mutableStateOf<LightLuxNavHost>(LightLuxNavHost.Meter) }
 
@@ -14,7 +15,8 @@ fun LightLuxScreen(
         is LightLuxNavHost.Meter -> {
             LightMeterScreen(
                 viewModel = mainViewModel,
-                onNavigateToSnapshots = { currentScreen = LightLuxNavHost.SnapshotList }
+                onNavigateToSnapshots = { currentScreen = LightLuxNavHost.SnapshotList },
+                onBack = onBack
             )
         }
         is LightLuxNavHost.SnapshotList -> {
