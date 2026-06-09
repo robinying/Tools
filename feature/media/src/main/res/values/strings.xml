@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Media Editor</string>
+    <string name="media_compression_tool">Media Compression Tool</string>
+    <string name="video_compress">Video Compress</string>
+    <string name="video_compress_desc">Reduce video file size</string>
+    <string name="image_compress">Image Compress</string>
+    <string name="image_compress_desc">Reduce image file size</string>
+    <string name="video_to_gif">Video to GIF</string>
+    <string name="video_to_gif_desc">Convert video to animated GIF</string>
+    <string name="clear_cache">Clear Cache</string>
+    <string name="cache_cleared">Cache cleared</string>
+    <string name="select_file">Select File</string>
+    <string name="reselect_file">Reselect File</string>
+    <string name="files_selected">%d file(s) selected</string>
+    <string name="select_compression_level">Select Compression Level</string>
+    <string name="select_gif_quality">Select GIF Quality</string>
+    <string name="compression_level_low">Low (Best Quality)</string>
+    <string name="compression_level_medium">Medium</string>
+    <string name="compression_level_high">High (Max Compress)</string>
+    <string name="start_compression">Start Compression</string>
+    <string name="start_conversion">Start Conversion</string>
+    <string name="processing_complete">Processing Complete</string>
+    <string name="processing_failed">Processing Failed</string>
+    <string name="all_saved_to_gallery">All files saved to gallery</string>
+    <string name="processing_error">An error occurred during processing</string>
+    <string name="open_gallery">Open Gallery</string>
+    <string name="view_file">View File</string>
+    <string name="close">Close</string>
+    <string name="back">Back</string>
+    <string name="processing">Processing %1$d/%2$d: %3$s</string>
+    <string name="notification_channel_name">Compression Service</string>
+    <string name="notification_channel_desc">Shows compression progress</string>
+    <string name="notification_ready">Ready to compress</string>
+    <string name="notification_title">Compressing</string>
+    <string name="notification_finished_all">All files processed successfully</string>
+    <string name="notification_failed_single">Failed: %s</string>
+    <string name="notification_finished_with_errors">%1$d success, %2$d failed</string>
+</resources>

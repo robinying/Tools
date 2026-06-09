@@ -4,26 +4,90 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Image
+import androidx.compose.material.icons.filled.LightMode
+import androidx.compose.material.icons.filled.MenuBook
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.robin.tools.feature.lightlux.data.*
+import com.robin.tools.feature.lightlux.presentation.LightLuxScreen
+import com.robin.tools.feature.ebook.ui.ConversionViewModel
+import com.robin.tools.feature.ebook.ui.MainScreen as EbookScreen
+import com.robin.tools.feature.media.data.CompressionType
+import com.robin.tools.feature.media.ui.screens.CompressionScreen
+import com.robin.tools.feature.media.ui.screens.MainScreen as MediaMainScreen
 import com.robin.tools.ui.theme.ToolsTheme
 
+sealed class AppScreen {
+    object Home : AppScreen()
+    data class Media(val type: CompressionType? = null) : AppScreen()
+    object Ebook : AppScreen()
+    object LightLux : AppScreen()
+}
+
 class MainActivity : ComponentActivity() {
+
+    private lateinit var lightMainViewModel: MainViewModel
+    private lateinit var lightSnapshotViewModel: SnapshotListViewModel
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        val db = AppDatabase.getInstance(applicationContext)
+        val repo = LightRepository(db.lightEntryDao())
+        lightMainViewModel = MainViewModel(repo)
+        lightSnapshotViewModel = SnapshotListViewModel(repo)
+
         setContent {
             ToolsTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                var currentScreen by remember { mutableStateOf<AppScreen>(AppScreen.Home) }
+
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    when (val screen = currentScreen) {
+                        is AppScreen.Home -> HomeScreen(
+                            onMediaClick = { currentScreen = AppScreen.Media() },
+                            onEbookClick = { currentScreen = AppScreen.Ebook },
+                            onLightLuxClick = { currentScreen = AppScreen.LightLux }
+                        )
+                        is AppScreen.Media -> {
+                            val type = screen.type
+                            if (type != null) {
+                                CompressionScreen(
+                                    type = type,
+                                    onBack = { currentScreen = AppScreen.Home }
+                                )
+                            } else {
+                                MediaMainScreen(
+                                    onVideoCompressClick = { currentScreen = AppScreen.Media(CompressionType.VIDEO) },
+                                    onImageCompressClick = { currentScreen = AppScreen.Media(CompressionType.IMAGE) },
+                                    onGifConvertClick = { currentScreen = AppScreen.Media(CompressionType.GIF) }
+                                )
+                            }
+                        }
+                        is AppScreen.Ebook -> {
+                            EbookScreen(viewModel = ConversionViewModel(applicationContext))
+                        }
+                        is AppScreen.LightLux -> {
+                            LightLuxScreen(
+                                mainViewModel = lightMainViewModel,
+                                snapshotViewModel = lightSnapshotViewModel
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -31,17 +95,93 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
+fun HomeScreen(
+    onMediaClick: () -> Unit,
+    onEbookClick: () -> Unit,
+    onLightLuxClick: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .systemBarsPadding()
+            .padding(24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = "Tools",
+            fontSize = 32.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(bottom = 8.dp, top = 32.dp)
+        )
+        Text(
+            text = "Media Compression · Ebook Conversion · Light Meter",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(bottom = 40.dp)
+        )
+
+        FeatureCard(
+            title = "Media Editor",
+            description = "Compress video/image, convert video to GIF",
+            icon = Icons.Default.Image,
+            onClick = onMediaClick
+        )
+        Spacer(Modifier.height(16.dp))
+        FeatureCard(
+            title = "Ebook Converter",
+            description = "Convert EPUB to PDF",
+            icon = Icons.Default.MenuBook,
+            onClick = onEbookClick
+        )
+        Spacer(Modifier.height(16.dp))
+        FeatureCard(
+            title = "Light Meter",
+            description = "Measure ambient light with real-time chart",
+            icon = Icons.Default.LightMode,
+            onClick = onLightLuxClick
+        )
+    }
 }
 
-@Preview(showBackground = true)
 @Composable
-fun GreetingPreview() {
-    ToolsTheme {
-        Greeting("Android")
+fun FeatureCard(
+    title: String,
+    description: String,
+    icon: ImageVector,
+    onClick: () -> Unit
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() },
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(20.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                modifier = Modifier.size(40.dp),
+                tint = MaterialTheme.colorScheme.primary
+            )
+            Spacer(Modifier.width(16.dp))
+            Column {
+                Text(
+                    text = title,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 18.sp
+                )
+                Text(
+                    text = description,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
     }
 }
