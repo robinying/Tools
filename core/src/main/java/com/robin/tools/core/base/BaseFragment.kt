@@ -13,8 +13,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.viewbinding.ViewBinding
-import com.robin.tools.core.ext.dismissLoadingExt
-import com.robin.tools.core.ext.showLoadingExt
 import com.robin.tools.core.util.inflateBindingWithGeneric
 import com.robin.tools.core.ext.view.hideSoftKeyboard
 import java.lang.reflect.ParameterizedType
@@ -122,14 +120,14 @@ abstract class BaseFragment<VM : BaseViewModel, VB : ViewBinding> : Fragment() {
      * 打开等待框
      */
     open fun showLoading(message: String="请求网络中...") {
-        showLoadingExt(message)
+        // Override in subclass to show loading UI
     }
 
     /**
      * 关闭等待框
      */
     open fun dismissLoading() {
-        dismissLoadingExt()
+        // Override in subclass to dismiss loading UI
     }
 
 

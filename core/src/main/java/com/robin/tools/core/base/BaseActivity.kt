@@ -10,10 +10,8 @@ import androidx.viewbinding.ViewBinding
 import com.robin.tools.core.util.inflateBindingWithGeneric
 import com.robin.tools.core.event.AppViewModel
 import com.robin.tools.core.event.EventViewModel
-import com.robin.tools.core.ext.dismissLoadingExt
 import com.robin.tools.core.ext.getAppViewModel
 import com.robin.tools.core.ext.getVmClazz
-import com.robin.tools.core.ext.showLoadingExt
 import java.lang.reflect.ParameterizedType
 
 abstract class BaseActivity<VM : BaseViewModel, VB : ViewBinding> : AppCompatActivity(){
@@ -34,11 +32,11 @@ abstract class BaseActivity<VM : BaseViewModel, VB : ViewBinding> : AppCompatAct
     abstract fun initView(savedInstanceState: Bundle?)
 
     open fun showLoading(message: String = "请求网络中..."){
-        showLoadingExt(message)
+        // Override in subclass to show loading UI
     }
 
     open fun dismissLoading(){
-        dismissLoadingExt()
+        // Override in subclass to dismiss loading UI
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

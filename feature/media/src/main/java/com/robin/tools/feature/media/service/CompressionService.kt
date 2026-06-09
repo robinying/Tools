@@ -13,7 +13,6 @@ import android.os.Build
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
-import com.robin.tools.feature.media.MainActivity
 import com.robin.tools.feature.media.R
 import com.robin.tools.feature.media.data.*
 import com.robin.tools.feature.media.delegate.CompressionDelegateFactory
@@ -110,16 +109,14 @@ class CompressionService : Service() {
     }
 
     private fun createNotification(progress: Int, max: Int, content: String): Notification {
-        val intent = Intent(this, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        }
+        val intent = packageManager.getLaunchIntentForPackage(packageName) ?: Intent()
         val pendingIntent = PendingIntent.getActivity(
             this, 0, intent,
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
 
         return NotificationCompat.Builder(this, CHANNEL_ID)
-            .setSmallIcon(R.mipmap.ic_launcher)
+            .setSmallIcon(android.R.drawable.ic_menu_compass)
             .setContentTitle(getString(R.string.notification_title))
             .setContentText(content)
             .setProgress(max, progress, false)

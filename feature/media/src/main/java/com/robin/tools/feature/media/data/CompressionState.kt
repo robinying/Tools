@@ -6,10 +6,10 @@ enum class CompressionType {
     VIDEO, IMAGE, GIF
 }
 
-enum class CompressionLevel(val labelResId: Int) {
-    LOW(com.robin.videoeditor.R.string.compression_level_low),
-    MEDIUM(com.robin.videoeditor.R.string.compression_level_medium),
-    HIGH(com.robin.videoeditor.R.string.compression_level_high)
+enum class CompressionLevel(val label: String) {
+    LOW("Low"),
+    MEDIUM("Medium"),
+    HIGH("High")
 }
 
 sealed class CompressionTaskState {

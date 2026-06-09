@@ -1,15 +1,49 @@
+# --- Gradle ---
+.gradle/
+**/build/
+!src/**/build/
+
+# --- IDE ---
 *.iml
-.gradle
-/local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
+.idea/
+*.iws
+
+# --- OS ---
 .DS_Store
-/build
-/captures
-.externalNativeBuild
-.cxx
+Thumbs.db
+
+# --- Android ---
 local.properties
+*.apk
+*.aab
+*.dex
+*.class
+*.ap_
+*.hprof
+
+# --- NDK ---
+.externalNativeBuild/
+.cxx/
+*.o
+*.obj
+
+# --- Kotlin ---
+.kotlin/
+
+# --- Misc ---
+*.log
+*.tmp
+*.bak
+*.swp
+*~
+
+# --- App signing ---
+*.jks
+*.keystore
+release/
+
+# --- ProGuard ---
+proguard/
+
+# --- Captures ---
+/captures

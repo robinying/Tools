@@ -180,7 +180,7 @@ fun CompressionScreen(
                     FilterChip(
                         selected = compressionLevel == level,
                         onClick = { if (!isProcessing) compressionLevel = level },
-                        label = { Text(context.getString(level.labelResId)) },
+                        label = { Text(level.label) },
                         enabled = !isProcessing
                     )
                 }
