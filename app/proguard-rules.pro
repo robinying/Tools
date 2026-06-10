@@ -14,9 +14,8 @@
 -dontwarn com.gemalto.jp2.JP2Decoder
 -dontwarn com.gemalto.jp2.JP2Encoder
 
-# epublib-core optional SLF4J logging
--dontwarn org.slf4j.Logger
--dontwarn org.slf4j.LoggerFactory
+# SLF4J — used by epublib and pdfbox for logging
+-keep class org.slf4j.** { *; }
 
 # If your project uses WebView with JS, uncomment the following
 # and specify the fully qualified class name to the JavaScript interface

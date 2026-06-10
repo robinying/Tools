@@ -30,6 +30,7 @@ lottie = "6.6.2"
 utilcodex = "1.31.1"
 permissionx = "1.8.1"
 coil = "2.7.0"
+slf4j = "2.0.16"
 mockk = "1.13.14"
 turbine = "1.2.0"
 archCoreTesting = "2.2.0"
@@ -98,6 +99,7 @@ smartexception = { group = "com.arthenica", name = "smart-exception-java", versi
 glide = { group = "com.github.bumptech.glide", name = "glide", version.ref = "glide" }
 coil = { group = "io.coil-kt", name = "coil", version.ref = "coil" }
 coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
+slf4j-nop = { group = "org.slf4j", name = "slf4j-nop", version.ref = "slf4j" }
 
 # UI
 lottie = { group = "com.airbnb.android", name = "lottie", version.ref = "lottie" }

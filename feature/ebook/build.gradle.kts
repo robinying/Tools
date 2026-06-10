@@ -48,11 +48,11 @@ dependencies {
     implementation(libs.androidx.compose.material3)
 
     implementation(libs.epublib.core) {
-        exclude(group = "org.slf4j")
         exclude(group = "xmlpull")
         exclude(group = "net.sf.kxml", module = "kxml2")
     }
     implementation(libs.pdfbox.android)
+    implementation(libs.slf4j.nop)
 
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
