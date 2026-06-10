@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Convertitore Ebook</string>
+    <string name="ebook_title">Ebook in PDF</string>
+    <string name="back">Indietro</string>
+    <string name="select_epub">Seleziona EPUB</string>
+    <string name="converting_progress">Conversione in corso… %1$d%%</string>
+    <string name="conversion_success">Conversione riuscita!</string>
+    <string name="conversion_error">Ops, qualcosa è andato storto: %s</string>
+    <string name="open_pdf">Apri PDF</string>
+    <string name="continue_converting">Converti un altro file</string>
+    <string name="try_again">Riprova</string>
+    <string name="failed_to_save">Salvataggio in Download non riuscito</string>
+    <string name="unknown_error">Errore sconosciuto</string>
+    <string name="open_with">Apri PDF</string>
+</resources>

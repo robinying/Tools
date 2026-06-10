@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Medidor de Luz</string>
+    <string name="light_meter_title">Medidor de Luz</string>
+    <string name="back">Voltar</string>
+    <string name="history">Histórico</string>
+    <string name="lux_unit">lux</string>
+    <string name="save_snapshot">Salvar instantâneo</string>
+    <string name="saved_snapshot">Salvo: %1$.1f lux</string>
+    <string name="realtime_chart_title">Gráfico em tempo real (últimos 60s)</string>
+    <string name="waiting_sensor_data">Aguardando dados do sensor…</string>
+    <string name="snapshots_title">Instantâneos</string>
+    <string name="delete_all">Excluir tudo</string>
+    <string name="delete">Excluir</string>
+    <string name="no_snapshots_yet">Nenhum instantâneo ainda</string>
+    <string name="lux_value">%1$.1f lux</string>
+</resources>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">光线测量仪</string>
+    <string name="light_meter_title">光线测量仪</string>
+    <string name="back">返回</string>
+    <string name="history">历史记录</string>
+    <string name="lux_unit">lux</string>
+    <string name="save_snapshot">保存快照</string>
+    <string name="saved_snapshot">已保存: %1$.1f lux</string>
+    <string name="realtime_chart_title">实时图表 (最近60秒)</string>
+    <string name="waiting_sensor_data">等待传感器数据…</string>
+    <string name="snapshots_title">快照列表</string>
+    <string name="delete_all">删除全部</string>
+    <string name="delete">删除</string>
+    <string name="no_snapshots_yet">暂无快照</string>
+    <string name="lux_value">%1$.1f lux</string>
+</resources>

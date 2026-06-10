@@ -9,7 +9,7 @@
     <string name="notification_title">Compressing</string>
     <string name="notification_finished_all">All files processed successfully</string>
     <string name="notification_failed_single">Failed: %s</string>
-    <string name="notification_finished_with_errors">%d succeeded, %d failed</string>
+    <string name="notification_finished_with_errors">%1$d succeeded, %2$d failed</string>
     <string name="processing">Processing %1$d/%2$d: %3$s</string>
     <string name="processing_complete">Processing complete</string>
     <string name="processing_failed">Processing failed</string>
@@ -18,13 +18,16 @@
     <string name="open_gallery">Open gallery</string>
     <string name="view_file">View file</string>
     <string name="close">Close</string>
+    <string name="cancel">Cancel</string>
     <string name="video_compress">Video Compress</string>
     <string name="image_compress">Image Compress</string>
     <string name="video_to_gif">Video to GIF</string>
     <string name="back">Back</string>
     <string name="select_file">Select file</string>
     <string name="reselect_file">Reselect file</string>
-    <string name="files_selected">File(s) selected</string>
+    <string name="files_selected">%d file(s) selected</string>
+    <string name="preview_image">Preview image</string>
+    <string name="remove">Remove</string>
     <string name="select_gif_quality">Select GIF quality</string>
     <string name="select_compression_level">Select compression level</string>
     <string name="start_conversion">Start conversion</string>
@@ -35,4 +38,6 @@
     <string name="video_to_gif_desc">Convert video to animated GIF</string>
     <string name="cache_cleared">Cache cleared</string>
     <string name="clear_cache">Clear cache</string>
+    <string name="service_cancelled">Task cancelled</string>
+    <string name="service_unknown_error">Unknown error</string>
 </resources>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Outils</string>
+    <string name="home_title">Outils</string>
+    <string name="home_subtitle">Compression Média · Conversion Ebook · Luxmètre</string>
+    <string name="media_editor_title">Éditeur Média</string>
+    <string name="media_editor_desc">Compresser vidéo/image, convertir vidéo en GIF</string>
+    <string name="ebook_converter_title">Convertisseur Ebook</string>
+    <string name="ebook_converter_desc">Convertir EPUB en PDF</string>
+    <string name="light_meter_title">Luxmètre</string>
+    <string name="light_meter_desc">Mesurer la lumière ambiante avec graphique en temps réel</string>
+</resources>

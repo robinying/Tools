@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="compression_level_low">Baja</string>
+    <string name="compression_level_medium">Media</string>
+    <string name="compression_level_high">Alta</string>
+    <string name="notification_channel_name">Compresión de Medios</string>
+    <string name="notification_channel_desc">Muestra el progreso de la compresión</string>
+    <string name="notification_ready">Preparando…</string>
+    <string name="notification_title">Comprimiendo</string>
+    <string name="notification_finished_all">Todos los archivos procesados correctamente</string>
+    <string name="notification_failed_single">Falló: %s</string>
+    <string name="notification_finished_with_errors">%1$d correctos, %2$d fallidos</string>
+    <string name="processing">Procesando %1$d/%2$d: %3$s</string>
+    <string name="processing_complete">Procesamiento completado</string>
+    <string name="processing_failed">Procesamiento fallido</string>
+    <string name="all_saved_to_gallery">Todo guardado en la galería</string>
+    <string name="processing_error">Error de procesamiento</string>
+    <string name="open_gallery">Abrir galería</string>
+    <string name="view_file">Ver archivo</string>
+    <string name="close">Cerrar</string>
+    <string name="cancel">Cancelar</string>
+    <string name="video_compress">Compresión de Video</string>
+    <string name="image_compress">Compresión de Imagen</string>
+    <string name="video_to_gif">Video a GIF</string>
+    <string name="back">Volver</string>
+    <string name="select_file">Seleccionar archivo</string>
+    <string name="reselect_file">Volver a seleccionar</string>
+    <string name="files_selected">%d archivo(s) seleccionado(s)</string>
+    <string name="preview_image">Vista previa</string>
+    <string name="remove">Eliminar</string>
+    <string name="select_gif_quality">Seleccionar calidad GIF</string>
+    <string name="select_compression_level">Seleccionar nivel de compresión</string>
+    <string name="start_conversion">Iniciar conversión</string>
+    <string name="start_compression">Iniciar compresión</string>
+    <string name="media_compression_tool">Herramienta de Compresión</string>
+    <string name="video_compress_desc">Comprimir archivos de video con FFmpeg</string>
+    <string name="image_compress_desc">Comprimir imágenes con control de calidad</string>
+    <string name="video_to_gif_desc">Convertir video a GIF animado</string>
+    <string name="cache_cleared">Caché limpiada</string>
+    <string name="clear_cache">Limpiar caché</string>
+    <string name="service_cancelled">Tarea cancelada</string>
+    <string name="service_unknown_error">Error desconocido</string>
+</resources>

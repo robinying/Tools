@@ -16,6 +16,7 @@ import nl.siegmann.epublib.domain.Book
 import nl.siegmann.epublib.epub.EpubReader
 import java.io.File
 import java.io.FileOutputStream
+import java.io.InputStream
 import kotlin.coroutines.resume
 
 class EpubToPdfConverter(private val context: Context) {
@@ -33,9 +34,10 @@ class EpubToPdfConverter(private val context: Context) {
             if (tempDir.exists()) tempDir.deleteRecursively()
             tempDir.mkdirs()
 
-            val inputStream = context.contentResolver.openInputStream(epubUri)
-                ?: throw IllegalArgumentException("Could not open input stream for URI: $epubUri")
-            val book = EpubReader().readEpub(inputStream)
+            val book = context.contentResolver.openInputStream(epubUri)?.use { stream ->
+                EpubReader().readEpub(stream)
+            } ?: throw IllegalArgumentException("Could not open input stream for URI: $epubUri")
+
             extractResources(book, tempDir)
 
             val chapters = book.spine.spineReferences
@@ -78,7 +80,11 @@ class EpubToPdfConverter(private val context: Context) {
         val deferred = CompletableDeferred<Unit>()
         webView.webViewClient = object : WebViewClient() {
             override fun onPageFinished(view: WebView?, url: String?) {
-                saveWebViewToPdf(view!!, outputFile) { deferred.complete(Unit) }
+                if (view != null) {
+                    saveWebViewToPdf(view, outputFile) { deferred.complete(Unit) }
+                } else {
+                    deferred.completeExceptionally(IllegalStateException("WebView is null in onPageFinished"))
+                }
             }
         }
         webView.loadDataWithBaseURL("file://$baseUrl/", html, "text/html", "UTF-8", null)

@@ -50,6 +50,7 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.smartexception)
+    implementation(libs.coil.compose)
 
     // FFmpegKit (bundle from local aar)
     implementation(files("libs/ffmpeg-kit.aar"))

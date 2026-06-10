@@ -13,7 +13,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.robin.tools.feature.lightlux.R
 import com.robin.tools.feature.lightlux.data.SnapshotListViewModel
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -31,16 +33,16 @@ fun SnapshotListScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Snapshots") },
+                title = { Text(stringResource(R.string.snapshots_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 },
                 actions = {
                     if (entries.isNotEmpty()) {
                         IconButton(onClick = { viewModel.deleteAll() }) {
-                            Icon(Icons.Default.Delete, contentDescription = "Delete all")
+                            Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.delete_all))
                         }
                     }
                 }
@@ -52,7 +54,7 @@ fun SnapshotListScreen(
                 modifier = Modifier.fillMaxSize().padding(innerPadding),
                 contentAlignment = Alignment.Center
             ) {
-                Text("No snapshots yet", style = MaterialTheme.typography.bodyLarge)
+                Text(stringResource(R.string.no_snapshots_yet), style = MaterialTheme.typography.bodyLarge)
             }
         } else {
             LazyColumn(
@@ -68,7 +70,7 @@ fun SnapshotListScreen(
                         ) {
                             Column(modifier = Modifier.weight(1f)) {
                                 Text(
-                                    text = String.format(Locale.US, "%.1f lux", entry.luxValue),
+                                    text = stringResource(R.string.lux_value, entry.luxValue),
                                     fontSize = 24.sp,
                                     fontWeight = FontWeight.Bold
                                 )
@@ -79,7 +81,7 @@ fun SnapshotListScreen(
                                 )
                             }
                             IconButton(onClick = { viewModel.deleteEntry(entry) }) {
-                                Icon(Icons.Default.Delete, contentDescription = "Delete")
+                                Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.delete))
                             }
                         }
                     }

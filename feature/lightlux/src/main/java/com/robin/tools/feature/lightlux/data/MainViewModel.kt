@@ -1,8 +1,11 @@
 package com.robin.tools.feature.lightlux.data
 
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.robin.tools.feature.lightlux.R
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -14,7 +17,8 @@ data class ChartDataPoint(
     val luxValue: Float
 )
 
-class MainViewModel(private val repository: LightRepository) : ViewModel() {
+class MainViewModel(application: Application, private val repository: LightRepository) : AndroidViewModel(application) {
+    private val appContext get() = getApplication<Application>()
 
     private val _currentLux = MutableStateFlow(0f)
     val currentLux: StateFlow<Float> = _currentLux.asStateFlow()
@@ -44,7 +48,7 @@ class MainViewModel(private val repository: LightRepository) : ViewModel() {
             val lux = _currentLux.value
             val timestamp = System.currentTimeMillis()
             repository.insertEntry(LightEntry(timestamp = timestamp, luxValue = lux))
-            _saveStatus.value = "Saved: ${"%.1f".format(lux)} lux"
+            _saveStatus.value = appContext.getString(R.string.saved_snapshot, lux)
         }
     }
 
@@ -52,10 +56,10 @@ class MainViewModel(private val repository: LightRepository) : ViewModel() {
         _saveStatus.value = null
     }
 
-    class Factory(private val repository: LightRepository) : ViewModelProvider.Factory {
+    class Factory(private val application: Application, private val repository: LightRepository) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return MainViewModel(repository) as T
+            return MainViewModel(application, repository) as T
         }
     }
 }

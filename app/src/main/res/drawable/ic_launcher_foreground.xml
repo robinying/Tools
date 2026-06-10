@@ -1,62 +1,93 @@
 <?xml version="1.0" encoding="utf-8"?>
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
     android:width="108dp"
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <!-- Media icon - play triangle -->
+
+    <!--
+         Modern gear icon with six teeth.
+         All content fits within the 66dp safe zone for adaptive icons.
+    -->
+
+    <!-- Gear tooth 1 — top (0°) -->
+    <group android:rotation="0" android:pivotX="54" android:pivotY="54">
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M50,22 h8 c2,0 4,2 4,4 v6 c0,2 -2,4 -4,4 h-8 c-2,0 -4,-2 -4,-4 v-6 c0,-2 2,-4 4,-4 Z" />
+    </group>
+
+    <!-- Gear tooth 2 (60°) -->
+    <group android:rotation="60" android:pivotX="54" android:pivotY="54">
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M50,22 h8 c2,0 4,2 4,4 v6 c0,2 -2,4 -4,4 h-8 c-2,0 -4,-2 -4,-4 v-6 c0,-2 2,-4 4,-4 Z" />
+    </group>
+
+    <!-- Gear tooth 3 (120°) -->
+    <group android:rotation="120" android:pivotX="54" android:pivotY="54">
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M50,22 h8 c2,0 4,2 4,4 v6 c0,2 -2,4 -4,4 h-8 c-2,0 -4,-2 -4,-4 v-6 c0,-2 2,-4 4,-4 Z" />
+    </group>
+
+    <!-- Gear tooth 4 — bottom (180°) -->
+    <group android:rotation="180" android:pivotX="54" android:pivotY="54">
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M50,22 h8 c2,0 4,2 4,4 v6 c0,2 -2,4 -4,4 h-8 c-2,0 -4,-2 -4,-4 v-6 c0,-2 2,-4 4,-4 Z" />
+    </group>
+
+    <!-- Gear tooth 5 (240°) -->
+    <group android:rotation="240" android:pivotX="54" android:pivotY="54">
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M50,22 h8 c2,0 4,2 4,4 v6 c0,2 -2,4 -4,4 h-8 c-2,0 -4,-2 -4,-4 v-6 c0,-2 2,-4 4,-4 Z" />
+    </group>
+
+    <!-- Gear tooth 6 (300°) -->
+    <group android:rotation="300" android:pivotX="54" android:pivotY="54">
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M50,22 h8 c2,0 4,2 4,4 v6 c0,2 -2,4 -4,4 h-8 c-2,0 -4,-2 -4,-4 v-6 c0,-2 2,-4 4,-4 Z" />
+    </group>
+
+    <!-- Main gear hub with center cutout (donut using evenOdd fill) -->
     <path
-        android:fillColor="#FF6200EE"
-        android:pathData="M30,35 L30,55 L48,45 Z" />
-    <!-- Ebook icon - book with bookmark -->
+        android:fillColor="#FFFFFF"
+        android:fillType="evenOdd"
+        android:pathData="M54,31 A23,23 0,1,1 54,77 A23,23 0,1,1 54,31 Z M54,44 A10,10 0,1,1 54,64 A10,10 0,1,1 54,44 Z" />
+
+    <!--
+        Center icon: stylized multi-tool mark
+        - Play triangle (Media)
+        - Page lines (Ebook)
+        - Light rays (Light Meter)
+    -->
+
+    <!-- Play triangle (Media) — top -->
     <path
-        android:fillColor="#FF03DAC5"
-        android:pathData="M54,35 L54,65 L62,60 L70,65 L70,35 Z" />
+        android:fillColor="#FFFFFF"
+        android:pathData="M50.5,46.5 L50.5,52.5 L55.5,49.5 Z" />
+
+    <!-- Page lines (Ebook) — right -->
     <path
-        android:fillColor="#FF03DAC5"
-        android:pathData="M62,60 L62,35" />
-    <!-- Light meter icon - sun with rays -->
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="1.2"
+        android:strokeLineCap="round"
+        android:pathData="M56,48 h3.5 M56,50.5 h3.5 M56,53 h2" />
+
+    <!-- Light burst (Light Meter) — bottom-left -->
     <path
-        android:fillColor="#FFFFD600"
-        android:pathData="M78,54 C78,60.63 72.63,66 66,66 C59.37,66 54,60.63 54,54 C54,47.37 59.37,42 66,42 C72.63,42 78,47.37 78,54 Z" />
+        android:fillColor="#FFFFFF"
+        android:pathData="M48.5,56 m-1.8,0 a1.8,1.8 0,1,0 3.6,0 a1.8,1.8 0,1,0 -3.6,0" />
     <path
-        android:fillColor="#FFFFD600"
-        android:pathData="M66,38 L66,34"
-        android:strokeWidth="2"
-        android:strokeColor="#FFFFD600" />
-    <path
-        android:fillColor="#FFFFD600"
-        android:pathData="M66,74 L66,70"
-        android:strokeWidth="2"
-        android:strokeColor="#FFFFD600" />
-    <path
-        android:fillColor="#FFFFD600"
-        android:pathData="M78,54 L82,54"
-        android:strokeWidth="2"
-        android:strokeColor="#FFFFD600" />
-    <path
-        android:fillColor="#FFFFD600"
-        android:pathData="M50,54 L54,54"
-        android:strokeWidth="2"
-        android:strokeColor="#FFFFD600" />
-    <path
-        android:fillColor="#FFFFD600"
-        android:pathData="M74.49,39.51 L77.31,36.69"
-        android:strokeWidth="2"
-        android:strokeColor="#FFFFD600" />
-    <path
-        android:fillColor="#FFFFD600"
-        android:pathData="M57.51,69.51 L54.69,72.33"
-        android:strokeWidth="2"
-        android:strokeColor="#FFFFD600" />
-    <path
-        android:fillColor="#FFFFD600"
-        android:pathData="M57.51,38.49 L54.69,35.67"
-        android:strokeWidth="2"
-        android:strokeColor="#FFFFD600" />
-    <path
-        android:fillColor="#FFFFD600"
-        android:pathData="M74.49,68.49 L77.31,71.31"
-        android:strokeWidth="2"
-        android:strokeColor="#FFFFD600" />
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="1"
+        android:strokeLineCap="round"
+        android:pathData="M48.5,50.5 v-1.5 M48.5,58 v1.5 M46,54.5 h-1.5 M51,54.5 h1.5" />
+
 </vector>

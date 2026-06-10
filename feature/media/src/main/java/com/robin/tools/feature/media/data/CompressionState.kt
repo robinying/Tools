@@ -1,15 +1,17 @@
 package com.robin.tools.feature.media.data
 
 import android.net.Uri
+import androidx.annotation.StringRes
+import com.robin.tools.feature.media.R
 
 enum class CompressionType {
     VIDEO, IMAGE, GIF
 }
 
-enum class CompressionLevel(val label: String) {
-    LOW("Low"),
-    MEDIUM("Medium"),
-    HIGH("High")
+enum class CompressionLevel(@StringRes val labelRes: Int) {
+    LOW(R.string.compression_level_low),
+    MEDIUM(R.string.compression_level_medium),
+    HIGH(R.string.compression_level_high)
 }
 
 sealed class CompressionTaskState {

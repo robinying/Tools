@@ -1,3 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Tools</string>
+    <string name="home_title">Tools</string>
+    <string name="home_subtitle">Media Compression · Ebook Conversion · Light Meter</string>
+    <string name="media_editor_title">Media Editor</string>
+    <string name="media_editor_desc">Compress video/image, convert video to GIF</string>
+    <string name="ebook_converter_title">Ebook Converter</string>
+    <string name="ebook_converter_desc">Convert EPUB to PDF</string>
+    <string name="light_meter_title">Light Meter</string>
+    <string name="light_meter_desc">Measure ambient light with real-time chart</string>
 </resources>

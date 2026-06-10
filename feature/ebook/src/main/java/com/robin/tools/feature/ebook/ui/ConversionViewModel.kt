@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.robin.tools.feature.ebook.R
 import com.robin.tools.feature.ebook.converter.EpubToPdfConverter
 import com.robin.tools.feature.ebook.util.StorageUtils
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -31,10 +32,10 @@ class ConversionViewModel(private val context: Context) : ViewModel() {
                 override fun onSuccess(file: File) {
                     viewModelScope.launch {
                         val publicUri = StorageUtils.savePdfToDownloads(context, file, file.name)
-                        _uiState.value = if (publicUri != null) ConversionState.Success(file, publicUri) else ConversionState.Error("Failed to save to Downloads")
+                        _uiState.value = if (publicUri != null) ConversionState.Success(file, publicUri) else ConversionState.Error(context.getString(R.string.failed_to_save))
                     }
                 }
-                override fun onError(e: Exception) { _uiState.value = ConversionState.Error(e.message ?: "Unknown error") }
+                override fun onError(e: Exception) { _uiState.value = ConversionState.Error(e.message ?: context.getString(R.string.unknown_error)) }
             })
         }
     }

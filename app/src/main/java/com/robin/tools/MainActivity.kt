@@ -2,6 +2,7 @@ package com.robin.tools
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.clickable
@@ -19,6 +20,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.platform.LocalContext
 import com.robin.tools.feature.lightlux.data.*
 import com.robin.tools.feature.lightlux.presentation.LightLuxScreen
 import com.robin.tools.feature.ebook.ui.ConversionViewModel
@@ -47,7 +50,7 @@ class MainActivity : ComponentActivity() {
 
         val db = AppDatabase.getInstance(applicationContext)
         val repo = LightRepository(db.lightEntryDao())
-        lightMainViewModel = MainViewModel(repo)
+        lightMainViewModel = MainViewModel(application, repo)
         lightSnapshotViewModel = SnapshotListViewModel(repo)
 
         setContent {
@@ -117,35 +120,35 @@ fun HomeScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Tools",
+            text = stringResource(R.string.home_title),
             fontSize = 32.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(bottom = 8.dp, top = 32.dp)
         )
         Text(
-            text = "Media Compression · Ebook Conversion · Light Meter",
+            text = stringResource(R.string.home_subtitle),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(bottom = 40.dp)
         )
 
         FeatureCard(
-            title = "Media Editor",
-            description = "Compress video/image, convert video to GIF",
+            title = stringResource(R.string.media_editor_title),
+            description = stringResource(R.string.media_editor_desc),
             icon = Icons.Default.Image,
             onClick = onMediaClick
         )
         Spacer(Modifier.height(16.dp))
         FeatureCard(
-            title = "Ebook Converter",
-            description = "Convert EPUB to PDF",
+            title = stringResource(R.string.ebook_converter_title),
+            description = stringResource(R.string.ebook_converter_desc),
             icon = Icons.Default.MenuBook,
             onClick = onEbookClick
         )
         Spacer(Modifier.height(16.dp))
         FeatureCard(
-            title = "Light Meter",
-            description = "Measure ambient light with real-time chart",
+            title = stringResource(R.string.light_meter_title),
+            description = stringResource(R.string.light_meter_desc),
             icon = Icons.Default.LightMode,
             onClick = onLightLuxClick
         )

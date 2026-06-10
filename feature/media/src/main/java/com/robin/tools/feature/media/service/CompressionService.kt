@@ -164,12 +164,12 @@ class CompressionService : Service() {
                     lastOutputUri = result.getOrThrow()
                 } else {
                     failCount++
-                    lastErrorMsg = result.exceptionOrNull()?.message ?: "Unknown error"
+                    lastErrorMsg = result.exceptionOrNull()?.message ?: getString(R.string.service_unknown_error)
                 }
             }
 
             val finalMessage = if (CompressionManager.isCancelled()) {
-                "Task cancelled"
+                getString(R.string.service_cancelled)
             } else if (failCount == 0) {
                 getString(R.string.notification_finished_all)
             } else if (total == 1) {

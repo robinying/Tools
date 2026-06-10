@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Ferramentas</string>
+    <string name="home_title">Ferramentas</string>
+    <string name="home_subtitle">Compressão de Mídia · Conversão de Ebook · Medidor de Luz</string>
+    <string name="media_editor_title">Editor de Mídia</string>
+    <string name="media_editor_desc">Comprimir vídeo/imagem, converter vídeo para GIF</string>
+    <string name="ebook_converter_title">Conversor de Ebook</string>
+    <string name="ebook_converter_desc">Converter EPUB para PDF</string>
+    <string name="light_meter_title">Medidor de Luz</string>
+    <string name="light_meter_desc">Medir luz ambiente com gráfico em tempo real</string>
+</resources>

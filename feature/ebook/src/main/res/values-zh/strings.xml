@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">电子书转换</string>
+    <string name="ebook_title">电子书转 PDF</string>
+    <string name="back">返回</string>
+    <string name="select_epub">选择 EPUB</string>
+    <string name="converting_progress">转换中… %1$d%%</string>
+    <string name="conversion_success">转换成功！</string>
+    <string name="conversion_error">哎呀，出错了: %s</string>
+    <string name="open_pdf">打开 PDF</string>
+    <string name="continue_converting">继续转换其他文件</string>
+    <string name="try_again">再试一次</string>
+    <string name="failed_to_save">保存到下载目录失败</string>
+    <string name="unknown_error">未知错误</string>
+    <string name="open_with">打开 PDF</string>
+</resources>

@@ -37,7 +37,7 @@ fun MainScreen(
                 title = { Text(context.getString(R.string.media_compression_tool)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.Default.ArrowBack, contentDescription = context.getString(R.string.back))
                     }
                 }
             )

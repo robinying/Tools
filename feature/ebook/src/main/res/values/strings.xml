@@ -1,4 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Ebook Converter</string>
+    <string name="ebook_title">Ebook to PDF</string>
+    <string name="back">Back</string>
+    <string name="select_epub">Select EPUB</string>
+    <string name="converting_progress">Converting… %1$d%%</string>
+    <string name="conversion_success">Conversion successful!</string>
+    <string name="conversion_error">Oops, something went wrong: %s</string>
+    <string name="open_pdf">Open PDF</string>
+    <string name="continue_converting">Convert another file</string>
+    <string name="try_again">Try again</string>
+    <string name="failed_to_save">Failed to save to Downloads</string>
+    <string name="unknown_error">Unknown error</string>
+    <string name="open_with">Open PDF</string>
 </resources>

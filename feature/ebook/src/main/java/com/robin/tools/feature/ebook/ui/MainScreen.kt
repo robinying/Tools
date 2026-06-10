@@ -23,7 +23,9 @@ import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.drawscope.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
 import androidx.core.content.FileProvider
+import com.robin.tools.feature.ebook.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -37,10 +39,10 @@ fun MainScreen(viewModel: ConversionViewModel, onBack: () -> Unit = {}, modifier
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Ebook to PDF") },
+                title = { Text(stringResource(R.string.ebook_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 }
             )
@@ -61,7 +63,7 @@ fun MainScreen(viewModel: ConversionViewModel, onBack: () -> Unit = {}, modifier
                 Button(onClick = { launcher.launch(arrayOf("application/epub+zip")) }) {
                     Icon(Icons.Default.Add, null)
                     Spacer(Modifier.width(8.dp))
-                    Text("Select EPUB")
+                    Text(stringResource(R.string.select_epub))
                 }
             }
             is ConversionState.Converting -> {
@@ -73,7 +75,7 @@ fun MainScreen(viewModel: ConversionViewModel, onBack: () -> Unit = {}, modifier
                         modifier = Modifier.width(200.dp).graphicsLayer(clip = true, shape = RoundedCornerShape(4.dp))
                     )
                     Spacer(Modifier.height(8.dp))
-                    Text("魔法转换中... ${state.progress}%", style = MaterialTheme.typography.bodyLarge)
+                    Text(stringResource(R.string.converting_progress, state.progress), style = MaterialTheme.typography.bodyLarge)
                 }
             }
             is ConversionState.Success -> {
@@ -84,20 +86,20 @@ fun MainScreen(viewModel: ConversionViewModel, onBack: () -> Unit = {}, modifier
                     modifier = Modifier.size(80.dp)
                 )
                 Spacer(Modifier.height(16.dp))
-                Text("转换成功！", style = MaterialTheme.typography.headlineSmall)
+                Text(stringResource(R.string.conversion_success), style = MaterialTheme.typography.headlineSmall)
                 Spacer(Modifier.height(24.dp))
                 Button(onClick = { openPdf(context, state.cacheFile) }) {
-                    Text("打开 PDF")
+                    Text(stringResource(R.string.open_pdf))
                 }
                 TextButton(onClick = { viewModel.reset() }) {
-                    Text("继续转换其他文件")
+                    Text(stringResource(R.string.continue_converting))
                 }
             }
             is ConversionState.Error -> {
-                Text("哎呀，出错了: ${state.message}", color = Color.Red)
+                Text(stringResource(R.string.conversion_error, state.message), color = Color.Red)
                 Spacer(Modifier.height(16.dp))
                 Button(onClick = { viewModel.reset() }) {
-                    Text("再试一次")
+                    Text(stringResource(R.string.try_again))
                 }
             }
         }
@@ -218,5 +220,5 @@ private fun openPdf(context: Context, file: java.io.File) {
         setDataAndType(uri, "application/pdf")
         addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
     }
-    context.startActivity(Intent.createChooser(intent, "Open PDF"))
+    context.startActivity(Intent.createChooser(intent, context.getString(R.string.open_with)))
 }

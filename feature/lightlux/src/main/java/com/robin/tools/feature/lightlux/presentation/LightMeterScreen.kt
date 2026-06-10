@@ -25,7 +25,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.robin.tools.feature.lightlux.R
 import com.robin.tools.feature.lightlux.data.ChartDataPoint
 import com.robin.tools.feature.lightlux.data.MainViewModel
 
@@ -60,31 +62,31 @@ fun LightMeterScreen(
     }
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text("Light Meter") }, navigationIcon = {
+            TopAppBar(title = { Text(stringResource(R.string.light_meter_title)) }, navigationIcon = {
                 IconButton(onClick = onBack) {
-                    Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                    Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.back))
                 }
             }, actions = {
-                IconButton(onClick = onNavigateToSnapshots) { Icon(Icons.Default.History, "History") }
+                IconButton(onClick = onNavigateToSnapshots) { Icon(Icons.Default.History, stringResource(R.string.history)) }
             })
         }
     ) { innerPadding ->
         Column(Modifier.fillMaxSize().padding(innerPadding).padding(16.dp).verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally) {
             Text(String.format("%.1f", currentLux), fontSize = 72.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
-            Text("lux", style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(R.string.lux_unit), style = MaterialTheme.typography.titleMedium)
             Spacer(Modifier.height(16.dp))
             Button(onClick = { viewModel.saveSnapshot() }, modifier = Modifier.fillMaxWidth()) {
-                Icon(Icons.Default.Save, null); Spacer(Modifier.width(8.dp)); Text("Save Snapshot")
+                Icon(Icons.Default.Save, null); Spacer(Modifier.width(8.dp)); Text(stringResource(R.string.save_snapshot))
             }
             saveStatus?.let { Text(it, color = MaterialTheme.colorScheme.primary) }
             Spacer(Modifier.height(24.dp))
-            Text("Real-time Chart (last 60s)", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.realtime_chart_title), style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
             Spacer(Modifier.height(8.dp))
             if (chartData.isNotEmpty()) {
                 LuxChart(data = chartData, modifier = Modifier.fillMaxWidth().height(200.dp))
             } else {
-                Text("Waiting for sensor data...", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(stringResource(R.string.waiting_sensor_data), color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
     }

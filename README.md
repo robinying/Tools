@@ -76,8 +76,18 @@ A unified Android utility app combining three powerful tools into a single appli
 ## Testing
 
 ```bash
-# Unit tests
+# All unit tests (179+ tests across all modules)
 ./gradlew test
+
+# Run tests for specific modules
+./gradlew :core:test
+./gradlew :feature:media:test
+./gradlew :feature:lightlux:test
+./gradlew :feature:ebook:test
+
+# Run a single test class
+./gradlew :core:test --tests "com.robin.tools.core.state.ResultStateTest"
+./gradlew :feature:lightlux:test --tests "com.robin.tools.feature.lightlux.data.MainViewModelTest"
 
 # Instrumented tests
 ./gradlew connectedAndroidTest
@@ -85,6 +95,17 @@ A unified Android utility app combining three powerful tools into a single appli
 # Lint
 ./gradlew lint
 ```
+
+### Test Coverage by Module
+
+| Module | Tests | Scope |
+|--------|-------|-------|
+| `:core` | 14 test classes | ResultState, ExceptionHandle, AppException, Error, NumberExtension, BooleanExtension, NumberUtils, UrlEncoderUtils, RegexTool, StringExt, ListDataUiState, UpdateUiState, LogUtilsExt, BaseViewModel |
+| `:feature:media` | 3 test classes | CompressionManager, CompressionState, CompressionDelegateFactory |
+| `:feature:lightlux` | 3 test classes | LightEntry, MainViewModel (MockK), SnapshotListViewModel (MockK) |
+| `:feature:ebook` | 2 test classes | EpubToPdfConverter, ConversionState |
+
+**Testing patterns**: Core module uses JUnit 4 only. Feature modules with MockK + kotlinx-coroutines-test use `UnconfinedTestDispatcher` for ViewModel coroutine testing and `coEvery`/`coVerify` for suspend function mocking.
 
 ## Project Structure
 

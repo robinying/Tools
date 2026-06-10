@@ -1,111 +1,93 @@
 package com.robin.tools.util
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.awaitEachGesture
-import androidx.compose.foundation.gestures.awaitFirstDown
-import androidx.compose.foundation.gestures.drag
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.width
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clipToBounds
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import kotlin.math.roundToInt
 
 /**
- * Detects right-swipe gestures starting from the left edge (within [edgeWidth])
- * and calls [onBack] when the drag exceeds [threshold].
- * Content slides right during drag with a shadow + arrow indicator.
+ * A container that enables right-swipe-from-left-edge to navigate back.
+ *
+ * The swipe gesture is only recognized when starting within [edgeWidth] dp from
+ * the left edge of the screen. If the drag distance exceeds 35% of the container
+ * width, [onBack] is invoked; otherwise, the content snaps back to its original
+ * position.
  */
 @Composable
 fun SwipeBackContainer(
     onBack: () -> Unit,
-    modifier: Modifier = Modifier,
-    edgeWidth: Float = with(LocalDensity.current) { 40.dp.toPx() },
-    threshold: Float = with(LocalDensity.current) { 120.dp.toPx() },
+    edgeWidth: androidx.compose.ui.unit.Dp = 40.dp,
     content: @Composable () -> Unit
 ) {
-    var offsetX by remember { mutableFloatStateOf(0f) }
+    var isDragging by remember { mutableStateOf(false) }
+    var dragOffset by remember { mutableStateOf(0f) }
+    var containerWidth by remember { mutableIntStateOf(0) }
+    var startInEdgeZone by remember { mutableStateOf(false) }
+    var navigateBack by remember { mutableStateOf(false) }
 
-    Box(modifier = modifier.fillMaxSize()) {
-        // Shadow + arrow indicator visible during drag
-        if (offsetX > 0f) {
-            val progress = (offsetX / threshold).coerceIn(0f, 1f)
+    val density = LocalDensity.current
+    val edgeWidthPx = with(density) { edgeWidth.toPx() }
+    val triggerThreshold = if (containerWidth > 0) containerWidth * 0.35f else Float.MAX_VALUE
 
-            // Dark overlay behind content
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.Black.copy(alpha = progress * 0.25f))
-            )
+    // Animate back to 0 when the user releases without triggering back
+    val displayOffset by animateFloatAsState(
+        targetValue = if (isDragging) dragOffset else 0f,
+        animationSpec = tween(durationMillis = 200),
+        label = "swipeBack"
+    )
 
-            // Arrow indicator strip on left edge
-            Column(
-                modifier = Modifier
-                    .width(48.dp)
-                    .fillMaxHeight()
-                    .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = progress * 0.4f)),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Spacer(Modifier.height(250.dp))
-                Icon(
-                    Icons.AutoMirrored.Filled.KeyboardArrowLeft,
-                    contentDescription = "Back",
-                    tint = MaterialTheme.colorScheme.onSurface.copy(alpha = progress),
-                    modifier = Modifier.width(28.dp).height(28.dp)
+    LaunchedEffect(navigateBack) {
+        if (navigateBack) {
+            onBack()
+        }
+    }
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .onSizeChanged { containerWidth = it.width }
+            .pointerInput(edgeWidthPx) {
+                detectHorizontalDragGestures(
+                    onDragStart = { offset ->
+                        startInEdgeZone = offset.x <= edgeWidthPx
+                    },
+                    onDragEnd = {
+                        if (startInEdgeZone && dragOffset > triggerThreshold) {
+                            navigateBack = true
+                        }
+                        isDragging = false
+                        startInEdgeZone = false
+                    },
+                    onDragCancel = {
+                        isDragging = false
+                        dragOffset = 0f
+                        startInEdgeZone = false
+                    },
+                    onHorizontalDrag = { change, dragAmount ->
+                        if (startInEdgeZone) {
+                            change.consume()
+                            isDragging = true
+                            dragOffset = (dragOffset + dragAmount)
+                                .coerceIn(0f, containerWidth.toFloat())
+                        }
+                    }
                 )
             }
-        }
-
-        // Content shifted right by drag offset
+    ) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .clipToBounds()
-                .graphicsLayer { translationX = offsetX }
-                .pointerInput(edgeWidth) {
-                    awaitEachGesture {
-                        val down = awaitFirstDown(requireUnconsumed = false)
-                        // Only respond to touches starting from left edge
-                        if (down.position.x > edgeWidth) return@awaitEachGesture
-
-                        var totalDrag = 0f
-                        do {
-                            val event = awaitPointerEvent()
-                            val change = event.changes.firstOrNull() ?: break
-                            change.consume()
-                            val dx = change.position.x - change.previousPosition.x
-                            totalDrag += dx
-                            offsetX = totalDrag.coerceAtLeast(0f)
-                        } while (change.pressed)
-
-                        if (totalDrag >= threshold) {
-                            onBack()
-                        }
-                        // Snap back
-                        offsetX = 0f
-                    }
-                }
+                .offset { IntOffset(displayOffset.roundToInt(), 0) }
         ) {
             content()
         }

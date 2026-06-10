@@ -1,4 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Light Meter</string>
+    <string name="light_meter_title">Light Meter</string>
+    <string name="back">Back</string>
+    <string name="history">History</string>
+    <string name="lux_unit">lux</string>
+    <string name="save_snapshot">Save Snapshot</string>
+    <string name="saved_snapshot">Saved: %1$.1f lux</string>
+    <string name="realtime_chart_title">Real-time Chart (last 60s)</string>
+    <string name="waiting_sensor_data">Waiting for sensor data…</string>
+    <string name="snapshots_title">Snapshots</string>
+    <string name="delete_all">Delete all</string>
+    <string name="delete">Delete</string>
+    <string name="no_snapshots_yet">No snapshots yet</string>
+    <string name="lux_value">%1$.1f lux</string>
 </resources>
