@@ -17,6 +17,7 @@ fun Number.formatNumber(
         decimal = DEFAULT_DECIMAL_NUMBER
     }
     val decimalFormat = DecimalFormat()
+    decimalFormat.minimumFractionDigits = decimal
     decimalFormat.maximumFractionDigits = decimal
     decimalFormat.groupingSize = if (addComma) DEFAULT_SEPARATE_NUMBER else 0
     if (modeFloor) decimalFormat.roundingMode = RoundingMode.FLOOR

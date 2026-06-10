@@ -8,7 +8,7 @@ import java.util.regex.Pattern
  */
 fun String?.isPhone(): Boolean {
     return this?.let {
-        Pattern.matches(it, "0?(13|14|15|16|17|18|19)[0-9]{9}")
+        Pattern.matches("0?(13|14|15|16|17|18|19)[0-9]{9}", it)
     }?:let {
        false
     }
@@ -36,7 +36,7 @@ fun String?.isTel(): Boolean {
  */
 fun String?.isEmail(): Boolean {
     return this?.let {
-        Pattern.matches(this, "^\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*\$")
+        Pattern.matches("^\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*\$", it)
     }?:let {
         false
     }

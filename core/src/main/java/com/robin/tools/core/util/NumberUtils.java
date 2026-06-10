@@ -27,7 +27,7 @@ public class NumberUtils {
 
     public static String formatDecimal(double value, int... saveCount) {
         StringBuilder pattern;
-        if (saveCount != null && saveCount.length > 0) {
+        if (saveCount != null && saveCount.length > 0 && saveCount[0] > 0) {
             pattern = new StringBuilder("0.");
             for (int i = 0; i < saveCount[0]; i++) {
                 pattern.append("0");
