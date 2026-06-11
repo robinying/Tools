@@ -187,7 +187,9 @@ class EpubToPdfConverter(private val context: Context) {
 
                 if (pdfSegments.isEmpty()) throw IllegalStateException("All chapters failed to render")
 
-                val outputFile = File(context.cacheDir, outputFileName)
+                val outputDir = File(context.cacheDir, "pdf_output")
+                outputDir.mkdirs()
+                val outputFile = File(outputDir, outputFileName)
                 mergePdfs(pdfSegments, outputFile)
 
                 withContext(Dispatchers.Main) {
@@ -199,10 +201,12 @@ class EpubToPdfConverter(private val context: Context) {
             Log.e(TAG, "Conversion failed", e)
             withContext(Dispatchers.Main) { callback.onError(e) }
         } finally {
-            withContext(Dispatchers.Main) {
+            withContext(NonCancellable + Dispatchers.Main) {
                 webView?.destroy()
             }
-            tempDir.deleteRecursively()
+            withContext(NonCancellable) {
+                tempDir.deleteRecursively()
+            }
         }
     }
 
@@ -369,6 +373,8 @@ class EpubToPdfConverter(private val context: Context) {
         return WebView(context.applicationContext ?: context).also { wv ->
             wv.settings.javaScriptEnabled = false
             wv.settings.domStorageEnabled = false
+            wv.settings.allowFileAccess = false
+            wv.settings.allowContentAccess = false
             wv.settings.loadWithOverviewMode = true
             wv.settings.useWideViewPort = true
             wv.settings.builtInZoomControls = false

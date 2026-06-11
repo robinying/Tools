@@ -50,7 +50,10 @@ class CompressionService : Service() {
             // 使用 START_REDELIVER_INTENT 确保服务被系统杀死后能重新启动
         }
 
-        startForegroundService()
+        if (!startForegroundService()) {
+            stopSelf()
+            return START_NOT_STICKY
+        }
 
         val uris = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             intent.getParcelableArrayListExtra(EXTRA_URIS, Uri::class.java)
@@ -95,16 +98,18 @@ class CompressionService : Service() {
         }
     }
 
-    private fun startForegroundService() {
+    private fun startForegroundService(): Boolean {
         val notification = createNotification(0, 100, getString(R.string.notification_ready))
-        try {
+        return try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                  startForeground(NOTIFICATION_ID, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROCESSING)
             } else {
                  startForeground(NOTIFICATION_ID, notification)
             }
+            true
         } catch (e: Exception) {
             Log.e(TAG, "Failed to start foreground service", e)
+            false
         }
     }
 

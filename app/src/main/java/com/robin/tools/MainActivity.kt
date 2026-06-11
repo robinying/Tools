@@ -87,7 +87,8 @@ class MainActivity : ComponentActivity() {
                         }
                         is AppScreen.Ebook -> {
                             SwipeBackContainer(onBack = { currentScreen = AppScreen.Home }) {
-                                EbookScreen(viewModel = ConversionViewModel(applicationContext), onBack = { currentScreen = AppScreen.Home })
+                                val ebookViewModel = remember { ConversionViewModel(applicationContext) }
+                                EbookScreen(viewModel = ebookViewModel, onBack = { currentScreen = AppScreen.Home })
                             }
                         }
                         is AppScreen.LightLux -> {
