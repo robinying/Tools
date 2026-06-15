@@ -2,6 +2,7 @@ package com.robin.tools.feature.ebook.ui
 
 import android.content.Context
 import android.net.Uri
+import android.provider.OpenableColumns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.robin.tools.feature.ebook.R
@@ -26,8 +27,13 @@ class ConversionViewModel(private val context: Context) : ViewModel() {
 
     fun convertFile(uri: Uri) {
         viewModelScope.launch {
+            val inputName = getDisplayName(uri)
+            val outputName = if (inputName != null)
+                inputName.removeSuffix(".epub").removeSuffix(".EPUB") + ".pdf"
+            else "converted.pdf"
+
             _uiState.value = ConversionState.Converting(0)
-            converter.convert(uri, "converted_${System.currentTimeMillis()}.pdf", object : EpubToPdfConverter.ProgressCallback {
+            converter.convert(uri, outputName, object : EpubToPdfConverter.ProgressCallback {
                 override fun onProgress(percent: Int) { _uiState.value = ConversionState.Converting(percent) }
                 override fun onSuccess(file: File) {
                     viewModelScope.launch {
@@ -40,4 +46,15 @@ class ConversionViewModel(private val context: Context) : ViewModel() {
         }
     }
     fun reset() { _uiState.value = ConversionState.Idle }
+
+    private fun getDisplayName(uri: Uri): String? {
+        return try {
+            context.contentResolver.query(uri, null, null, null, null)?.use { cursor ->
+                if (cursor.moveToFirst()) {
+                    val idx = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+                    if (idx >= 0) cursor.getString(idx) else null
+                } else null
+            }
+        } catch (_: Exception) { null }
+    }
 }

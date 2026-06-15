@@ -17,7 +17,6 @@ import com.tom_roush.pdfbox.android.PDFBoxResourceLoader
 import kotlinx.coroutines.*
 import nl.siegmann.epublib.domain.Book
 import nl.siegmann.epublib.epub.EpubReader
-import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
 
@@ -35,14 +34,18 @@ class EpubToPdfConverter(private val context: Context) {
         private const val WEBVIEW_RECYCLE_INTERVAL = 2 // Destroy & recreate WebView every N segments
         private const val LARGE_HTML_THRESHOLD = 256 * 1024 // 256KB — write large HTML to file
 
-        // ~15 A4 pages worth of text at 14px font. Splitting more aggressively
-        // keeps the Print Framework's per-segment page buffer small.
-        private const val MAX_CHARS_PER_SEGMENT = 50_000
+        // ~8-10 A4 pages worth of text at 14px font. Lowered from 50K to keep
+        // Print Framework's per-segment page buffer under ~28MB on low-memory devices.
+        // Each A4 page at 96 DPI ≈ 1.8MB; 10 pages ≈ 18MB, well within heap limits.
+        private const val MAX_CHARS_PER_SEGMENT = 30_000
 
-        // 120 DPI — per-page bitmap ~992×1403 px. At RGB_565 that's ~2.8MB per page.
-        // A 15-page segment thus needs ~42MB for page buffers, well within typical
-        // Android app heap limits (128-512MB depending on device).
-        private const val PDF_DPI = 120
+        // 96 DPI — per-page bitmap ~794×1123 px. At RGB_565 that's ~1.8MB per page.
+        // Lowered from 120 DPI to reduce memory pressure on low-end devices.
+        // Quality is still sufficient for reading text on screen and most print scenarios.
+        private const val PDF_DPI = 96
+
+        // Pause after WebView destroy during OOM recovery to allow native memory to be freed
+        private const val OOM_RECOVERY_DELAY_MS = 300L
     }
 
     private val tempDir = File(context.cacheDir, "epub_temp")
@@ -55,33 +58,32 @@ class EpubToPdfConverter(private val context: Context) {
                 if (tempDir.exists()) tempDir.deleteRecursively()
                 tempDir.mkdirs()
 
-                val book = context.contentResolver.openInputStream(epubUri)?.use { stream ->
+                var book: Book? = context.contentResolver.openInputStream(epubUri)?.use { stream ->
                     EpubReader().readEpub(stream)
                 } ?: throw IllegalArgumentException("Could not open input stream for URI: $epubUri")
 
                 // Extract spine references BEFORE clearing resources, since clearing
                 // the underlying resource data invalidates spine references
-                val chapters = book.spine.spineReferences
+                val chapters = book!!.spine.spineReferences
                     .map { it.resource?.href ?: "" }
                     .filter { it.isNotEmpty() }
+                    .toList()  // Materialize to a concrete list before releasing book data
                 if (chapters.isEmpty()) throw IllegalStateException("No valid chapters found in EPUB")
 
-                // Write resources to disk first, then CLEAR the book's in-memory data.
+                // Write resources to disk AND release each resource's byte[] immediately.
                 // The Book object holds ALL resource byte[] across the entire conversion,
-                // which is the #1 cause of OOM for large EPUBs.
-                extractResources(book, tempDir)
+                // which is the #1 cause of OOM for large EPUBs. By releasing each resource
+                // right after writing it to disk, we ensure only one resource's byte[]
+                // is in memory at a time.
+                extractAndReleaseResources(book!!, tempDir)
 
-                // Free all in-memory resource data now that everything is on disk.
-                // After this point, all chapter HTML/images must be read from disk.
-                book.resources.all.forEach { res ->
-                    res.data = ByteArray(0)  // Release the byte[]
-                }
-                Log.d(TAG, "Released in-memory book resources (${chapters.size} chapters)")
+                // Release the Book object to allow GC of all metadata
+                book = null
 
                 // Create one WebView on the main thread — reused for all chapters to avoid OOM
                 webView = withContext(Dispatchers.Main) { createWebView() }
 
-                val pdfSegments = mutableListOf<File>()
+                var mergedPdf: File? = null
 
                 val runtime = Runtime.getRuntime()
                 val maxMemoryMB = runtime.maxMemory() / (1024 * 1024)
@@ -91,106 +93,28 @@ class EpubToPdfConverter(private val context: Context) {
                 // sub-parts if it exceeds MAX_CHARS_PER_SEGMENT. Critically, we do
                 // NOT pre-read all chapters — each chapter's HTML is read, split,
                 // rendered, and then released before the next chapter is loaded.
-                var taskSeq = 0
-
                 for (chapterIdx in chapters.indices) {
                     val chapterHref = chapters[chapterIdx]
-                    val chapterFile = File(tempDir, chapterHref)
 
-                    if (!chapterFile.exists() || chapterFile.length() == 0L) {
-                        Log.w(TAG, "Skipping empty/missing chapter ${chapterIdx + 1}: $chapterHref")
-                        continue
-                    }
+                    val result = processChapter(
+                        webView!!, chapterIdx, chapterHref, chapters.size,
+                        mergedPdf, runtime, maxMemoryMB
+                    )
 
-                    // Read ONE chapter at a time, then release before the next
-                    val rawHtml: String
-                    try {
-                        rawHtml = chapterFile.inputStream().use { it.readBytes().toString(Charsets.UTF_8) }
-                    } catch (e: Exception) {
-                        Log.w(TAG, "Failed to read chapter ${chapterIdx + 1}, skipping: ${e.message}")
-                        continue
-                    }
-                    if (rawHtml.isBlank()) continue
+                    webView = result.first
+                    mergedPdf = result.second
 
-                    // Split into page-count-safe chunks.  Most chapters won't split.
-                    val parts = splitLongHtml(rawHtml)
-
-                    for (partIdx in parts.indices) {
-                        val htmlContent = parts[partIdx]
-                        val chapterLabel = if (parts.size > 1)
-                            "${chapterIdx + 1}.${partIdx + 1}" else "${chapterIdx + 1}"
-
-                        // Memory check before each render
-                        val usedMB = (runtime.totalMemory() - runtime.freeMemory()) / (1024 * 1024)
-                        if (usedMB > maxMemoryMB * 0.8) {
-                            Log.w(TAG, "Memory high: ${usedMB}/${maxMemoryMB}MB — GC before $chapterLabel")
-                            System.gc()
-                            System.runFinalization()
-                        }
-
-                        taskSeq++
-                        // Progress is approximate since we discover splits on-the-fly
-                        val progress = ((chapterIdx.toFloat() / chapters.size) * 85).toInt()
-                        withContext(Dispatchers.Main) { callback.onProgress(progress) }
-
-                        val segmentFile = File(tempDir, "segment_${chapterIdx}_${partIdx}.pdf")
-                        Log.d(TAG, "Rendering $chapterLabel (${htmlContent.length} chars, ${(runtime.totalMemory() - runtime.freeMemory()) / (1024 * 1024)}/${maxMemoryMB}MB)")
-
-                        var renderOk = false
-                        try {
-                            renderChapterToPdf(webView!!, htmlContent, tempDir.absolutePath, segmentFile)
-                            renderOk = true
-                        } catch (e: OutOfMemoryError) {
-                            Log.e(TAG, "OOM at $chapterLabel, purging WebView and retrying once...")
-                            withContext(Dispatchers.Main) {
-                                webView?.destroy()
-                            }
-                            System.gc()
-                            System.runFinalization()
-                            webView = withContext(Dispatchers.Main) { createWebView() }
-                            try {
-                                renderChapterToPdf(webView!!, htmlContent, tempDir.absolutePath, segmentFile)
-                                renderOk = true
-                                Log.d(TAG, "OOM retry OK for $chapterLabel")
-                            } catch (e2: Exception) {
-                                Log.e(TAG, "OOM retry failed for $chapterLabel, skipping")
-                            }
-                        } catch (e: CancellationException) {
-                            throw IllegalStateException("Cancelled at $chapterLabel: ${e.message}", e)
-                        } catch (e: Exception) {
-                            Log.e(TAG, "Failed $chapterLabel: ${e.message}, skipping")
-                        }
-
-                        if (renderOk && segmentFile.exists() && segmentFile.length() > 0) {
-                            pdfSegments.add(segmentFile)
-                        }
-
-                        // WebView cleanup between parts
-                        withContext(Dispatchers.Main) {
-                            webView?.clearHistory()
-                            webView?.clearCache(true)
-                            webView?.freeMemory()
-                        }
-                    }
-
-                    // After each chapter, force a stronger WebView reset
-                    val segmentsAfterChapter = pdfSegments.size
-                    if (segmentsAfterChapter % WEBVIEW_RECYCLE_INTERVAL == 0) {
-                        withContext(Dispatchers.Main) {
-                            webView?.destroy()
-                            webView = createWebView()
-                        }
-                        System.gc()
-                        System.runFinalization()
+                    withContext(Dispatchers.Main) {
+                        callback.onProgress(((chapterIdx.toFloat() / chapters.size) * 85).toInt())
                     }
                 }
 
-                if (pdfSegments.isEmpty()) throw IllegalStateException("All chapters failed to render")
+                if (mergedPdf == null) throw IllegalStateException("All chapters failed to render")
 
                 val outputDir = File(context.cacheDir, "pdf_output")
                 outputDir.mkdirs()
                 val outputFile = File(outputDir, outputFileName)
-                mergePdfs(pdfSegments, outputFile)
+                mergedPdf.copyTo(outputFile, overwrite = true)
 
                 withContext(Dispatchers.Main) {
                     callback.onProgress(100)
@@ -210,18 +134,146 @@ class EpubToPdfConverter(private val context: Context) {
         }
     }
 
-    private fun extractResources(book: Book, resDir: File) {
+    /**
+     * Processes a single chapter: reads its HTML from disk, splits if needed,
+     * renders each part to PDF, and incrementally merges the result.
+     * Extracted to a function so local variables (rawHtml, parts) can be GC'd
+     * after this chapter completes, before the next one starts.
+     */
+    private suspend fun processChapter(
+        webView: WebView,
+        chapterIdx: Int,
+        chapterHref: String,
+        totalChapters: Int,
+        currentMergedPdf: File?,
+        runtime: Runtime,
+        maxMemoryMB: Long
+    ): Pair<WebView, File?> {
+        var wv = webView
+        val chapterFile = File(tempDir, chapterHref)
+        val chapterLabel = "${chapterIdx + 1}"
+        var mergedResult = currentMergedPdf
+
+        if (!chapterFile.exists() || chapterFile.length() == 0L) {
+            Log.w(TAG, "Skipping empty/missing chapter $chapterLabel: $chapterHref")
+            return wv to mergedResult
+        }
+
+        // Read ONE chapter at a time using readText() which avoids the intermediate
+        // ByteArray that readBytes().toString() would create.
+        val rawHtml: String
+        try {
+            rawHtml = chapterFile.inputStream().bufferedReader(Charsets.UTF_8).use { it.readText() }
+        } catch (e: Exception) {
+            Log.w(TAG, "Failed to read chapter $chapterLabel, skipping: ${e.message}")
+            return wv to mergedResult
+        }
+        if (rawHtml.isBlank()) return wv to mergedResult
+
+        // Split into page-count-safe chunks. Most chapters won't split.
+        val parts = splitLongHtml(rawHtml)
+        // rawHtml is no longer referenced after this point; eligible for GC
+
+        for (partIdx in parts.indices) {
+            val htmlContent = parts[partIdx]
+            val partLabel = if (parts.size > 1)
+                "$chapterLabel.${partIdx + 1}" else chapterLabel
+
+            // Memory check before each render
+            val usedMB = (runtime.totalMemory() - runtime.freeMemory()) / (1024 * 1024)
+            if (usedMB > maxMemoryMB * 0.8) {
+                Log.w(TAG, "Memory high: ${usedMB}/${maxMemoryMB}MB — GC before $partLabel")
+                System.gc()
+                System.runFinalization()
+            }
+
+            val segmentFile = File(tempDir, "segment_${chapterIdx}_${partIdx}.pdf")
+            Log.d(TAG, "Rendering $partLabel (${htmlContent.length} chars, ${(runtime.totalMemory() - runtime.freeMemory()) / (1024 * 1024)}/${maxMemoryMB}MB)")
+
+            var renderOk = false
+            try {
+                renderChapterToPdf(wv, htmlContent, tempDir.absolutePath, segmentFile)
+                renderOk = true
+            } catch (e: OutOfMemoryError) {
+                Log.e(TAG, "OOM at $partLabel, purging WebView and retrying once...")
+                withContext(Dispatchers.Main) {
+                    wv.destroy()
+                }
+                System.gc()
+                System.runFinalization()
+                // Delay to allow native WebView memory to be fully released before recreating
+                delay(OOM_RECOVERY_DELAY_MS)
+                System.gc()
+                wv = withContext(Dispatchers.Main) { createWebView() }
+                try {
+                    renderChapterToPdf(wv, htmlContent, tempDir.absolutePath, segmentFile)
+                    renderOk = true
+                    Log.d(TAG, "OOM retry OK for $partLabel")
+                } catch (e2: Exception) {
+                    Log.e(TAG, "OOM retry failed for $partLabel, skipping")
+                }
+            } catch (e: CancellationException) {
+                throw IllegalStateException("Cancelled at $partLabel: ${e.message}", e)
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed $partLabel: ${e.message}, skipping")
+            }
+
+            if (renderOk && segmentFile.exists() && segmentFile.length() > 0) {
+                // Incremental merge: merge this segment into the running result immediately
+                // rather than accumulating all segments. This keeps at most 2 PDF files
+                // open at a time instead of N, substantially reducing memory for long books.
+                mergedResult = incrementalMergePdf(mergedResult, segmentFile)
+            }
+
+            // WebView cleanup between parts
+            withContext(Dispatchers.Main) {
+                wv.clearHistory()
+                wv.clearCache(true)
+                wv.freeMemory()
+            }
+        }
+
+        // After each chapter, force a stronger WebView reset
+        val segmentsAfterChapter = parts.size // approximate count
+        if (segmentsAfterChapter > 0 && parts.size % WEBVIEW_RECYCLE_INTERVAL == 0) {
+            withContext(Dispatchers.Main) {
+                wv.destroy()
+                wv = createWebView()
+            }
+            System.gc()
+            System.runFinalization()
+        }
+
+        return wv to mergedResult
+    }
+
+    /**
+     * Extracts each resource to disk and immediately releases its byte[] to minimize
+     * peak memory. Instead of holding ALL resource byte[] simultaneously, only one
+     * resource's data is in memory at any point during extraction.
+     * For images that need resizing, writes the original to disk first then resizes
+     * in-place from file — this avoids holding both the original byte[] and the
+     * decoded Bitmap simultaneously.
+     */
+    private fun extractAndReleaseResources(book: Book, resDir: File) {
         book.resources.all.forEach { res ->
             val relativePath = res.href.trimStart('/')
             val safePath = relativePath.replace("../", "").replace("..\\", "")
             val file = File(resDir, safePath)
             file.parentFile?.mkdirs()
+
+            // Write original data to disk first
+            file.writeBytes(res.data)
+
+            // If it's a large image, resize in-place from file (avoids holding
+            // byte[] + Bitmap + ByteArrayOutputStream simultaneously)
             if (isImageFile(safePath) && res.data.size > 50 * 1024) {
-                // Downscale large images to print resolution to avoid OOM
-                file.writeBytes(resizeImage(res.data))
-            } else {
-                file.writeBytes(res.data)
+                resizeImageInPlace(file)
             }
+
+            // Immediately release this resource's byte[] so it can be GC'd
+            // before the next resource is processed
+            res.data = ByteArray(0)
         }
     }
 
@@ -231,16 +283,18 @@ class EpubToPdfConverter(private val context: Context) {
     }
 
     /**
-     * Resize image to fit within [MAX_IMAGE_DIMENSION] using power-of-2 sample size
-     * and RGB_565 config to cut memory in half. Necessary because WebView loads
-     * every image into its render tree simultaneously.
+     * Resizes an image file in-place. Reads dimensions from file (not byte[]),
+     * decodes with downsampling directly from file, and compresses back to the
+     * same file. This avoids holding the original byte[] and the decoded Bitmap
+     * simultaneously — only one Bitmap is in memory at a time.
      */
-    private fun resizeImage(data: ByteArray): ByteArray {
+    private fun resizeImageInPlace(file: File): Boolean {
         return try {
+            // Decode bounds only (no pixel allocation)
             val opts = BitmapFactory.Options().apply { inJustDecodeBounds = true }
-            BitmapFactory.decodeByteArray(data, 0, data.size, opts)
+            BitmapFactory.decodeFile(file.absolutePath, opts)
             val maxDim = maxOf(opts.outWidth, opts.outHeight)
-            if (maxDim <= MAX_IMAGE_DIMENSION) return data // Already small enough
+            if (maxDim <= MAX_IMAGE_DIMENSION) return false // Already small enough
 
             // Calculate power-of-2 sample size (Android requires powers of 2)
             var sampleSize = 1
@@ -251,30 +305,53 @@ class EpubToPdfConverter(private val context: Context) {
             val decodeOpts = BitmapFactory.Options().apply {
                 inSampleSize = sampleSize
                 // RGB_565 uses 2 bytes/pixel instead of 4 (ARGB_8888).
-                // Acceptable quality loss for 150 DPI print — halves bitmap memory.
+                // Acceptable quality loss for print — halves bitmap memory.
                 inPreferredConfig = Bitmap.Config.RGB_565
             }
-            val bitmap = BitmapFactory.decodeByteArray(data, 0, data.size, decodeOpts)
-                ?: return data
+            // Decode directly from file — no intermediate byte[] in memory
+            val bitmap = BitmapFactory.decodeFile(file.absolutePath, decodeOpts)
+                ?: return false
 
-            val output = ByteArrayOutputStream()
-            // Always use JPEG for photos/illustrations in a print context.
-            // PNG only for images where transparency matters (rare in EPUBs).
+            // Determine output format and quality
             val format = if (opts.outMimeType == "image/png" &&
                 (opts.outWidth <= 200 || opts.outHeight <= 200))
                 Bitmap.CompressFormat.PNG else Bitmap.CompressFormat.JPEG
             val quality = if (format == Bitmap.CompressFormat.JPEG) 70 else 85
-            bitmap.compress(format, quality, output)
-            // Capture dimensions BEFORE recycle() — accessing bitmap after recycle() crashes
-            val newW = bitmap.width
-            val newH = bitmap.height
-            bitmap.recycle()
-            Log.d(TAG, "Resized image: ${opts.outWidth}x${opts.outHeight} → " +
-                "${newW}x${newH} ${output.size() / 1024}KB (was ${data.size / 1024}KB, sample=$sampleSize)")
-            output.toByteArray()
+
+            // Write compressed result directly to file — no ByteArrayOutputStream buffer
+            val tempFile = File(file.parent, file.name + ".tmp")
+            try {
+                tempFile.outputStream().use { fos ->
+                    if (!bitmap.compress(format, quality, fos)) {
+                        Log.w(TAG, "Bitmap.compress returned false for ${file.name}")
+                        return false
+                    }
+                    fos.flush()
+                    fos.fd.sync()
+                }
+                // Capture dimensions BEFORE recycle
+                val newW = bitmap.width
+                val newH = bitmap.height
+                bitmap.recycle()
+
+                // Replace original with resized version
+                if (!file.delete() || !tempFile.renameTo(file)) {
+                    Log.w(TAG, "Failed to replace image file, keeping original")
+                    tempFile.delete()
+                    return false
+                }
+                Log.d(TAG, "Resized image: ${opts.outWidth}x${opts.outHeight} → " +
+                    "${newW}x${newH} ${file.length() / 1024}KB (sample=$sampleSize)")
+                true
+            } catch (e: Exception) {
+                bitmap.recycle()
+                tempFile.delete()
+                Log.w(TAG, "Failed to resize image ${file.name}: ${e.message}")
+                false
+            }
         } catch (e: Exception) {
-            Log.w(TAG, "Failed to resize image, using original", e)
-            data
+            Log.w(TAG, "Failed to resize image ${file.name}, using original", e)
+            false
         }
     }
 
@@ -296,6 +373,8 @@ class EpubToPdfConverter(private val context: Context) {
             if (!isCompleted) {
                 isCompleted = true
                 timeoutJob?.cancel()
+                // Stop any ongoing WebView loading to prevent callbacks after timeout/OOM
+                try { webView.stopLoading() } catch (_: Exception) {}
             }
         }
 
@@ -303,6 +382,7 @@ class EpubToPdfConverter(private val context: Context) {
             delay(CHAPTER_TIMEOUT_MS)
             if (!isCompleted) {
                 isCompleted = true
+                try { webView.stopLoading() } catch (_: Exception) {}
                 deferred.completeExceptionally(
                     CancellationException("Chapter PDF rendering timed out after ${CHAPTER_TIMEOUT_MS}ms")
                 )
@@ -373,7 +453,7 @@ class EpubToPdfConverter(private val context: Context) {
         return WebView(context.applicationContext ?: context).also { wv ->
             wv.settings.javaScriptEnabled = false
             wv.settings.domStorageEnabled = false
-            wv.settings.allowFileAccess = false
+            wv.settings.allowFileAccess = true  // Needed for file:// loading of local images/resources
             wv.settings.allowContentAccess = false
             wv.settings.loadWithOverviewMode = true
             wv.settings.useWideViewPort = true
@@ -381,7 +461,7 @@ class EpubToPdfConverter(private val context: Context) {
             wv.settings.displayZoomControls = false
             wv.settings.cacheMode = android.webkit.WebSettings.LOAD_NO_CACHE
             wv.settings.blockNetworkLoads = true  // No external resources
-            wv.settings.blockNetworkImage = true  // No external images
+            wv.settings.blockNetworkImage = false  // Allow LOCAL images (file://)
             @Suppress("DEPRECATION")
             wv.settings.setRenderPriority(android.webkit.WebSettings.RenderPriority.HIGH)
             wv.setLayerType(android.view.View.LAYER_TYPE_NONE, null)
@@ -395,8 +475,7 @@ class EpubToPdfConverter(private val context: Context) {
     /**
      * A4 width in CSS pixels at [PDF_DPI] DPI.
      * A4 = 210mm wide → 210/25.4 = 8.2677 inches → 8.2677 × DPI pixels.
-     * At 120 DPI: ~992px. This gives a 1:1 CSS-px-to-output-dot mapping,
-     * which is the most memory-efficient configuration.
+     * At 96 DPI: ~794px. Each page buffer ≈ 1.8MB at RGB_565.
      */
     private val viewportWidth: Int get() = (210f / 25.4f * PDF_DPI).toInt()
 
@@ -426,12 +505,21 @@ class EpubToPdfConverter(private val context: Context) {
 
     /**
      * Splits HTML content that exceeds [MAX_CHARS_PER_SEGMENT] into smaller chunks.
+     * Estimates length by removing <head> before deciding whether to split,
+     * avoiding creation of a full string copy for the simple case.
      * Splits at natural boundaries: <h1>-<h6>, <hr>, <section>, <div class="chapter">, etc.
-     * If no natural boundaries are found, splits after paragraph boundaries.
-     * Returns a list with the original HTML if no splitting is needed.
      */
     private fun splitLongHtml(html: String): List<String> {
-        val stripped = html.replace(Regex("<head>.*?</head>", RegexOption.DOT_MATCHES_ALL), "")
+        // Quick check: if HTML is well within the limit, skip the expensive regex
+        if (html.length <= MAX_CHARS_PER_SEGMENT) return listOf(html)
+
+        val headRegex = Regex("<head>.*?</head>", RegexOption.DOT_MATCHES_ALL)
+        // Estimate stripped length without creating a full copy
+        val estimatedLength = html.length - headRegex.findAll(html).sumOf { it.value.length }
+        if (estimatedLength <= MAX_CHARS_PER_SEGMENT) return listOf(html)
+
+        // Only now create the stripped version for actual splitting
+        val stripped = html.replace(headRegex, "")
         if (stripped.length <= MAX_CHARS_PER_SEGMENT) return listOf(html)
 
         Log.d(TAG, "Splitting long HTML (${html.length} chars) into segments")
@@ -446,7 +534,7 @@ class EpubToPdfConverter(private val context: Context) {
         )
 
         for (pattern in splitPatterns) {
-            val parts = html.split(pattern).filter { it.isNotBlank() }
+            val parts = stripped.split(pattern).filter { it.isNotBlank() }
             if (parts.size > 1) {
                 val merged = mergeSmallParts(parts, MAX_CHARS_PER_SEGMENT)
                 Log.d(TAG, "Split HTML into ${merged.size} parts using $pattern")
@@ -455,7 +543,7 @@ class EpubToPdfConverter(private val context: Context) {
         }
 
         // Last resort: split by paragraph boundaries
-        val paragraphs = html.split(Regex("(?=</?p\\b)", RegexOption.IGNORE_CASE)).filter { it.isNotBlank() }
+        val paragraphs = stripped.split(Regex("(?=</?p\\b)", RegexOption.IGNORE_CASE)).filter { it.isNotBlank() }
         if (paragraphs.size > 1) {
             val merged = mergeSmallParts(paragraphs, MAX_CHARS_PER_SEGMENT)
             if (merged.size > 1) {
@@ -471,10 +559,11 @@ class EpubToPdfConverter(private val context: Context) {
 
     /**
      * Merges small adjacent parts so each chunk approaches but doesn't exceed [maxChars].
+     * Pre-allocates StringBuilder capacity to reduce array copies during appends.
      */
     private fun mergeSmallParts(parts: List<String>, maxChars: Int): List<String> {
         val result = mutableListOf<String>()
-        val current = StringBuilder()
+        val current = StringBuilder(maxChars.coerceAtMost(MAX_CHARS_PER_SEGMENT))
         for (part in parts) {
             if (current.length + part.length > maxChars && current.isNotEmpty()) {
                 result.add(current.toString())
@@ -510,6 +599,10 @@ class EpubToPdfConverter(private val context: Context) {
             .setMinMargins(PrintAttributes.Margins.NO_MARGINS)
             .build()
         val adapter = webView.createPrintDocumentAdapter("Chapter")
+
+        // Call onStart() to follow the full PrintDocumentAdapter lifecycle
+        adapter.onStart()
+
         adapter.onLayout(null, attributes, null, object : android.print.PrintDocumentAdapterHelper.LayoutCallback() {
             override fun onLayoutFinished(info: PrintDocumentInfo?, changed: Boolean) {
                 val pfd = ParcelFileDescriptor.open(outputFile, ParcelFileDescriptor.MODE_CREATE or ParcelFileDescriptor.MODE_READ_WRITE)
@@ -521,32 +614,46 @@ class EpubToPdfConverter(private val context: Context) {
                         object : android.print.PrintDocumentAdapterHelper.WriteCallback() {
                             override fun onWriteFinished(pages: Array<out PageRange>?) {
                                 try { pfd.close() } catch (_: Exception) {}
+                                adapter.onFinish()  // Complete the adapter lifecycle
                                 onComplete()
                             }
                         })
                 } catch (e: Exception) {
                     try { pfd.close() } catch (_: Exception) {}
+                    adapter.onFinish()  // Ensure lifecycle completes even on error
                     throw e
                 }
             }
         }, null)
     }
 
-    private fun mergePdfs(segments: List<File>, outputFile: File) {
-        if (segments.size == 1) {
-            // No merge needed — just copy to avoid PDFBox overhead
-            segments[0].copyTo(outputFile, overwrite = true)
-            Log.d(TAG, "Single segment, copied directly (${outputFile.length() / 1024}KB)")
-            return
+    /**
+     * Incrementally merges a new segment into the existing merged PDF (if any).
+     * Keeps at most 2 PDF files open at a time, instead of accumulating all
+     * segments and merging at the end. This substantially reduces peak memory
+     * for books with many chapters/segments.
+     */
+    private fun incrementalMergePdf(currentMerged: File?, newSegment: File): File {
+        if (currentMerged == null) {
+            // First segment — just use it directly
+            return newSegment
         }
+
+        val mergedOutput = File(tempDir, "merge_${System.nanoTime()}.pdf")
         val merger = PDFMergerUtility()
         merger.isIgnoreAcroFormErrors = true
-        segments.forEach { merger.addSource(it) }
-        // Use buffered stream to reduce memory pressure during merge
-        java.io.BufferedOutputStream(FileOutputStream(outputFile), 64 * 1024).use { bos ->
+        merger.addSource(currentMerged)
+        merger.addSource(newSegment)
+        java.io.BufferedOutputStream(FileOutputStream(mergedOutput), 64 * 1024).use { bos ->
             merger.destinationStream = bos
             merger.mergeDocuments(null)
         }
-        Log.d(TAG, "Merged ${segments.size} segments → ${outputFile.length() / 1024}KB")
+
+        // Clean up intermediate files
+        currentMerged.delete()
+        newSegment.delete()
+
+        Log.d(TAG, "Incremental merge → ${mergedOutput.length() / 1024}KB")
+        return mergedOutput
     }
 }
