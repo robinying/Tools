@@ -31,7 +31,7 @@ import com.robin.tools.feature.media.data.CompressionType
 import com.robin.tools.feature.media.ui.screens.CompressionScreen
 import com.robin.tools.feature.media.ui.screens.MainScreen as MediaMainScreen
 import com.robin.tools.ui.theme.ToolsTheme
-import com.robin.tools.util.SwipeBackContainer
+import com.robin.tools.core.widget.SwipeBackContainer
 
 sealed class AppScreen {
     object Home : AppScreen()
@@ -61,6 +61,7 @@ class MainActivity : ComponentActivity() {
                             onLightLuxClick = { currentScreen = AppScreen.LightLux }
                         )
                         is AppScreen.Media -> {
+                            BackHandler { currentScreen = AppScreen.Home }
                             SwipeBackContainer(onBack = { currentScreen = AppScreen.Home }) {
                                 val type = screen.type
                                 if (type != null) {
@@ -79,29 +80,30 @@ class MainActivity : ComponentActivity() {
                             }
                         }
                         is AppScreen.Ebook -> {
+                            BackHandler { currentScreen = AppScreen.Home }
                             SwipeBackContainer(onBack = { currentScreen = AppScreen.Home }) {
                                 val ebookViewModel = remember { ConversionViewModel(applicationContext) }
                                 EbookScreen(viewModel = ebookViewModel, onBack = { currentScreen = AppScreen.Home })
                             }
                         }
                         is AppScreen.LightLux -> {
-                            SwipeBackContainer(onBack = { currentScreen = AppScreen.Home }) {
-                                val context = LocalContext.current
-                                val db = remember { AppDatabase.getInstance(context.applicationContext) }
-                                val repo = remember { LightRepository(db.lightEntryDao()) }
-                                val application = remember { context.applicationContext as android.app.Application }
-                                val lightMainViewModel: MainViewModel = viewModel(
-                                    factory = MainViewModel.Factory(application, repo)
-                                )
-                                val lightSnapshotViewModel: SnapshotListViewModel = viewModel(
-                                    factory = SnapshotListViewModel.Factory(repo)
-                                )
-                                LightLuxScreen(
-                                    mainViewModel = lightMainViewModel,
-                                    snapshotViewModel = lightSnapshotViewModel,
-                                    onBack = { currentScreen = AppScreen.Home }
-                                )
-                            }
+                            // 滑动返回由 LightLuxScreen 内部自治（Meter 回 Home、SnapshotList 回 Meter），
+                            // 因此此处不再套外层 SwipeBackContainer，避免两层边缘手势条相互拦截。
+                            val context = LocalContext.current
+                            val db = remember { AppDatabase.getInstance(context.applicationContext) }
+                            val repo = remember { LightRepository(db.lightEntryDao()) }
+                            val application = remember { context.applicationContext as android.app.Application }
+                            val lightMainViewModel: MainViewModel = viewModel(
+                                factory = MainViewModel.Factory(application, repo)
+                            )
+                            val lightSnapshotViewModel: SnapshotListViewModel = viewModel(
+                                factory = SnapshotListViewModel.Factory(repo)
+                            )
+                            LightLuxScreen(
+                                mainViewModel = lightMainViewModel,
+                                snapshotViewModel = lightSnapshotViewModel,
+                                onBack = { currentScreen = AppScreen.Home }
+                            )
                         }
                     }
                 }
