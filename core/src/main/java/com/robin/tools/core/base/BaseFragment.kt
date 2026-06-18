@@ -17,6 +17,14 @@ import com.robin.tools.core.util.inflateBindingWithGeneric
 import com.robin.tools.core.ext.view.hideSoftKeyboard
 import java.lang.reflect.ParameterizedType
 
+/**
+ * Legacy ViewBinding 基类。本项目为单 Activity Jetpack Compose 应用，不使用 Fragment，
+ * 且无任何 Fragment 继承此类。新代码请使用 Compose 屏级组件管理 UI 与状态，勿再继承本类。
+ */
+@Deprecated(
+    "ViewBinding/Fragment 基类已在 Compose 架构下废弃，新代码请使用 Compose 屏级组件",
+    level = DeprecationLevel.WARNING
+)
 abstract class BaseFragment<VM : BaseViewModel, VB : ViewBinding> : Fragment() {
 
     //Application全局的ViewModel，里面存放了一些账户信息，基本配置信息等
@@ -48,7 +56,8 @@ abstract class BaseFragment<VM : BaseViewModel, VB : ViewBinding> : Fragment() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        mActivity = context as AppCompatActivity
+        mActivity = context as? AppCompatActivity
+            ?: throw IllegalStateException("BaseFragment must be attached to an AppCompatActivity")
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

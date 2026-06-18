@@ -1,5 +1,15 @@
 package com.robin.tools.core.coroutine
 
+/**
+ * 自定义协程批量管理实现。与 [Coroutine] 同属早期自定义协程体系，当前无任何调用方。
+ *
+ * 新代码请使用 kotlinx.coroutines 的结构化并发（[kotlinx.coroutines.CoroutineScope] +
+ * [kotlinx.coroutines.Job] / [kotlinx.coroutines.SupervisorJob]）替代。
+ */
+@Deprecated(
+    "自定义协程体系已废弃，请使用 kotlinx.coroutines 的结构化并发（CoroutineScope + Job）",
+    level = DeprecationLevel.WARNING
+)
 @Suppress("unused")
 class CompositeCoroutine : CoroutineContainer {
 

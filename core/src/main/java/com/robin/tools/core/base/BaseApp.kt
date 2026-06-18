@@ -18,7 +18,9 @@ open class BaseApp() : Application() {
 
 
 
-    private var mFactory: ViewModelProvider.Factory? = null
+    private val appFactory: ViewModelProvider.Factory by lazy {
+        ViewModelProvider.AndroidViewModelFactory.getInstance(this)
+    }
     private val appViewModelStore = ViewModelStore()
 
     companion object {
@@ -35,13 +37,6 @@ open class BaseApp() : Application() {
      * 获取一个全局的ViewModel，使用共享的 ViewModelStore 确保 Application 级别单例
      */
     fun getAppViewModelProvider(): ViewModelProvider {
-        return ViewModelProvider(appViewModelStore, getAppFactory())
-    }
-
-    private fun getAppFactory(): ViewModelProvider.Factory {
-        if (mFactory == null) {
-            mFactory = ViewModelProvider.AndroidViewModelFactory.getInstance(this)
-        }
-        return mFactory as ViewModelProvider.Factory
+        return ViewModelProvider(appViewModelStore, appFactory)
     }
 }

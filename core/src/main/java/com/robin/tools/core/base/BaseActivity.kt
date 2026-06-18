@@ -14,6 +14,15 @@ import com.robin.tools.core.ext.getAppViewModel
 import com.robin.tools.core.ext.getVmClazz
 import java.lang.reflect.ParameterizedType
 
+/**
+ * Legacy ViewBinding 基类。本项目为单 Activity Jetpack Compose 应用，不再使用 ViewBinding，
+ * 且无任何 Activity 继承此类。新代码请直接继承 [androidx.activity.ComponentActivity] 并使用
+ * Compose 管理 UI 与 loading 状态，勿再继承本类。
+ */
+@Deprecated(
+    "ViewBinding 基类已在 Compose 架构下废弃，新代码请直接使用 ComponentActivity + Compose",
+    level = DeprecationLevel.WARNING
+)
 abstract class BaseActivity<VM : BaseViewModel, VB : ViewBinding> : AppCompatActivity(){
 
     //Application全局的ViewModel，里面存放了一些账户信息，基本配置信息等

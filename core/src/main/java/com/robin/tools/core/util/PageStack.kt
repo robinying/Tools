@@ -9,6 +9,16 @@ import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
 import java.util.*
 
+/**
+ * Activity/Fragment 栈管理器。本项目为单 Activity Jetpack Compose 应用，不使用 Fragment，
+ * 且本对象从未被注册为 ActivityLifecycleCallbacks，亦无任何调用方，属死代码。
+ *
+ * 新代码无需 Activity/Fragment 栈管理；如确有需要，请使用 androidx 的导航组件或自维护状态。
+ */
+@Deprecated(
+    "单 Activity Compose 应用下无用且无调用方，属死代码；如需导航请使用 Compose 导航",
+    level = DeprecationLevel.WARNING
+)
 object PageStack : Application.ActivityLifecycleCallbacks {
     val stack = LinkedList<Activity>()
     // Fragment 集合

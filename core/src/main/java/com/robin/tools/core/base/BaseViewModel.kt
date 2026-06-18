@@ -16,8 +16,16 @@ import kotlinx.coroutines.launch
 open class BaseViewModel : ViewModel() {
 
     /**
-     * 在主线程中执行一个协程
+     * 在主线程中执行一个协程。
+     *
+     * 冗余方法：[viewModelScope] 的默认调度器本身就是 [Dispatchers.Main]，直接使用
+     * `viewModelScope.launch { }` 即可，无需显式指定 Main 调度器。
      */
+    @Deprecated(
+        "viewModelScope.launch 默认就在 Dispatchers.Main，请直接使用 viewModelScope.launch { }",
+        ReplaceWith("viewModelScope.launch { block() }"),
+        level = DeprecationLevel.WARNING
+    )
     protected fun launchOnMain(block: suspend CoroutineScope.() -> Unit): Job {
         return viewModelScope.launch(Dispatchers.Main) { block() }
     }
