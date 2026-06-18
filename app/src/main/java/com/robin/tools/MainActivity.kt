@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.robin.tools.feature.lightlux.data.*
 import com.robin.tools.feature.lightlux.presentation.LightLuxScreen
 import com.robin.tools.feature.ebook.ui.ConversionViewModel
@@ -41,17 +42,9 @@ sealed class AppScreen {
 
 class MainActivity : ComponentActivity() {
 
-    private lateinit var lightMainViewModel: MainViewModel
-    private lateinit var lightSnapshotViewModel: SnapshotListViewModel
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-
-        val db = AppDatabase.getInstance(applicationContext)
-        val repo = LightRepository(db.lightEntryDao())
-        lightMainViewModel = MainViewModel(application, repo)
-        lightSnapshotViewModel = SnapshotListViewModel(repo)
 
         setContent {
             ToolsTheme {
@@ -93,6 +86,16 @@ class MainActivity : ComponentActivity() {
                         }
                         is AppScreen.LightLux -> {
                             SwipeBackContainer(onBack = { currentScreen = AppScreen.Home }) {
+                                val context = LocalContext.current
+                                val db = remember { AppDatabase.getInstance(context.applicationContext) }
+                                val repo = remember { LightRepository(db.lightEntryDao()) }
+                                val application = remember { context.applicationContext as android.app.Application }
+                                val lightMainViewModel: MainViewModel = viewModel(
+                                    factory = MainViewModel.Factory(application, repo)
+                                )
+                                val lightSnapshotViewModel: SnapshotListViewModel = viewModel(
+                                    factory = SnapshotListViewModel.Factory(repo)
+                                )
                                 LightLuxScreen(
                                     mainViewModel = lightMainViewModel,
                                     snapshotViewModel = lightSnapshotViewModel,

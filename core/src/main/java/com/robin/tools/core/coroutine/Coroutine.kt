@@ -13,11 +13,8 @@ class Coroutine<T>(
 
     companion object {
 
-        @Deprecated("Using the default MainScope() causes memory leaks. Always pass an explicit lifecycle-bound scope (e.g. viewModelScope or lifecycleScope).")
-        private val DEFAULT = MainScope()
-
         fun <T> async(
-            scope: CoroutineScope = DEFAULT,
+            scope: CoroutineScope,
             context: CoroutineContext = Dispatchers.IO,
             block: suspend CoroutineScope.() -> T
         ): Coroutine<T> {

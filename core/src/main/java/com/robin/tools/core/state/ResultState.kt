@@ -27,8 +27,8 @@ sealed class ResultState<out T> {
  * @param result 请求结果
  */
 fun <T> MutableLiveData<ResultState<T>>.paresResult(result: BaseResponse<T>) {
-    value = if (result.isSuccess()) ResultState.onAppSuccess(result.getResponseData()) else
-        ResultState.onAppError(AppException(result.getResponseCode(), result.getResponseMsg()))
+    postValue(if (result.isSuccess()) ResultState.onAppSuccess(result.getResponseData()) else
+        ResultState.onAppError(AppException(result.getResponseCode(), result.getResponseMsg())))
 }
 
 /**
@@ -36,13 +36,13 @@ fun <T> MutableLiveData<ResultState<T>>.paresResult(result: BaseResponse<T>) {
  * @param result 请求结果
  */
 fun <T> MutableLiveData<ResultState<T>>.paresResult(result: T) {
-    value = ResultState.onAppSuccess(result)
+    postValue(ResultState.onAppSuccess(result))
 }
 
 /**
  * 异常转换异常处理
  */
 fun <T> MutableLiveData<ResultState<T>>.paresException(e: Throwable) {
-    this.value = ResultState.onAppError(ExceptionHandle.handleException(e))
+    this.postValue(ResultState.onAppError(ExceptionHandle.handleException(e)))
 }
 

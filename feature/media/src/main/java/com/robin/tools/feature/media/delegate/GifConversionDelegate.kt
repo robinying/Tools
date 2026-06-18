@@ -27,13 +27,14 @@ class GifConversionDelegate : CompressionDelegate {
         val outputFile = FileUtils.createOutputFile(context, "gif")
 
         var totalDurationMs = 0L
+        val retriever = MediaMetadataRetriever()
         try {
-            val retriever = MediaMetadataRetriever()
             retriever.setDataSource(inputFile.absolutePath)
             totalDurationMs = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toLongOrNull() ?: 0L
-            retriever.release()
         } catch (e: Exception) {
             Log.e(TAG, "Failed to get video duration", e)
+        } finally {
+            retriever.release()
         }
 
         val (fps, targetWidth) = when (level) {

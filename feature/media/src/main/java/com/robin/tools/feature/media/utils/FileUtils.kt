@@ -53,7 +53,8 @@ object FileUtils {
 
     fun createOutputFile(context: Context, extension: String): File {
         val fileName = "compressed_${System.currentTimeMillis()}.$extension"
-        return File(context.getExternalFilesDir(null), fileName)
+        val dir = context.getExternalFilesDir(null) ?: context.cacheDir
+        return File(dir, fileName)
     }
 
     fun saveVideoToGallery(context: Context, file: File): Uri? {

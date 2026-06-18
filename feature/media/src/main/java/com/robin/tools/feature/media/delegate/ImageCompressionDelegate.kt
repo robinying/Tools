@@ -76,9 +76,6 @@ class ImageCompressionDelegate : CompressionDelegate {
                 out.flush()
             }
 
-            // 释放 Bitmap 内存
-            bitmap.recycle()
-
             val galleryUri = FileUtils.saveImageToGallery(context, outputFile)
             if (galleryUri != null) {
                 outputFile.delete()
@@ -89,6 +86,8 @@ class ImageCompressionDelegate : CompressionDelegate {
         } catch (e: Exception) {
             outputFile.delete()
             Result.failure(e)
+        } finally {
+            bitmap.recycle()
         }
     }
 }

@@ -10,7 +10,8 @@ object CountDownManager {
     private val mListener = CopyOnWriteArrayList<CountDataChangeListener>()
 
     fun startCount(remainSecond: Long = 10L) {
-        cancelCount()
+        mTimer?.cancel()
+        mTimer = null
         mRemainSecond.set(remainSecond)
         mTimer = object : CountDownTimer(remainSecond * 1000, 1000) {
             override fun onTick(millisUntilFinished: Long) {
@@ -27,7 +28,6 @@ object CountDownManager {
     fun cancelCount() {
         mTimer?.cancel()
         mTimer = null
-        mListener.clear()
     }
 
     private fun dispatchMessage(msg: String) {

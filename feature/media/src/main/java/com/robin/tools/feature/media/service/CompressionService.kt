@@ -162,7 +162,12 @@ class CompressionService : Service() {
                 }
 
                 val delegate = CompressionDelegateFactory.create(type)
-                val result = delegate.process(this@CompressionService, uri, level, onProgress)
+                val result = try {
+                    delegate.process(this@CompressionService, uri, level, onProgress)
+                } catch (e: Exception) {
+                    Log.e(TAG, "Unexpected error processing file $currentFileNum", e)
+                    Result.failure(e)
+                }
 
                 if (result.isSuccess) {
                     successCount++

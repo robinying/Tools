@@ -234,8 +234,7 @@ class EpubToPdfConverter(private val context: Context) {
         }
 
         // After each chapter, force a stronger WebView reset
-        val segmentsAfterChapter = parts.size // approximate count
-        if (segmentsAfterChapter > 0 && parts.size % WEBVIEW_RECYCLE_INTERVAL == 0) {
+        if (chapterIdx > 0 && (chapterIdx + 1) % WEBVIEW_RECYCLE_INTERVAL == 0) {
             withContext(Dispatchers.Main) {
                 wv.destroy()
                 wv = createWebView()
@@ -256,10 +255,27 @@ class EpubToPdfConverter(private val context: Context) {
      * decoded Bitmap simultaneously.
      */
     private fun extractAndReleaseResources(book: Book, resDir: File) {
+        val resDirCanonical = resDir.canonicalPath
         book.resources.all.forEach { res ->
             val relativePath = res.href.trimStart('/')
             val safePath = relativePath.replace("../", "").replace("..\\", "")
             val file = File(resDir, safePath)
+
+            // Zip Slip defense: reject entries that escape the resource directory.
+            // String replacement alone is bypassable; canonical path check is authoritative.
+            val fileCanonical = try {
+                file.canonicalPath
+            } catch (e: java.io.IOException) {
+                Log.w(TAG, "Skipping resource with unresolvable path: ${res.href}", e)
+                res.data = ByteArray(0)
+                return@forEach
+            }
+            if (!fileCanonical.startsWith(resDirCanonical + File.separator)) {
+                Log.w(TAG, "Skipping resource with path traversal attempt: ${res.href}")
+                res.data = ByteArray(0)
+                return@forEach
+            }
+
             file.parentFile?.mkdirs()
 
             // Write original data to disk first

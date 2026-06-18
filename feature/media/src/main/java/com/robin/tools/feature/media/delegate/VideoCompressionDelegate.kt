@@ -29,8 +29,8 @@ class VideoCompressionDelegate : CompressionDelegate {
         var totalDurationMs = 0L
         var inputWidth = 0
         var inputHeight = 0
+        val retriever = MediaMetadataRetriever()
         try {
-            val retriever = MediaMetadataRetriever()
             retriever.setDataSource(inputFile.absolutePath)
             totalDurationMs = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toLongOrNull() ?: 0L
             inputWidth = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH)?.toIntOrNull() ?: 0
@@ -41,9 +41,10 @@ class VideoCompressionDelegate : CompressionDelegate {
                 inputWidth = inputHeight
                 inputHeight = temp
             }
-            retriever.release()
         } catch (e: Exception) {
             Log.e(TAG, "Failed to get video metadata", e)
+        } finally {
+            retriever.release()
         }
 
         val minDim = if (inputWidth > 0 && inputHeight > 0) Math.min(inputWidth, inputHeight) else 720
