@@ -9,4 +9,6 @@
     <string name="ebook_converter_desc">Convertir EPUB en PDF</string>
     <string name="light_meter_title">Luxmètre</string>
     <string name="light_meter_desc">Mesurer la lumière ambiante avec graphique en temps réel</string>
+    <string name="face_compare_title">Comparaison Faciale</string>
+    <string name="face_compare_desc">Comparer la similarité faciale entre deux photos</string>
 </resources>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="face_compare_title">Comparaison Faciale</string>
+    <string name="face_compare_back">Retour</string>
+    <string name="face_compare_select_photo">Sélectionner une photo</string>
+    <string name="face_compare_photo_label">Photo %s</string>
+    <string name="face_compare_selected_photo">Photo sélectionnée %s</string>
+    <string name="face_compare_swap">Échanger</string>
+    <string name="face_compare_action">Comparer</string>
+    <string name="face_compare_analyzing">Analyse en cours…</string>
+    <string name="face_compare_result">Similarité : %.1f%%</string>
+    <string name="face_compare_high">Correspondance élevée</string>
+    <string name="face_compare_medium">Correspondance moyenne</string>
+    <string name="face_compare_low">Correspondance faible</string>
+    <string name="face_compare_none">Aucune correspondance</string>
+    <string name="face_compare_left_image">Image gauche</string>
+    <string name="face_compare_right_image">Image droite</string>
+    <string name="face_compare_no_faces_short">Aucun visage</string>
+    <string name="face_compare_one_face">1 visage</string>
+    <string name="face_compare_n_faces">%d visages</string>
+    <string name="face_compare_n_face_s">%d visage(s)</string>
+    <string name="face_compare_no_face_left">Aucun visage détecté dans l\'image gauche</string>
+    <string name="face_compare_no_face_right">Aucun visage détecté dans l\'image droite</string>
+    <string name="face_compare_no_faces">Aucun visage détecté</string>
+    <string name="face_compare_face_count">%d visage(s) détecté(s)</string>
+    <string name="face_compare_loading">Analyse en cours…</string>
+    <string name="face_compare_error">Échec de la comparaison</string>
+    <string name="face_compare_align_failed_both">Échec de l\'alignement facial pour les deux images</string>
+    <string name="face_compare_align_failed_left">Échec de l\'alignement facial pour l\'image gauche</string>
+    <string name="face_compare_align_failed_right">Échec de l\'alignement facial pour l\'image droite</string>
+    <string name="face_compare_model_missing">Modèle de reconnaissance faciale introuvable. Placez mobile_face_net.tflite dans assets/.</string>
+</resources>

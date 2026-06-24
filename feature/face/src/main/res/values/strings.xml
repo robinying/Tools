@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="face_compare_title">Face Compare</string>
+    <string name="face_compare_back">Back</string>
+    <string name="face_compare_select_photo">Select Photo</string>
+    <string name="face_compare_photo_label">Photo %s</string>
+    <string name="face_compare_selected_photo">Selected photo %s</string>
+    <string name="face_compare_swap">Swap</string>
+    <string name="face_compare_action">Compare</string>
+    <string name="face_compare_analyzing">Analyzing…</string>
+    <string name="face_compare_result">Similarity: %.1f%%</string>
+    <string name="face_compare_high">High match</string>
+    <string name="face_compare_medium">Medium match</string>
+    <string name="face_compare_low">Low match</string>
+    <string name="face_compare_none">No match</string>
+    <string name="face_compare_left_image">Left image</string>
+    <string name="face_compare_right_image">Right image</string>
+    <string name="face_compare_no_faces_short">No faces</string>
+    <string name="face_compare_one_face">1 face</string>
+    <string name="face_compare_n_faces">%d faces</string>
+    <string name="face_compare_n_face_s">%d face(s)</string>
+    <string name="face_compare_no_face_left">No face detected in left image</string>
+    <string name="face_compare_no_face_right">No face detected in right image</string>
+    <string name="face_compare_no_faces">No faces detected</string>
+    <string name="face_compare_face_count">%d face(s) detected</string>
+    <string name="face_compare_loading">Analyzing…</string>
+    <string name="face_compare_error">Comparison failed</string>
+    <string name="face_compare_align_failed_both">Face alignment failed for both images</string>
+    <string name="face_compare_align_failed_left">Face alignment failed for left image</string>
+    <string name="face_compare_align_failed_right">Face alignment failed for right image</string>
+    <string name="face_compare_model_missing">Face recognition model not found. Place mobile_face_net.tflite in assets/.</string>
+</resources>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="face_compare_title">人脸对比</string>
+    <string name="face_compare_back">返回</string>
+    <string name="face_compare_select_photo">选择照片</string>
+    <string name="face_compare_photo_label">照片 %s</string>
+    <string name="face_compare_selected_photo">已选照片 %s</string>
+    <string name="face_compare_swap">交换</string>
+    <string name="face_compare_action">开始对比</string>
+    <string name="face_compare_analyzing">分析中…</string>
+    <string name="face_compare_result">相似度：%.1f%%</string>
+    <string name="face_compare_high">高度匹配</string>
+    <string name="face_compare_medium">中度匹配</string>
+    <string name="face_compare_low">低度匹配</string>
+    <string name="face_compare_none">不匹配</string>
+    <string name="face_compare_left_image">左侧图片</string>
+    <string name="face_compare_right_image">右侧图片</string>
+    <string name="face_compare_no_faces_short">无人脸</string>
+    <string name="face_compare_one_face">1 张人脸</string>
+    <string name="face_compare_n_faces">%d 张人脸</string>
+    <string name="face_compare_n_face_s">%d 张人脸</string>
+    <string name="face_compare_no_face_left">左侧图片未检测到人脸</string>
+    <string name="face_compare_no_face_right">右侧图片未检测到人脸</string>
+    <string name="face_compare_no_faces">未检测到人脸</string>
+    <string name="face_compare_face_count">检测到 %d 张人脸</string>
+    <string name="face_compare_loading">分析中…</string>
+    <string name="face_compare_error">对比失败</string>
+    <string name="face_compare_align_failed_both">两张图片的人脸对齐均失败</string>
+    <string name="face_compare_align_failed_left">左侧图片人脸对齐失败</string>
+    <string name="face_compare_align_failed_right">右侧图片人脸对齐失败</string>
+    <string name="face_compare_model_missing">未找到人脸识别模型，请将 mobile_face_net.tflite 放入 assets/ 目录。</string>
+</resources>

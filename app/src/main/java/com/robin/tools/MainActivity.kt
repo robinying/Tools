@@ -9,6 +9,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.MenuBook
@@ -30,6 +31,8 @@ import com.robin.tools.feature.ebook.ui.MainScreen as EbookScreen
 import com.robin.tools.feature.media.data.CompressionType
 import com.robin.tools.feature.media.ui.screens.CompressionScreen
 import com.robin.tools.feature.media.ui.screens.MainScreen as MediaMainScreen
+import com.robin.tools.feature.face.ui.FaceCompareScreen
+import com.robin.tools.feature.face.ui.FaceCompareViewModel
 import com.robin.tools.ui.theme.ToolsTheme
 import com.robin.tools.core.widget.SwipeBackContainer
 
@@ -38,6 +41,7 @@ sealed class AppScreen {
     data class Media(val type: CompressionType? = null) : AppScreen()
     object Ebook : AppScreen()
     object LightLux : AppScreen()
+    object FaceCompare : AppScreen()
 }
 
 class MainActivity : ComponentActivity() {
@@ -58,7 +62,8 @@ class MainActivity : ComponentActivity() {
                         is AppScreen.Home -> HomeScreen(
                             onMediaClick = { currentScreen = AppScreen.Media() },
                             onEbookClick = { currentScreen = AppScreen.Ebook },
-                            onLightLuxClick = { currentScreen = AppScreen.LightLux }
+                            onLightLuxClick = { currentScreen = AppScreen.LightLux },
+                            onFaceCompareClick = { currentScreen = AppScreen.FaceCompare }
                         )
                         is AppScreen.Media -> {
                             BackHandler { currentScreen = AppScreen.Home }
@@ -105,6 +110,19 @@ class MainActivity : ComponentActivity() {
                                 onBack = { currentScreen = AppScreen.Home }
                             )
                         }
+                        is AppScreen.FaceCompare -> {
+                            BackHandler { currentScreen = AppScreen.Home }
+                            SwipeBackContainer(onBack = { currentScreen = AppScreen.Home }) {
+                                val context = LocalContext.current
+                                val faceViewModel = remember {
+                                    FaceCompareViewModel(context.applicationContext)
+                                }
+                                FaceCompareScreen(
+                                    viewModel = faceViewModel,
+                                    onBack = { currentScreen = AppScreen.Home }
+                                )
+                            }
+                        }
                     }
                 }
             }
@@ -116,7 +134,8 @@ class MainActivity : ComponentActivity() {
 fun HomeScreen(
     onMediaClick: () -> Unit,
     onEbookClick: () -> Unit,
-    onLightLuxClick: () -> Unit
+    onLightLuxClick: () -> Unit,
+    onFaceCompareClick: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -157,6 +176,13 @@ fun HomeScreen(
             description = stringResource(R.string.light_meter_desc),
             icon = Icons.Default.LightMode,
             onClick = onLightLuxClick
+        )
+        Spacer(Modifier.height(16.dp))
+        FeatureCard(
+            title = stringResource(R.string.face_compare_title),
+            description = stringResource(R.string.face_compare_desc),
+            icon = Icons.Default.Face,
+            onClick = onFaceCompareClick
         )
     }
 }

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="face_compare_title">Confronto Facciale</string>
+    <string name="face_compare_back">Indietro</string>
+    <string name="face_compare_select_photo">Seleziona foto</string>
+    <string name="face_compare_photo_label">Foto %s</string>
+    <string name="face_compare_selected_photo">Foto selezionata %s</string>
+    <string name="face_compare_swap">Scambia</string>
+    <string name="face_compare_action">Confronta</string>
+    <string name="face_compare_analyzing">Analisi in corso…</string>
+    <string name="face_compare_result">Somiglianza: %.1f%%</string>
+    <string name="face_compare_high">Alta corrispondenza</string>
+    <string name="face_compare_medium">Media corrispondenza</string>
+    <string name="face_compare_low">Bassa corrispondenza</string>
+    <string name="face_compare_none">Nessuna corrispondenza</string>
+    <string name="face_compare_left_image">Immagine sinistra</string>
+    <string name="face_compare_right_image">Immagine destra</string>
+    <string name="face_compare_no_faces_short">Nessun volto</string>
+    <string name="face_compare_one_face">1 volto</string>
+    <string name="face_compare_n_faces">%d volti</string>
+    <string name="face_compare_n_face_s">%d volto/i</string>
+    <string name="face_compare_no_face_left">Nessun volto rilevato nell\'immagine sinistra</string>
+    <string name="face_compare_no_face_right">Nessun volto rilevato nell\'immagine destra</string>
+    <string name="face_compare_no_faces">Nessun volto rilevato</string>
+    <string name="face_compare_face_count">%d volto/i rilevato/i</string>
+    <string name="face_compare_loading">Analisi in corso…</string>
+    <string name="face_compare_error">Confronto fallito</string>
+    <string name="face_compare_align_failed_both">Allineamento facciale fallito per entrambe le immagini</string>
+    <string name="face_compare_align_failed_left">Allineamento facciale fallito per l\'immagine sinistra</string>
+    <string name="face_compare_align_failed_right">Allineamento facciale fallito per l\'immagine destra</string>
+    <string name="face_compare_model_missing">Modello di riconoscimento facciale non trovato. Inserire mobile_face_net.tflite in assets/.</string>
+</resources>

@@ -9,4 +9,6 @@
     <string name="ebook_converter_desc">Convert EPUB to PDF</string>
     <string name="light_meter_title">Light Meter</string>
     <string name="light_meter_desc">Measure ambient light with real-time chart</string>
+    <string name="face_compare_title">Face Compare</string>
+    <string name="face_compare_desc">Compare face similarity between two photos</string>
 </resources>

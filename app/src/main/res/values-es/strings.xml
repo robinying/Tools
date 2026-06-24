@@ -9,4 +9,6 @@
     <string name="ebook_converter_desc">Convertir EPUB a PDF</string>
     <string name="light_meter_title">Medidor de Luz</string>
     <string name="light_meter_desc">Medir luz ambiental con gráfico en tiempo real</string>
+    <string name="face_compare_title">Comparación Facial</string>
+    <string name="face_compare_desc">Comparar similitud facial entre dos fotos</string>
 </resources>

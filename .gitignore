@@ -48,3 +48,4 @@ proguard/
 # --- Captures ---
 /captures
 CLAUDE.md
+face_compare.md

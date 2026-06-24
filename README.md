@@ -1,6 +1,6 @@
 # Tools
 
-A unified Android utility app combining three powerful tools into a single application, built with clean multi-module architecture.
+A unified Android utility app combining four powerful tools into a single application, built with clean multi-module architecture.
 
 ## Features
 
@@ -23,12 +23,20 @@ A unified Android utility app combining three powerful tools into a single appli
 - Snapshot save with Room database persistence
 - History view with swipe-to-delete
 
+### 👤 Face Compare
+- Select two photos and compare face similarity
+- On-device ML Kit face detection with landmark alignment
+- Cosine similarity scoring with visual result card
+- Landmark-geometry fallback when TFLite model is not available
+- Multi-language support (en, zh, es, fr, it, pt)
+
 ## Architecture
 
 ```
 :app  →  :feature:media  →  :core
        →  :feature:ebook   →  :core
        →  :feature:lightlux →  :core
+       →  :feature:face     →  :core
 ```
 
 ### Module Structure
@@ -40,6 +48,7 @@ A unified Android utility app combining three powerful tools into a single appli
 | `:feature:media` | `com.robin.tools.feature.media` | Video/image/GIF compression (from VideoEditor) |
 | `:feature:ebook` | `com.robin.tools.feature.ebook` | EPUB to PDF conversion (from EbookConverter) |
 | `:feature:lightlux` | `com.robin.tools.feature.lightlux` | Light sensor meter (from LightLux2, converted to Compose) |
+| `:feature:face` | `com.robin.tools.feature.face` | Face similarity comparison using ML Kit + TFLite |
 
 ### Key Design Decisions
 
@@ -58,6 +67,7 @@ A unified Android utility app combining three powerful tools into a single appli
 - **Room**: 2.6.1 with KSP
 - **FFmpeg Kit**: Custom AAR for media processing
 - **epublib** + **PDFBox Android**: For ebook conversion
+- **ML Kit** + **TensorFlow Lite**: For face detection and recognition
 - **Retrofit + OkHttp**: Network layer (core module)
 - **ViewBinding**: Core module supports both Compose and ViewBinding
 
@@ -76,7 +86,7 @@ A unified Android utility app combining three powerful tools into a single appli
 ## Testing
 
 ```bash
-# All unit tests (179+ tests across all modules)
+# All unit tests across all modules
 ./gradlew test
 
 # Run tests for specific modules
@@ -84,6 +94,7 @@ A unified Android utility app combining three powerful tools into a single appli
 ./gradlew :feature:media:test
 ./gradlew :feature:lightlux:test
 ./gradlew :feature:ebook:test
+./gradlew :feature:face:test
 
 # Run a single test class
 ./gradlew :core:test --tests "com.robin.tools.core.state.ResultStateTest"
@@ -104,6 +115,7 @@ A unified Android utility app combining three powerful tools into a single appli
 | `:feature:media` | 3 test classes | CompressionManager, CompressionState, CompressionDelegateFactory |
 | `:feature:lightlux` | 3 test classes | LightEntry, MainViewModel (MockK), SnapshotListViewModel (MockK) |
 | `:feature:ebook` | 2 test classes | EpubToPdfConverter, ConversionState |
+| `:feature:face` | 2 test classes | FaceSimilarityCalculator, FaceCompareViewModel |
 
 **Testing patterns**: Core module uses JUnit 4 only. Feature modules with MockK + kotlinx-coroutines-test use `UnconfinedTestDispatcher` for ViewModel coroutine testing and `coEvery`/`coVerify` for suspend function mocking.
 
@@ -144,6 +156,12 @@ Tools/
 │       └── src/main/java/.../lightlux/
 │           ├── data/             # Room DB, DAO, Repository, ViewModels
 │           └── presentation/     # Compose screens (meter, snapshot list)
+├── feature/
+│   ├── face/                     # Face similarity comparison
+│   │   └── src/main/java/.../face/
+│   │       ├── data/             # FaceDetector, Aligner, EmbeddingExtractor, Calculator
+│   │       ├── ui/               # Compose screen + ViewModel
+│   │       └── assets/           # TFLite model placeholder
 ├── gradle/
 │   └── libs.versions.toml       # Version catalog
 ├── build.gradle.kts

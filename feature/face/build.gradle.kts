@@ -1,33 +1,21 @@
 plugins {
-    alias(libs.plugins.android.application)
+    alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
 }
 
 android {
-    namespace = "com.robin.tools"
+    namespace = "com.robin.tools.feature.face"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.robin.tools"
         minSdk = 28
-        targetSdk = 36
-        versionCode = 1
-        versionName = "1.0"
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-
-        // arm64-v8a only: FFmpeg is arm64-v8a exclusive, x86/x86_64/armeabi-v7a can't run anyway.
-        // This removes ~12 MB of useless TFLite native libs from those ABIs.
-        ndk {
-            abiFilters += listOf("arm64-v8a")
-        }
     }
 
     buildTypes {
         release {
-            isMinifyEnabled = true
-            isShrinkResources = true
+            isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
@@ -43,17 +31,26 @@ android {
 
     buildFeatures {
         compose = true
-        buildConfig = true
+    }
+
+    aaptOptions {
+        noCompress("tflite")
     }
 }
 
 dependencies {
     implementation(project(":core"))
-    implementation(project(":feature:media"))
-    implementation(project(":feature:ebook"))
-    implementation(project(":feature:lightlux"))
-    implementation(project(":feature:face"))
 
+    // ML Kit Face Detection (bundled, arm64-v8a only via app-level ndk abiFilters)
+    implementation("com.google.mlkit:face-detection:16.1.7")
+
+    // TensorFlow Lite (MobileFaceNet inference)
+    implementation("org.tensorflow:tensorflow-lite:2.14.0")
+
+    // EXIF orientation handling
+    implementation("androidx.exifinterface:exifinterface:1.3.7")
+
+    // Compose
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
@@ -64,8 +61,17 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.material.icons.extended)
+    implementation(libs.coil.compose)
 
+    // Coroutines
+    implementation(libs.kotlinx.coroutines.android)
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.9.0")
+
+    // Testing
     testImplementation(libs.junit)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.mockk)
+    testImplementation(libs.turbine)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))

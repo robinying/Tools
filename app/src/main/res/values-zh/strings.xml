@@ -9,4 +9,6 @@
     <string name="ebook_converter_desc">将 EPUB 转换为 PDF</string>
     <string name="light_meter_title">光线测量仪</string>
     <string name="light_meter_desc">测量环境光线，实时图表显示</string>
+    <string name="face_compare_title">人脸对比</string>
+    <string name="face_compare_desc">对比两张照片的人脸相似度</string>
 </resources>
