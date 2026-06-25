@@ -125,9 +125,11 @@ class FaceCompareViewModel(context: Context) : ViewModel() {
 
                     val leftEmbedding: FloatArray
                     val rightEmbedding: FloatArray
+                    val useEuclidean: Boolean
                     if (embeddingExtractor.isModelLoaded) {
                         leftEmbedding = embeddingExtractor.extract(leftAligned)
                         rightEmbedding = embeddingExtractor.extract(rightAligned)
+                        useEuclidean = false
                     } else {
                         leftEmbedding = LandmarkFeatureExtractor.extract(leftFaces.first())
                             ?: return@withContext CompareResult(
@@ -145,11 +147,14 @@ class FaceCompareViewModel(context: Context) : ViewModel() {
                                 faceCountRight = rightFaces.size,
                                 errorMessage = appContext.getString(R.string.face_compare_align_failed_right)
                             )
+                        useEuclidean = true
                     }
 
-                    val score = FaceSimilarityCalculator.cosineSimilarity(
-                        leftEmbedding, rightEmbedding
-                    )
+                    val score = if (useEuclidean) {
+                        FaceSimilarityCalculator.euclideanSimilarity(leftEmbedding, rightEmbedding)
+                    } else {
+                        FaceSimilarityCalculator.cosineSimilarity(leftEmbedding, rightEmbedding)
+                    }
                     val level = FaceSimilarityCalculator.classify(score)
                     CompareResult(
                         similarityScore = score,
