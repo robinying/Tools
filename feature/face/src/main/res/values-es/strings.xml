@@ -29,4 +29,6 @@
     <string name="face_compare_align_failed_left">Fallo de alineación facial en la imagen izquierda</string>
     <string name="face_compare_align_failed_right">Fallo de alineación facial en la imagen derecha</string>
     <string name="face_compare_model_missing">Modelo de reconocimiento facial no encontrado. Coloque mobile_face_net.tflite en assets/.</string>
+    <string name="face_compare_feature_failed_left">Falló la extracción de características en la imagen izquierda</string>
+    <string name="face_compare_feature_failed_right">Falló la extracción de características en la imagen derecha</string>
 </resources>

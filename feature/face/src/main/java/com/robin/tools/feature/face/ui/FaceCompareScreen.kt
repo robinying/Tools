@@ -75,7 +75,7 @@ fun FaceCompareScreen(
     LaunchedEffect(errorMessage) {
         errorMessage?.let { msg ->
             snackbarHostState.showSnackbar(msg)
-            viewModel.reset()
+            viewModel.clearResult()
         }
     }
 

@@ -3,7 +3,9 @@ package com.robin.tools.feature.media.data
 import android.net.Uri
 import androidx.annotation.StringRes
 import com.robin.tools.feature.media.R
+import kotlinx.serialization.Serializable
 
+@Serializable
 enum class CompressionType {
     VIDEO, IMAGE, GIF
 }

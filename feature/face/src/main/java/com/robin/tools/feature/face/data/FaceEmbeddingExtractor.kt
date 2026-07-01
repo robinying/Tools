@@ -16,6 +16,11 @@ class FaceEmbeddingExtractor(context: Context) {
         }.isSuccess
     }
 
+    fun dispose() {
+        interpreter?.close()
+        interpreter = null
+    }
+
     fun extract(alignedFace: Bitmap): FloatArray {
         val tflite = interpreter
             ?: throw IllegalStateException(

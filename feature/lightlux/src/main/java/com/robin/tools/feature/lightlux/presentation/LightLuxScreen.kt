@@ -20,8 +20,7 @@ fun LightLuxScreen(
 
     when (currentScreen) {
         is LightLuxNavHost.Meter -> {
-            // 系统返回键兜底：与右滑一致，回 Home
-            BackHandler { onBack() }
+            // 系统返回由 NavHost 自动处理，回到 Home
             SwipeBackContainer(onBack = onBack) {
                 LightMeterScreen(
                     viewModel = mainViewModel,

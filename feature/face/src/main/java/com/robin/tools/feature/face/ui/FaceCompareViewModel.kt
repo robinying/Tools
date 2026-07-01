@@ -22,7 +22,11 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class FaceCompareViewModel(context: Context) : ViewModel() {
+class FaceCompareViewModel(
+    context: Context,
+    private val faceDetector: FaceDetector = FaceDetector(),
+    private val embeddingExtractor: FaceEmbeddingExtractor = FaceEmbeddingExtractor(context.applicationContext)
+) : ViewModel() {
 
     data class UiState(
         val leftImageUri: Uri? = null,
@@ -37,8 +41,6 @@ class FaceCompareViewModel(context: Context) : ViewModel() {
     val uiState: StateFlow<UiState> = _uiState.asStateFlow()
 
     private val appContext = context.applicationContext
-    private val faceDetector = FaceDetector()
-    private val embeddingExtractor = FaceEmbeddingExtractor(appContext)
 
     fun setLeftImage(uri: Uri) {
         _uiState.update { it.copy(leftImageUri = uri, result = null, leftFaceCount = -1) }
@@ -64,6 +66,15 @@ class FaceCompareViewModel(context: Context) : ViewModel() {
 
     fun reset() {
         _uiState.update { UiState() }
+    }
+
+    fun clearResult() {
+        _uiState.update { it.copy(isProcessing = false, result = null) }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        embeddingExtractor.dispose()
     }
 
     fun compare() {
@@ -137,7 +148,7 @@ class FaceCompareViewModel(context: Context) : ViewModel() {
                                 level = SimilarityLevel.NONE,
                                 faceCountLeft = leftFaces.size,
                                 faceCountRight = rightFaces.size,
-                                errorMessage = appContext.getString(R.string.face_compare_align_failed_left)
+                                errorMessage = appContext.getString(R.string.face_compare_feature_failed_left)
                             )
                         rightEmbedding = LandmarkFeatureExtractor.extract(rightFaces.first())
                             ?: return@withContext CompareResult(
@@ -145,7 +156,7 @@ class FaceCompareViewModel(context: Context) : ViewModel() {
                                 level = SimilarityLevel.NONE,
                                 faceCountLeft = leftFaces.size,
                                 faceCountRight = rightFaces.size,
-                                errorMessage = appContext.getString(R.string.face_compare_align_failed_right)
+                                errorMessage = appContext.getString(R.string.face_compare_feature_failed_right)
                             )
                         useEuclidean = true
                     }

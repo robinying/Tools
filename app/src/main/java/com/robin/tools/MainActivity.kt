@@ -2,47 +2,37 @@ package com.robin.tools
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Face
-import androidx.compose.material.icons.filled.Image
-import androidx.compose.material.icons.filled.LightMode
-import androidx.compose.material.icons.filled.MenuBook
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.robin.tools.feature.lightlux.data.*
-import com.robin.tools.feature.lightlux.presentation.LightLuxScreen
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
+import com.robin.tools.core.widget.SwipeBackContainer
 import com.robin.tools.feature.ebook.ui.ConversionViewModel
 import com.robin.tools.feature.ebook.ui.MainScreen as EbookScreen
+import com.robin.tools.feature.face.ui.FaceCompareScreen
+import com.robin.tools.feature.face.ui.FaceCompareViewModel
+import com.robin.tools.feature.lightlux.data.AppDatabase
+import com.robin.tools.feature.lightlux.data.LightRepository
+import com.robin.tools.feature.lightlux.data.MainViewModel
+import com.robin.tools.feature.lightlux.data.SnapshotListViewModel
+import com.robin.tools.feature.lightlux.presentation.LightLuxScreen
 import com.robin.tools.feature.media.data.CompressionType
 import com.robin.tools.feature.media.ui.screens.CompressionScreen
 import com.robin.tools.feature.media.ui.screens.MainScreen as MediaMainScreen
-import com.robin.tools.feature.face.ui.FaceCompareScreen
-import com.robin.tools.feature.face.ui.FaceCompareViewModel
+import com.robin.tools.navigation.AppRoute
+import com.robin.tools.ui.screens.HomeScreen
 import com.robin.tools.ui.theme.ToolsTheme
-import com.robin.tools.core.widget.SwipeBackContainer
-
-sealed class AppScreen {
-    object Home : AppScreen()
-    data class Media(val type: CompressionType? = null) : AppScreen()
-    object Ebook : AppScreen()
-    object LightLux : AppScreen()
-    object FaceCompare : AppScreen()
-}
 
 class MainActivity : ComponentActivity() {
 
@@ -52,76 +42,44 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             ToolsTheme {
-                var currentScreen by remember { mutableStateOf<AppScreen>(AppScreen.Home) }
+                val navController = rememberNavController()
 
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    when (val screen = currentScreen) {
-                        is AppScreen.Home -> HomeScreen(
-                            onMediaClick = { currentScreen = AppScreen.Media() },
-                            onEbookClick = { currentScreen = AppScreen.Ebook },
-                            onLightLuxClick = { currentScreen = AppScreen.LightLux },
-                            onFaceCompareClick = { currentScreen = AppScreen.FaceCompare }
-                        )
-                        is AppScreen.Media -> {
-                            BackHandler { currentScreen = AppScreen.Home }
-                            SwipeBackContainer(onBack = { currentScreen = AppScreen.Home }) {
-                                val type = screen.type
-                                if (type != null) {
-                                    CompressionScreen(
-                                        type = type,
-                                        onBack = { currentScreen = AppScreen.Home }
-                                    )
-                                } else {
-                                    MediaMainScreen(
-                                        onVideoCompressClick = { currentScreen = AppScreen.Media(CompressionType.VIDEO) },
-                                        onImageCompressClick = { currentScreen = AppScreen.Media(CompressionType.IMAGE) },
-                                        onGifConvertClick = { currentScreen = AppScreen.Media(CompressionType.GIF) },
-                                        onBack = { currentScreen = AppScreen.Home }
-                                    )
-                                }
-                            }
-                        }
-                        is AppScreen.Ebook -> {
-                            BackHandler { currentScreen = AppScreen.Home }
-                            SwipeBackContainer(onBack = { currentScreen = AppScreen.Home }) {
-                                val ebookViewModel = remember { ConversionViewModel(applicationContext) }
-                                EbookScreen(viewModel = ebookViewModel, onBack = { currentScreen = AppScreen.Home })
-                            }
-                        }
-                        is AppScreen.LightLux -> {
-                            // 滑动返回由 LightLuxScreen 内部自治（Meter 回 Home、SnapshotList 回 Meter），
-                            // 因此此处不再套外层 SwipeBackContainer，避免两层边缘手势条相互拦截。
-                            val context = LocalContext.current
-                            val db = remember { AppDatabase.getInstance(context.applicationContext) }
-                            val repo = remember { LightRepository(db.lightEntryDao()) }
-                            val application = remember { context.applicationContext as android.app.Application }
-                            val lightMainViewModel: MainViewModel = viewModel(
-                                factory = MainViewModel.Factory(application, repo)
-                            )
-                            val lightSnapshotViewModel: SnapshotListViewModel = viewModel(
-                                factory = SnapshotListViewModel.Factory(repo)
-                            )
-                            LightLuxScreen(
-                                mainViewModel = lightMainViewModel,
-                                snapshotViewModel = lightSnapshotViewModel,
-                                onBack = { currentScreen = AppScreen.Home }
+                    NavHost(
+                        navController = navController,
+                        startDestination = AppRoute.Home
+                    ) {
+                        composable<AppRoute.Home> {
+                            HomeScreen(
+                                onMediaClick = { navController.navigate(AppRoute.MediaMain) },
+                                onEbookClick = { navController.navigate(AppRoute.Ebook) },
+                                onLightLuxClick = { navController.navigate(AppRoute.LightLux) },
+                                onFaceCompareClick = { navController.navigate(AppRoute.FaceCompare) }
                             )
                         }
-                        is AppScreen.FaceCompare -> {
-                            BackHandler { currentScreen = AppScreen.Home }
-                            SwipeBackContainer(onBack = { currentScreen = AppScreen.Home }) {
-                                val context = LocalContext.current
-                                val faceViewModel = remember {
-                                    FaceCompareViewModel(context.applicationContext)
-                                }
-                                FaceCompareScreen(
-                                    viewModel = faceViewModel,
-                                    onBack = { currentScreen = AppScreen.Home }
-                                )
-                            }
+
+                        composable<AppRoute.MediaMain> {
+                            MediaMainWrapper(navController)
+                        }
+
+                        composable<AppRoute.Compression> { backStackEntry ->
+                            val route = backStackEntry.toRoute<AppRoute.Compression>()
+                            CompressionWrapper(navController, route.type)
+                        }
+
+                        composable<AppRoute.Ebook> {
+                            EbookWrapper(navController)
+                        }
+
+                        composable<AppRoute.LightLux> {
+                            LightLuxWrapper(navController)
+                        }
+
+                        composable<AppRoute.FaceCompare> {
+                            FaceCompareWrapper(navController)
                         }
                     }
                 }
@@ -131,101 +89,70 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun HomeScreen(
-    onMediaClick: () -> Unit,
-    onEbookClick: () -> Unit,
-    onLightLuxClick: () -> Unit,
-    onFaceCompareClick: () -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .systemBarsPadding()
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = stringResource(R.string.home_title),
-            fontSize = 32.sp,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(bottom = 8.dp, top = 32.dp)
-        )
-        Text(
-            text = stringResource(R.string.home_subtitle),
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(bottom = 40.dp)
-        )
-
-        FeatureCard(
-            title = stringResource(R.string.media_editor_title),
-            description = stringResource(R.string.media_editor_desc),
-            icon = Icons.Default.Image,
-            onClick = onMediaClick
-        )
-        Spacer(Modifier.height(16.dp))
-        FeatureCard(
-            title = stringResource(R.string.ebook_converter_title),
-            description = stringResource(R.string.ebook_converter_desc),
-            icon = Icons.Default.MenuBook,
-            onClick = onEbookClick
-        )
-        Spacer(Modifier.height(16.dp))
-        FeatureCard(
-            title = stringResource(R.string.light_meter_title),
-            description = stringResource(R.string.light_meter_desc),
-            icon = Icons.Default.LightMode,
-            onClick = onLightLuxClick
-        )
-        Spacer(Modifier.height(16.dp))
-        FeatureCard(
-            title = stringResource(R.string.face_compare_title),
-            description = stringResource(R.string.face_compare_desc),
-            icon = Icons.Default.Face,
-            onClick = onFaceCompareClick
+private fun MediaMainWrapper(navController: NavHostController) {
+    SwipeBackContainer(onBack = { navController.popBackStack() }) {
+        MediaMainScreen(
+            onVideoCompressClick = { navController.navigate(AppRoute.Compression(CompressionType.VIDEO)) },
+            onImageCompressClick = { navController.navigate(AppRoute.Compression(CompressionType.IMAGE)) },
+            onGifConvertClick = { navController.navigate(AppRoute.Compression(CompressionType.GIF)) },
+            onBack = { navController.popBackStack() }
         )
     }
 }
 
 @Composable
-fun FeatureCard(
-    title: String,
-    description: String,
-    icon: ImageVector,
-    onClick: () -> Unit
-) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onClick() },
-        shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(20.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                modifier = Modifier.size(40.dp),
-                tint = MaterialTheme.colorScheme.primary
-            )
-            Spacer(Modifier.width(16.dp))
-            Column {
-                Text(
-                    text = title,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 18.sp
-                )
-                Text(
-                    text = description,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
+private fun CompressionWrapper(navController: NavHostController, type: CompressionType) {
+    SwipeBackContainer(onBack = { navController.popBackStack() }) {
+        CompressionScreen(
+            type = type,
+            onBack = { navController.popBackStack() }
+        )
+    }
+}
+
+@Composable
+private fun EbookWrapper(navController: NavHostController) {
+    SwipeBackContainer(onBack = { navController.popBackStack() }) {
+        val context = LocalContext.current
+        val ebookViewModel = remember { ConversionViewModel(context.applicationContext) }
+        EbookScreen(
+            viewModel = ebookViewModel,
+            onBack = { navController.popBackStack() }
+        )
+    }
+}
+
+@Composable
+private fun LightLuxWrapper(navController: NavHostController) {
+    // 滑动返回由 LightLuxScreen 内部自治（Meter 回 Home、SnapshotList 回 Meter），
+    // 因此此处不再套外层 SwipeBackContainer，避免两层边缘手势条相互拦截。
+    val context = LocalContext.current
+    val db = remember { AppDatabase.getInstance(context.applicationContext) }
+    val repo = remember { LightRepository(db.lightEntryDao()) }
+    val application = remember { context.applicationContext as android.app.Application }
+    val lightMainViewModel: MainViewModel = viewModel(
+        factory = MainViewModel.Factory(application, repo)
+    )
+    val lightSnapshotViewModel: SnapshotListViewModel = viewModel(
+        factory = SnapshotListViewModel.Factory(repo)
+    )
+    LightLuxScreen(
+        mainViewModel = lightMainViewModel,
+        snapshotViewModel = lightSnapshotViewModel,
+        onBack = { navController.popBackStack() }
+    )
+}
+
+@Composable
+private fun FaceCompareWrapper(navController: NavHostController) {
+    SwipeBackContainer(onBack = { navController.popBackStack() }) {
+        val context = LocalContext.current
+        val faceViewModel = remember {
+            FaceCompareViewModel(context.applicationContext)
         }
+        FaceCompareScreen(
+            viewModel = faceViewModel,
+            onBack = { navController.popBackStack() }
+        )
     }
 }

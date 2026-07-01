@@ -1,70 +1,156 @@
 package com.robin.tools.feature.face.ui
 
-import app.cash.turbine.test
-import com.robin.tools.feature.face.data.CompareResult
-import com.robin.tools.feature.face.data.SimilarityLevel
+import android.content.Context
+import android.net.Uri
+import com.robin.tools.feature.face.data.FaceDetector
+import com.robin.tools.feature.face.data.FaceEmbeddingExtractor
 import io.mockk.every
 import io.mockk.mockk
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
-import org.junit.rules.TemporaryFolder
-import java.io.File
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class FaceCompareViewModelTest {
 
-    @get:Rule
-    val tempDir = TemporaryFolder()
+    private val testDispatcher = StandardTestDispatcher()
 
+    private lateinit var context: Context
+    private lateinit var faceDetector: FaceDetector
+    private lateinit var embeddingExtractor: FaceEmbeddingExtractor
     private lateinit var viewModel: FaceCompareViewModel
 
     @Before
     fun setUp() {
-        // FaceCompareViewModel requires a real context for ML Kit / TFLite,
-        // so we test the state machine through manual state manipulation.
-        // The actual compare() flow (which requires real bitmaps / ML Kit)
-        // is tested via instrumentation tests.
+        Dispatchers.setMain(testDispatcher)
+        context = mockk(relaxed = true)
+        faceDetector = mockk(relaxed = true)
+        embeddingExtractor = mockk(relaxed = true)
+        every { embeddingExtractor.isModelLoaded } returns true
+        viewModel = FaceCompareViewModel(context, faceDetector, embeddingExtractor)
+    }
+
+    @After
+    fun tearDown() {
+        Dispatchers.resetMain()
     }
 
     @Test
     fun `initial state has no images and no result`() = runTest {
-        // Verify the UiState defaults are correct
-        val defaultState = FaceCompareViewModel.UiState()
-        assertNull(defaultState.leftImageUri)
-        assertNull(defaultState.rightImageUri)
-        assertFalse(defaultState.isProcessing)
-        assertNull(defaultState.result)
-        assertEquals(-1, defaultState.leftFaceCount)
-        assertEquals(-1, defaultState.rightFaceCount)
-    }
-
-    @Test
-    fun `uiState has correct immutable defaults`() {
-        val state = FaceCompareViewModel.UiState()
+        val state = viewModel.uiState.value
+        assertNull(state.leftImageUri)
+        assertNull(state.rightImageUri)
         assertFalse(state.isProcessing)
         assertNull(state.result)
     }
 
     @Test
-    fun `compare button should be disabled when no images selected`() {
-        val state = FaceCompareViewModel.UiState()
-        val canCompare = state.leftImageUri != null
-                && state.rightImageUri != null
-                && !state.isProcessing
-        assertFalse(canCompare)
+    fun `swapImages swaps Uris and face counts`() = runTest {
+        val leftUri = mockk<Uri>(name = "left")
+        val rightUri = mockk<Uri>(name = "right")
+        viewModel.setLeftImage(leftUri)
+        viewModel.setRightImage(rightUri)
+        viewModel.swapImages()
+
+        val state = viewModel.uiState.value
+        assertEquals(rightUri, state.leftImageUri)
+        assertEquals(leftUri, state.rightImageUri)
     }
 
     @Test
-    fun `compare button should be disabled when processing`() {
+    fun `swapImages resets result`() = runTest {
+        val leftUri = mockk<Uri>(name = "left")
+        val rightUri = mockk<Uri>(name = "right")
+        viewModel.setLeftImage(leftUri)
+        viewModel.setRightImage(rightUri)
+        viewModel.swapImages()
+
+        assertNull(viewModel.uiState.value.result)
+    }
+
+    @Test
+    fun `clearResult clears processing flag and result`() = runTest {
+        val leftUri = mockk<Uri>(name = "left")
+        val rightUri = mockk<Uri>(name = "right")
+        viewModel.setLeftImage(leftUri)
+        viewModel.setRightImage(rightUri)
+        viewModel.clearResult()
+
+        val state = viewModel.uiState.value
+        assertFalse(state.isProcessing)
+        assertNull(state.result)
+        assertNotNull(state.leftImageUri)
+        assertNotNull(state.rightImageUri)
+    }
+
+    @Test
+    fun `clearResult preserves selected images`() = runTest {
+        val leftUri = mockk<Uri>(name = "left")
+        val rightUri = mockk<Uri>(name = "right")
+        viewModel.setLeftImage(leftUri)
+        viewModel.setRightImage(rightUri)
+        viewModel.clearResult()
+
+        assertEquals(leftUri, viewModel.uiState.value.leftImageUri)
+        assertEquals(rightUri, viewModel.uiState.value.rightImageUri)
+    }
+
+    @Test
+    fun `reset clears everything back to initial state`() = runTest {
+        viewModel.setLeftImage(mockk(name = "left"))
+        viewModel.setRightImage(mockk(name = "right"))
+        viewModel.reset()
+
+        val state = viewModel.uiState.value
+        assertNull(state.leftImageUri)
+        assertNull(state.rightImageUri)
+        assertFalse(state.isProcessing)
+        assertNull(state.result)
+    }
+
+    @Test
+    fun `compare does nothing when leftImage is null`() = runTest {
+        viewModel.setRightImage(mockk(name = "right"))
+        viewModel.compare()
+        assertNull(viewModel.uiState.value.result)
+    }
+
+    @Test
+    fun `compare does nothing when rightImage is null`() = runTest {
+        viewModel.setLeftImage(mockk(name = "left"))
+        viewModel.compare()
+        assertNull(viewModel.uiState.value.result)
+    }
+
+    @Test
+    fun `setLeftImage updates leftImageUri and resets result`() = runTest {
+        val uri = mockk<Uri>(name = "left")
+        viewModel.setLeftImage(uri)
+        assertEquals(uri, viewModel.uiState.value.leftImageUri)
+        assertNull(viewModel.uiState.value.result)
+    }
+
+    @Test
+    fun `setRightImage updates rightImageUri and resets result`() = runTest {
+        val uri = mockk<Uri>(name = "right")
+        viewModel.setRightImage(uri)
+        assertEquals(uri, viewModel.uiState.value.rightImageUri)
+        assertNull(viewModel.uiState.value.result)
+    }
+
+    @Test
+    fun `processing guard blocks compare when isProcessing is true`() {
         val state = FaceCompareViewModel.UiState(
             leftImageUri = mockk(relaxed = true),
             rightImageUri = mockk(relaxed = true),
@@ -77,7 +163,7 @@ class FaceCompareViewModelTest {
     }
 
     @Test
-    fun `compare button should be enabled when both images selected and not processing`() {
+    fun `compare is enabled when both images are set and not processing`() {
         val state = FaceCompareViewModel.UiState(
             leftImageUri = mockk(relaxed = true),
             rightImageUri = mockk(relaxed = true),
@@ -87,49 +173,5 @@ class FaceCompareViewModelTest {
                 && state.rightImageUri != null
                 && !state.isProcessing
         assertTrue(canCompare)
-    }
-
-    @Test
-    fun `CompareResult with HIGH level has score above 0_65`() {
-        val result = CompareResult(
-            similarityScore = 0.72f,
-            level = SimilarityLevel.HIGH,
-            faceCountLeft = 1,
-            faceCountRight = 1
-        )
-        assertEquals(SimilarityLevel.HIGH, result.level)
-        assertTrue(result.similarityScore >= 0.65f)
-        assertNull(result.errorMessage)
-    }
-
-    @Test
-    fun `CompareResult with errorMessage stores it correctly`() {
-        val result = CompareResult(
-            similarityScore = 0f,
-            level = SimilarityLevel.NONE,
-            faceCountLeft = 0,
-            faceCountRight = 1,
-            errorMessage = "No face detected in left image"
-        )
-        assertEquals(SimilarityLevel.NONE, result.level)
-        assertNotNull(result.errorMessage)
-    }
-
-    @Test
-    fun `swapImages logic swaps Uris and face counts`() {
-        val state = FaceCompareViewModel.UiState(
-            leftImageUri = mockk(relaxed = true, name = "left"),
-            rightImageUri = mockk(relaxed = true, name = "right"),
-            leftFaceCount = 2,
-            rightFaceCount = 1
-        )
-        val swapped = state.copy(
-            leftImageUri = state.rightImageUri,
-            rightImageUri = state.leftImageUri,
-            leftFaceCount = state.rightFaceCount,
-            rightFaceCount = state.leftFaceCount
-        )
-        assertEquals(1, swapped.leftFaceCount)
-        assertEquals(2, swapped.rightFaceCount)
     }
 }

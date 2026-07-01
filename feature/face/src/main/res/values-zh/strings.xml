@@ -29,4 +29,6 @@
     <string name="face_compare_align_failed_left">左侧图片人脸对齐失败</string>
     <string name="face_compare_align_failed_right">右侧图片人脸对齐失败</string>
     <string name="face_compare_model_missing">未找到人脸识别模型，请将 mobile_face_net.tflite 放入 assets/ 目录。</string>
+    <string name="face_compare_feature_failed_left">左侧图片特征提取失败</string>
+    <string name="face_compare_feature_failed_right">右侧图片特征提取失败</string>
 </resources>
