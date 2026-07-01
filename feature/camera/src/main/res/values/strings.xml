@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Camera feature -->
+    <string name="camera_feature_title">Camera</string>
+    <string name="camera_feature_desc">Record, edit, and enhance videos with filters and effects</string>
+
+    <!-- Camera main -->
+    <string name="camera_record_title">Record Video</string>
+    <string name="camera_record_desc">Multi-segment recording with filters and countdown</string>
+    <string name="camera_edit_title">Edit Video</string>
+    <string name="camera_edit_desc">Add watermarks, stickers, subtitles, and apply filters</string>
+    <string name="camera_trim_title">Trim Video</string>
+    <string name="camera_trim_desc">Trim, rotate, and adjust video orientation</string>
+    <string name="camera_cover_title">Select Cover</string>
+    <string name="camera_cover_desc">Choose a cover frame from your video</string>
+
+    <!-- Recording -->
+    <string name="record_back">Back</string>
+    <string name="record_flip_camera">Flip Camera</string>
+    <string name="record_delete_segment">Delete Last Segment</string>
+    <string name="record_done">Done</string>
+    <string name="record_processing">Processing…</string>
+
+    <!-- Trim -->
+    <string name="trim_title">Trim Video</string>
+    <string name="trim_export">Export</string>
+    <string name="trim_play">Play</string>
+    <string name="trim_pause">Pause</string>
+    <string name="trim_start">Start</string>
+    <string name="trim_end">End</string>
+    <string name="trim_duration">Duration</string>
+    <string name="trim_loading">Loading video…</string>
+
+    <!-- Edit -->
+    <string name="edit_title">Edit Video</string>
+    <string name="edit_export">Export</string>
+    <string name="edit_watermark">Text</string>
+    <string name="edit_sticker">Sticker</string>
+    <string name="edit_watermark_hint">Watermark text</string>
+    <string name="edit_add">Add</string>
+    <string name="edit_cancel">Cancel</string>
+    <string name="edit_watermark_title">Add Watermark</string>
+
+    <!-- Cover -->
+    <string name="cover_title">Select Cover</string>
+    <string name="cover_save">Save</string>
+    <string name="cover_hint">Tap a thumbnail to select a cover</string>
+    <string name="cover_frame">Frame at %1$s</string>
+
+    <!-- Filter names -->
+    <string name="filter_none">None</string>
+    <string name="filter_warm">Warm</string>
+    <string name="filter_antique">Antique</string>
+    <string name="filter_cool">Cool</string>
+    <string name="filter_brannan">Brannan</string>
+    <string name="filter_freud">Freud</string>
+    <string name="filter_hefe">Hefe</string>
+    <string name="filter_hudson">Hudson</string>
+    <string name="filter_inkwell">Inkwell</string>
+    <string name="filter_n1977">1977</string>
+    <string name="filter_nashville">Nashville</string>
+</resources>

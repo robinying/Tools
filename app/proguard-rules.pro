@@ -31,3 +31,26 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# Kotlin Serialization — keep all app code to prevent R8 from breaking
+# Navigation Compose type-safe routes and kotlinx.serialization require
+# original class names, companion objects, and serializer methods intact.
+-keepattributes *Annotation*, InnerClasses
+-dontnote kotlinx.serialization.AnnotationsKt
+
+# Keep all kotlinx.serialization runtime
+-keep class kotlinx.serialization.** { *; }
+-keepclassmembers class kotlinx.serialization.json.** {
+    *** Companion;
+}
+-keepclasseswithmembers class kotlinx.serialization.json.** {
+    kotlinx.serialization.KSerializer serializer(...);
+}
+
+# Keep Navigation serialization (InternalNavType subclasses)
+-keep class androidx.navigation.serialization.** { *; }
+
+# Keep all app code — this is a utility app, not a library.
+# R8 obfuscation provides no benefit and breaks kotlinx.serialization.
+-keep class com.robin.tools.** { *; }
+-keepnames class com.robin.tools.**

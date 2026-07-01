@@ -54,6 +54,7 @@ dependencies {
     implementation(project(":feature:ebook"))
     implementation(project(":feature:lightlux"))
     implementation(project(":feature:face"))
+    implementation(project(":feature:camera"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

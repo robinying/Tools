@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">工具箱</string>
     <string name="home_title">工具箱</string>
-    <string name="home_subtitle">媒体压缩 · 电子书转换 · 光线测量</string>
+    <string name="home_subtitle">媒体压缩 · 电子书转换 · 光线测量 · 相机</string>
     <string name="media_editor_title">媒体编辑</string>
     <string name="media_editor_desc">压缩视频/图片，转换视频为 GIF</string>
     <string name="ebook_converter_title">电子书转换</string>
@@ -11,4 +11,6 @@
     <string name="light_meter_desc">测量环境光线，实时图表显示</string>
     <string name="face_compare_title">人脸对比</string>
     <string name="face_compare_desc">对比两张照片的人脸相似度</string>
+    <string name="camera_title">相机</string>
+    <string name="camera_desc">录制和编辑视频，添加滤镜和特效</string>
 </resources>

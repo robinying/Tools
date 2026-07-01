@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="camera_feature_title">相机</string>
+    <string name="camera_feature_desc">录制和编辑视频，添加滤镜和特效</string>
+
+    <string name="camera_record_title">录制视频</string>
+    <string name="camera_record_desc">分段录制、倒计时和滤镜效果</string>
+    <string name="camera_edit_title">编辑视频</string>
+    <string name="camera_edit_desc">添加水印、贴纸、字幕和滤镜</string>
+    <string name="camera_trim_title">裁剪视频</string>
+    <string name="camera_trim_desc">裁剪、旋转和调整视频方向</string>
+    <string name="camera_cover_title">选择封面</string>
+    <string name="camera_cover_desc">从视频中选择一帧作为封面</string>
+
+    <string name="record_back">返回</string>
+    <string name="record_flip_camera">翻转摄像头</string>
+    <string name="record_delete_segment">删除上一段</string>
+    <string name="record_done">完成</string>
+    <string name="record_processing">处理中…</string>
+
+    <string name="trim_title">裁剪视频</string>
+    <string name="trim_export">导出</string>
+    <string name="trim_play">播放</string>
+    <string name="trim_pause">暂停</string>
+    <string name="trim_start">开始</string>
+    <string name="trim_end">结束</string>
+    <string name="trim_duration">时长</string>
+    <string name="trim_loading">加载视频中…</string>
+
+    <string name="edit_title">编辑视频</string>
+    <string name="edit_export">导出</string>
+    <string name="edit_watermark">文字</string>
+    <string name="edit_sticker">贴纸</string>
+    <string name="edit_watermark_hint">水印文字</string>
+    <string name="edit_add">添加</string>
+    <string name="edit_cancel">取消</string>
+    <string name="edit_watermark_title">添加水印</string>
+
+    <string name="cover_title">选择封面</string>
+    <string name="cover_save">保存</string>
+    <string name="cover_hint">点击缩略图选择封面</string>
+    <string name="cover_frame">%1$s 处的帧</string>
+
+    <string name="filter_none">原图</string>
+    <string name="filter_warm">暖色</string>
+    <string name="filter_antique">复古</string>
+    <string name="filter_cool">冷色</string>
+    <string name="filter_brannan">布莱恩</string>
+    <string name="filter_freud">佛洛依德</string>
+    <string name="filter_hefe">赫菲</string>
+    <string name="filter_hudson">哈德逊</string>
+    <string name="filter_inkwell">墨水瓶</string>
+    <string name="filter_n1977">1977</string>
+    <string name="filter_nashville">纳什维尔</string>
+</resources>

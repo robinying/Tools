@@ -22,4 +22,20 @@ sealed interface AppRoute {
 
     @Serializable
     data object FaceCompare : AppRoute
+
+    // Camera feature routes
+    @Serializable
+    data object CameraMain : AppRoute
+
+    @Serializable
+    data object CameraRecord : AppRoute
+
+    @Serializable
+    data class VideoEdit(val videoPath: String) : AppRoute
+
+    @Serializable
+    data class VideoTrim(val videoPath: String) : AppRoute
+
+    @Serializable
+    data class CoverSelect(val videoPath: String) : AppRoute
 }

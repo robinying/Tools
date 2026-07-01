@@ -1,0 +1,143 @@
+package com.robin.tools.feature.camera.ui.cover
+
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CoverScreen(
+    videoPath: String,
+    onBack: () -> Unit,
+    onComplete: (String) -> Unit = {},
+    viewModel: CoverViewModel = viewModel()
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+
+    LaunchedEffect(videoPath) { viewModel.loadVideo(context, videoPath) }
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Select Cover") },
+                navigationIcon = {
+                    IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back") }
+                },
+                actions = {
+                    if (uiState.selectedBitmap != null) {
+                        TextButton(onClick = { viewModel.saveCover(context, onComplete) }) {
+                            Icon(Icons.Default.Check, null, modifier = Modifier.size(18.dp))
+                            Spacer(Modifier.width(4.dp))
+                            Text("Save")
+                        }
+                    }
+                }
+            )
+        }
+    ) { padding ->
+        if (uiState.durationMs == 0L) {
+            Box(Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator()
+            }
+        } else {
+            Column(
+                modifier = Modifier.fillMaxSize().padding(padding).padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                // Large selected frame preview
+                Card(
+                    modifier = Modifier.fillMaxWidth().weight(1f),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    val bmp = uiState.selectedBitmap
+                    if (bmp != null) {
+                        Image(
+                            bitmap = bmp.asImageBitmap(),
+                            contentDescription = "Selected cover",
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    } else {
+                        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            Text("Tap a thumbnail to select a cover", color = Color.Gray)
+                        }
+                    }
+                }
+
+                // Selected time
+                if (uiState.selectedTimeMs > 0) {
+                    Text(
+                        "Frame at ${formatTime(uiState.selectedTimeMs)}",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+
+                // Thumbnail strip
+                Text("Tap to select:", fontSize = 12.sp, color = Color.Gray)
+                LazyRow(
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    itemsIndexed(uiState.thumbnails) { i, (time, bmp) ->
+                        val isSelected = time == uiState.selectedTimeMs
+                        Box(
+                            modifier = Modifier
+                                .width(120.dp).height(68.dp)
+                                .clip(RoundedCornerShape(4.dp))
+                                .then(
+                                    if (isSelected) Modifier.border(3.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(4.dp))
+                                    else Modifier.border(1.dp, Color.Gray, RoundedCornerShape(4.dp))
+                                )
+                                .clickable { viewModel.selectFrame(time) }
+                        ) {
+                            Image(
+                                bitmap = bmp.asImageBitmap(),
+                                contentDescription = formatTime(time),
+                                modifier = Modifier.fillMaxSize()
+                            )
+                            Text(
+                                formatTime(time),
+                                color = Color.White,
+                                fontSize = 10.sp,
+                                modifier = Modifier.align(Alignment.BottomEnd).padding(2.dp)
+                                    .background(Color.Black.copy(alpha = 0.6f), RoundedCornerShape(2.dp))
+                                    .padding(horizontal = 4.dp, vertical = 1.dp)
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
+        uiState.error?.let {
+            Snackbar(Modifier.padding(16.dp)) { Text(it) }
+        }
+    }
+}
+
+private fun formatTime(ms: Long): String {
+    val s = ms / 1000
+    return "${s / 60}:%02d".format(s % 60)
+}
