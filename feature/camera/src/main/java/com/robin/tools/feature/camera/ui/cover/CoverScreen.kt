@@ -19,11 +19,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.robin.tools.feature.camera.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -41,7 +43,7 @@ fun CoverScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Select Cover") },
+                title = { Text(stringResource(R.string.cover_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back") }
                 },
@@ -50,7 +52,7 @@ fun CoverScreen(
                         TextButton(onClick = { viewModel.saveCover(context, onComplete) }) {
                             Icon(Icons.Default.Check, null, modifier = Modifier.size(18.dp))
                             Spacer(Modifier.width(4.dp))
-                            Text("Save")
+                            Text(stringResource(R.string.cover_save))
                         }
                     }
                 }
@@ -80,7 +82,7 @@ fun CoverScreen(
                         )
                     } else {
                         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                            Text("Tap a thumbnail to select a cover", color = Color.Gray)
+                            Text(stringResource(R.string.cover_hint), color = Color.Gray)
                         }
                     }
                 }
@@ -88,7 +90,7 @@ fun CoverScreen(
                 // Selected time
                 if (uiState.selectedTimeMs > 0) {
                     Text(
-                        "Frame at ${formatTime(uiState.selectedTimeMs)}",
+                        stringResource(R.string.cover_frame, formatTime(uiState.selectedTimeMs)),
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium
                     )

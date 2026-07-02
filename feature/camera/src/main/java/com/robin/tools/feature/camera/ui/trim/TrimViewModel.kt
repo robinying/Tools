@@ -4,10 +4,10 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.media.MediaMetadataRetriever
 import android.media.MediaPlayer
-import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.robin.tools.feature.camera.editor.VideoClipper
+import com.robin.tools.feature.camera.storage.VideoPathResolver
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -37,11 +37,11 @@ class TrimViewModel : ViewModel() {
     private val videoClipper = VideoClipper()
 
     fun loadVideo(context: Context, path: String) {
-        videoPath = path
         viewModelScope.launch(Dispatchers.IO) {
             try {
+                videoPath = VideoPathResolver.resolve(context, path)
                 val retriever = MediaMetadataRetriever()
-                retriever.setDataSource(context, Uri.parse(path))
+                retriever.setDataSource(videoPath)
                 val dur = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toLongOrNull() ?: 0L
                 val thumbs = mutableListOf<Bitmap>()
                 val interval = (dur / 10).coerceAtLeast(1)
@@ -104,9 +104,10 @@ class TrimViewModel : ViewModel() {
     }
 
     fun setupPlayer(context: Context, surface: android.view.Surface) {
+        if (videoPath.isEmpty()) return
         mediaPlayer?.release()
         mediaPlayer = MediaPlayer().apply {
-            setDataSource(context, Uri.parse(videoPath))
+            setDataSource(videoPath)
             setSurface(surface)
             setOnPreparedListener { mp ->
                 mp.seekTo(_uiState.value.startMs.toInt())
@@ -119,6 +120,10 @@ class TrimViewModel : ViewModel() {
 
     fun export(outputFile: File, onComplete: (String) -> Unit) {
         val s = _uiState.value
+        if (videoPath.isEmpty()) {
+            _uiState.update { it.copy(error = "No video loaded") }
+            return
+        }
         _uiState.update { it.copy(isExporting = true) }
         viewModelScope.launch(Dispatchers.IO) {
             val ok = videoClipper.clip(videoPath, outputFile.absolutePath, s.startMs, s.endMs)

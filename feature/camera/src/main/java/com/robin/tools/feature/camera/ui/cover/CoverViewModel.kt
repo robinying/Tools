@@ -3,9 +3,9 @@ package com.robin.tools.feature.camera.ui.cover
 import android.content.Context
 import android.graphics.Bitmap
 import android.media.MediaMetadataRetriever
-import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.robin.tools.feature.camera.storage.VideoPathResolver
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -30,11 +30,11 @@ class CoverViewModel : ViewModel() {
     private var videoPath: String = ""
 
     fun loadVideo(context: Context, path: String) {
-        videoPath = path
         viewModelScope.launch(Dispatchers.IO) {
             try {
+                videoPath = VideoPathResolver.resolve(context, path)
                 val retriever = MediaMetadataRetriever()
-                retriever.setDataSource(context, Uri.parse(path))
+                retriever.setDataSource(videoPath)
                 val dur = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toLongOrNull() ?: 0L
 
                 val interval = (dur / 12).coerceAtLeast(500)

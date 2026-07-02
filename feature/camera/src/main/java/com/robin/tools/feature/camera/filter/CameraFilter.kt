@@ -7,11 +7,9 @@ import android.opengl.Matrix
 
 class CameraFilter(resources: Resources, private var cameraFacingFront: Boolean = false) : GpuImageFilter(resources) {
 
-    private val localMvpMatrix = FloatArray(16)
     private val textureTransform = FloatArray(16)
 
     init {
-        Matrix.setIdentityM(localMvpMatrix, 0)
         Matrix.setIdentityM(textureTransform, 0)
     }
 
@@ -19,7 +17,21 @@ class CameraFilter(resources: Resources, private var cameraFacingFront: Boolean 
         cameraFacingFront = front
     }
 
-    override fun getVertexShader(): String = NoFilter.DEFAULT_VERTEX_SHADER
+    fun setTextureTransform(matrix: FloatArray) {
+        System.arraycopy(matrix, 0, textureTransform, 0, 16)
+    }
+
+    override fun getVertexShader(): String = """
+        attribute vec4 vPosition;
+        attribute vec2 vCoord;
+        uniform mat4 vMatrix;
+        uniform mat4 uTextureTransform;
+        varying vec2 textureCoordinate;
+        void main() {
+            gl_Position = vMatrix * vPosition;
+            textureCoordinate = (uTextureTransform * vec4(vCoord, 0.0, 1.0)).xy;
+        }
+    """.trimIndent()
 
     override fun getFragmentShader(): String = """
         #extension GL_OES_EGL_image_external : require
@@ -30,6 +42,13 @@ class CameraFilter(resources: Resources, private var cameraFacingFront: Boolean 
             gl_FragColor = texture2D(inputImageTexture, textureCoordinate);
         }
     """.trimIndent()
+
+    private var texTransformHandle: Int = -1
+
+    override fun onInit() {
+        super.onInit()
+        texTransformHandle = GLES20.glGetUniformLocation(programId, "uTextureTransform")
+    }
 
     override fun draw(textureId: Int) {
         GLES20.glUseProgram(programId)
@@ -43,7 +62,12 @@ class CameraFilter(resources: Resources, private var cameraFacingFront: Boolean 
         GLES20.glEnableVertexAttribArray(positionHandle)
         GLES20.glVertexAttribPointer(texCoordHandle, 2, GLES20.GL_FLOAT, false, 8, glTextureBuffer)
         GLES20.glEnableVertexAttribArray(texCoordHandle)
-        GLES20.glUniformMatrix4fv(mvpMatrixHandle, 1, false, this.mvpMatrix, 0)
+
+        // vMatrix = identity (full-screen quad), texture transform handles orientation
+        GLES20.glUniformMatrix4fv(mvpMatrixHandle, 1, false, mvpMatrix, 0)
+        if (texTransformHandle >= 0) {
+            GLES20.glUniformMatrix4fv(texTransformHandle, 1, false, textureTransform, 0)
+        }
 
         GLES20.glActiveTexture(GLES20.GL_TEXTURE0)
         GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, textureId)

@@ -19,13 +19,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.robin.tools.feature.camera.R
 import com.robin.tools.feature.camera.filter.FilterType
+import com.robin.tools.feature.camera.filter.stringRes
 import com.robin.tools.feature.camera.storage.CameraFileManager
 import java.io.File
 
@@ -49,12 +52,12 @@ fun VideoEditScreen(
     if (showWatermarkDialog) {
         AlertDialog(
             onDismissRequest = { showWatermarkDialog = false },
-            title = { Text("Add Watermark") },
+            title = { Text(stringResource(R.string.edit_watermark_title)) },
             text = {
                 OutlinedTextField(
                     value = watermarkInput,
                     onValueChange = { watermarkInput = it },
-                    label = { Text("Watermark text") },
+                    label = { Text(stringResource(R.string.edit_watermark_hint)) },
                     singleLine = true
                 )
             },
@@ -65,10 +68,10 @@ fun VideoEditScreen(
                         watermarkInput = ""
                     }
                     showWatermarkDialog = false
-                }) { Text("Add") }
+                }) { Text(stringResource(R.string.edit_add)) }
             },
             dismissButton = {
-                TextButton(onClick = { showWatermarkDialog = false }) { Text("Cancel") }
+                TextButton(onClick = { showWatermarkDialog = false }) { Text(stringResource(R.string.edit_cancel)) }
             }
         )
     }
@@ -76,7 +79,7 @@ fun VideoEditScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Edit Video") },
+                title = { Text(stringResource(R.string.edit_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back") }
                 },
@@ -91,7 +94,7 @@ fun VideoEditScreen(
                         if (uiState.isExporting) {
                             CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp)
                         } else {
-                            Text("Export", color = MaterialTheme.colorScheme.primary)
+                            Text(stringResource(R.string.edit_export), color = MaterialTheme.colorScheme.primary)
                         }
                     }
                 }
@@ -161,7 +164,7 @@ fun VideoEditScreen(
                         FilterChip(
                             selected = sel,
                             onClick = { viewModel.setFilter(filter) },
-                            label = { Text(filter.displayName, fontSize = 12.sp) },
+                            label = { Text(stringResource(filter.stringRes()), fontSize = 12.sp) },
                             colors = FilterChipDefaults.filterChipColors(
                                 selectedContainerColor = MaterialTheme.colorScheme.primaryContainer
                             )
@@ -177,13 +180,13 @@ fun VideoEditScreen(
                     IconButton(onClick = { showWatermarkDialog = true }) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Icon(Icons.Default.TextFields, "Watermark")
-                            Text("Text", fontSize = 10.sp)
+                            Text(stringResource(R.string.edit_watermark), fontSize = 10.sp)
                         }
                     }
                     IconButton(onClick = {}) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Icon(Icons.Default.EmojiEmotions, "Sticker")
-                            Text("Sticker", fontSize = 10.sp)
+                            Text(stringResource(R.string.edit_sticker), fontSize = 10.sp)
                         }
                     }
                 }

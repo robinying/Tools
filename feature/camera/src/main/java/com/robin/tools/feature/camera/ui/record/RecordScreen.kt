@@ -26,10 +26,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.robin.tools.feature.camera.filter.FilterType
+import com.robin.tools.feature.camera.filter.stringRes
 import com.robin.tools.feature.camera.opengl.CameraGlSurfaceView
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -199,7 +201,7 @@ fun FilterSwipeSelector(
                 onClick = { onFilterChanged(filter) },
                 label = {
                     Text(
-                        filter.displayName,
+                        stringResource(filter.stringRes()),
                         fontSize = 12.sp,
                         maxLines = 1,
                         color = if (isSelected) Color.White else Color.White.copy(alpha = 0.7f)

@@ -23,12 +23,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.robin.tools.feature.camera.R
 import com.robin.tools.feature.camera.storage.CameraFileManager
 import java.io.File
 
@@ -52,7 +54,7 @@ fun TrimScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Trim Video") },
+                title = { Text(stringResource(R.string.trim_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back")
@@ -70,7 +72,7 @@ fun TrimScreen(
                             if (uiState.isExporting) {
                                 CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
                             } else {
-                                Text("Export", color = MaterialTheme.colorScheme.primary)
+                                Text(stringResource(R.string.trim_export), color = MaterialTheme.colorScheme.primary)
                             }
                         }
                     }
@@ -156,9 +158,9 @@ fun TrimScreen(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text("Start: ${formatTime(uiState.startMs)}", fontSize = 12.sp, color = Color.Gray)
-                    Text("End: ${formatTime(uiState.endMs)}", fontSize = 12.sp, color = Color.Gray)
-                    Text("Duration: ${formatTime(uiState.endMs - uiState.startMs)}", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                    Text("${stringResource(R.string.trim_start)}: ${formatTime(uiState.startMs)}", fontSize = 12.sp, color = Color.Gray)
+                    Text("${stringResource(R.string.trim_end)}: ${formatTime(uiState.endMs)}", fontSize = 12.sp, color = Color.Gray)
+                    Text("${stringResource(R.string.trim_duration)}: ${formatTime(uiState.endMs - uiState.startMs)}", fontSize = 12.sp, fontWeight = FontWeight.Bold)
                 }
 
                 // Thumbnail strip with trim handles

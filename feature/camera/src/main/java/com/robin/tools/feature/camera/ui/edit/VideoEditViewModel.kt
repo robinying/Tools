@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.robin.tools.feature.camera.editor.VideoClipper
 import com.robin.tools.feature.camera.filter.FilterType
+import com.robin.tools.feature.camera.storage.VideoPathResolver
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -37,11 +38,11 @@ class VideoEditViewModel : ViewModel() {
     private val videoClipper = VideoClipper()
 
     fun loadVideo(context: Context, path: String) {
-        videoPath = path
         viewModelScope.launch(Dispatchers.IO) {
             try {
+                videoPath = VideoPathResolver.resolve(context, path)
                 val retriever = MediaMetadataRetriever()
-                retriever.setDataSource(context, Uri.parse(path))
+                retriever.setDataSource(videoPath)
                 val dur = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toLongOrNull() ?: 0L
                 retriever.release()
                 _uiState.update { it.copy(durationMs = dur) }
@@ -72,9 +73,10 @@ class VideoEditViewModel : ViewModel() {
     }
 
     fun setupPlayer(context: Context, surface: android.view.Surface) {
+        if (videoPath.isEmpty()) return
         mediaPlayer?.release()
         mediaPlayer = MediaPlayer().apply {
-            setDataSource(context, Uri.parse(videoPath))
+            setDataSource(videoPath)
             setSurface(surface)
             setOnCompletionListener { _uiState.update { it.copy(isPlaying = false) } }
             prepareAsync()
@@ -83,6 +85,10 @@ class VideoEditViewModel : ViewModel() {
 
     fun export(outputFile: File, onComplete: (String) -> Unit) {
         val s = _uiState.value
+        if (videoPath.isEmpty()) {
+            _uiState.update { it.copy(error = "No video loaded") }
+            return
+        }
         _uiState.update { it.copy(isExporting = true) }
         viewModelScope.launch(Dispatchers.IO) {
             val ok = videoClipper.clip(videoPath, outputFile.absolutePath, 0, s.durationMs)

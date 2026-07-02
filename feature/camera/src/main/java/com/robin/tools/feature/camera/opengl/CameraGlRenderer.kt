@@ -32,7 +32,6 @@ class CameraGlRenderer : GLSurfaceView.Renderer {
     private var pendingPreviewResize: Boolean = false
     private var filterResources: android.content.res.Resources? = null
 
-    // FBO for OES→2D conversion
     private var offscreenFbo: GlFrameBuffer? = null
     private var offscreenFboCreated: Boolean = false
 
@@ -56,13 +55,21 @@ class CameraGlRenderer : GLSurfaceView.Renderer {
             pendingFilterType = value
         }
 
+    /**
+     * Display matrix rotates the already-oriented FBO image to fill the portrait viewport.
+     * After the OES→FBO pass (which applies SurfaceTexture's transform), the FBO image is
+     * already in the sensor's natural orientation. For a typical 90° back sensor, the FBO
+     * holds a landscape image; we rotate it to portrait. Front camera adds a horizontal mirror.
+     */
     private fun updateDisplayMatrix() {
         Matrix.setIdentityM(displayMatrix, 0)
+        // Rotate the FBO image to match display orientation.
+        // sensorOrientation is how much the sensor image is rotated relative to the display.
+        // We undo it with the opposite rotation on the quad.
+        Matrix.rotateM(displayMatrix, 0, -sensorOrientation.toFloat(), 0f, 0f, 1f)
         if (isFrontCamera) {
-            Matrix.rotateM(displayMatrix, 0, -90f, 0f, 0f, 1f)
+            // Mirror horizontally for natural selfie behavior.
             Matrix.scaleM(displayMatrix, 0, -1f, 1f, 1f)
-        } else {
-            Matrix.rotateM(displayMatrix, 0, -90f, 0f, 0f, 1f)
         }
     }
 
@@ -73,7 +80,6 @@ class CameraGlRenderer : GLSurfaceView.Renderer {
     fun setPreviewSize(width: Int, height: Int) {
         previewWidth = width
         previewHeight = height
-        // Defer FBO recreation to onDrawFrame (GL thread)
         pendingPreviewResize = true
     }
 
@@ -162,13 +168,19 @@ class CameraGlRenderer : GLSurfaceView.Renderer {
             st.updateTexImage()
             st.getTransformMatrix(textureTransform)
 
-            // Step 1: Camera OES → FBO. Identity matrix fills FBO with camera frame.
+            // Step 1: Camera OES → FBO.
+            // SurfaceTexture's transform matrix encodes the sensor orientation and Y-flip.
+            // Apply it to texture coordinates (not vertex positions) via CameraFilter.
             offscreenFbo?.bind()
             GLES20.glViewport(0, 0, previewWidth, previewHeight)
+            // Identity MVP for the camera filter — full-screen quad.
+            Matrix.setIdentityM(cameraFilter.mvpMatrix, 0)
+            cameraFilter.setTextureTransform(textureTransform)
             cameraFilter.draw(surfaceTextureId)
             GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0)
 
-            // Step 2: FBO → screen. displayMatrix handles orientation + Y-flip.
+            // Step 2: FBO → screen. The FBO now holds an upright (sensor-oriented) image.
+            // Apply displayMatrix to rotate it into portrait and mirror for front camera.
             GLES20.glViewport(0, 0, viewportWidth, viewportHeight)
             val camera2DTexture = offscreenFbo!!.frameBufferTextureId
             val outputFilter = if (currentFilterType == FilterType.NONE) displayFilter else currentEffectFilter
