@@ -55,6 +55,7 @@
     <string name="filter_result">效果图</string>
     <string name="original_image">原始图片</string>
     <string name="save_to_gallery">保存到相册</string>
+    <string name="saved_to_gallery">已保存到相册</string>
 
     <string name="filter_grayscale">灰度</string>
     <string name="filter_blur">模糊</string>

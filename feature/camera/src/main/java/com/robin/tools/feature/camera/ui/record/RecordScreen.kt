@@ -20,12 +20,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -44,7 +40,7 @@ fun RecordScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
-    Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
+    Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
 
         // Camera preview
         AndroidView(
@@ -64,10 +60,10 @@ fun RecordScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(onClick = onBack) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = Color.White)
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = MaterialTheme.colorScheme.onBackground)
             }
             IconButton(onClick = { viewModel.switchCamera() }) {
-                Icon(Icons.Default.SwitchCamera, "Flip", tint = Color.White)
+                Icon(Icons.Default.SwitchCamera, "Flip", tint = MaterialTheme.colorScheme.onBackground)
             }
         }
 
@@ -81,7 +77,7 @@ fun RecordScreen(
                     Box(
                         modifier = Modifier.width(20.dp).height(4.dp)
                             .clip(RoundedCornerShape(2.dp))
-                            .background(Color(0xFF00E676))
+                            .background(MaterialTheme.colorScheme.tertiary)
                     )
                 }
             }
@@ -96,9 +92,8 @@ fun RecordScreen(
         ) {
             Text(
                 text = if (uiState.countdownValue > 0) "${uiState.countdownValue}" else "Go!",
-                fontSize = 96.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.White
+                style = MaterialTheme.typography.displayLarge,
+                color = MaterialTheme.colorScheme.onBackground
             )
         }
 
@@ -106,13 +101,13 @@ fun RecordScreen(
         if (uiState.isProcessing) {
             Box(
                 modifier = Modifier.align(Alignment.Center).fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.7f)),
+                    .background(MaterialTheme.colorScheme.background.copy(alpha = 0.7f)),
                 contentAlignment = Alignment.Center
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    CircularProgressIndicator(color = Color.White)
+                    CircularProgressIndicator(color = MaterialTheme.colorScheme.onBackground)
                     Spacer(modifier = Modifier.height(16.dp))
-                    Text("Processing...", color = Color.White)
+                    Text("Processing...", color = MaterialTheme.colorScheme.onBackground)
                 }
             }
         }
@@ -131,7 +126,7 @@ fun RecordScreen(
             ) {
                 Icon(
                     Icons.Default.Undo, "Delete segment",
-                    tint = if (uiState.segmentCount > 0) Color.White else Color.White.copy(alpha = 0.3f),
+                    tint = if (uiState.segmentCount > 0) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.onBackground.copy(alpha = 0.3f),
                     modifier = Modifier.size(32.dp)
                 )
             }
@@ -139,7 +134,7 @@ fun RecordScreen(
             // Record button
             Box(
                 modifier = Modifier.size(80.dp).clip(CircleShape)
-                    .background(Color.White.copy(alpha = 0.3f))
+                    .background(MaterialTheme.colorScheme.onBackground.copy(alpha = 0.3f))
                     .clickable {
                         if (uiState.isRecording) viewModel.stopRecording()
                         else viewModel.startRecording()
@@ -150,7 +145,7 @@ fun RecordScreen(
                     modifier = Modifier
                         .size(if (uiState.isRecording) 32.dp else 60.dp)
                         .clip(if (uiState.isRecording) RoundedCornerShape(6.dp) else CircleShape)
-                        .background(Color.Red)
+                        .background(MaterialTheme.colorScheme.error)
                 )
             }
 
@@ -161,7 +156,7 @@ fun RecordScreen(
             ) {
                 Icon(
                     Icons.Default.Check, "Done",
-                    tint = if (uiState.segmentCount > 0) Color(0xFF00E676) else Color.White.copy(alpha = 0.3f),
+                    tint = if (uiState.segmentCount > 0) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.onBackground.copy(alpha = 0.3f),
                     modifier = Modifier.size(32.dp)
                 )
             }
@@ -202,15 +197,15 @@ fun FilterSwipeSelector(
                 label = {
                     Text(
                         stringResource(filter.stringRes()),
-                        fontSize = 12.sp,
+                        style = MaterialTheme.typography.labelSmall,
                         maxLines = 1,
-                        color = if (isSelected) Color.White else Color.White.copy(alpha = 0.7f)
+                        color = if (isSelected) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
                     )
                 },
                 selected = isSelected,
                 colors = FilterChipDefaults.filterChipColors(
-                    selectedContainerColor = Color.White.copy(alpha = 0.3f),
-                    containerColor = Color.White.copy(alpha = 0.15f)
+                    selectedContainerColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.3f),
+                    containerColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.15f)
                 ),
                 border = null
             )

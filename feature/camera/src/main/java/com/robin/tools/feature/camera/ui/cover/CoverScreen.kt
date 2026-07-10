@@ -16,13 +16,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
+
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.robin.tools.feature.camera.R
@@ -82,7 +81,7 @@ fun CoverScreen(
                         )
                     } else {
                         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                            Text(stringResource(R.string.cover_hint), color = Color.Gray)
+                            Text(stringResource(R.string.cover_hint), color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
                     }
                 }
@@ -91,13 +90,13 @@ fun CoverScreen(
                 if (uiState.selectedTimeMs > 0) {
                     Text(
                         stringResource(R.string.cover_frame, formatTime(uiState.selectedTimeMs)),
-                        fontSize = 14.sp,
+                        style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Medium
                     )
                 }
 
                 // Thumbnail strip
-                Text("Tap to select:", fontSize = 12.sp, color = Color.Gray)
+                Text("Tap to select:", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 LazyRow(
                     horizontalArrangement = Arrangement.spacedBy(4.dp),
                     modifier = Modifier.fillMaxWidth()
@@ -110,7 +109,7 @@ fun CoverScreen(
                                 .clip(RoundedCornerShape(4.dp))
                                 .then(
                                     if (isSelected) Modifier.border(3.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(4.dp))
-                                    else Modifier.border(1.dp, Color.Gray, RoundedCornerShape(4.dp))
+                                    else Modifier.border(1.dp, MaterialTheme.colorScheme.onSurfaceVariant, RoundedCornerShape(4.dp))
                                 )
                                 .clickable { viewModel.selectFrame(time) }
                         ) {
@@ -121,10 +120,10 @@ fun CoverScreen(
                             )
                             Text(
                                 formatTime(time),
-                                color = Color.White,
-                                fontSize = 10.sp,
+                                color = MaterialTheme.colorScheme.onBackground,
+                                style = MaterialTheme.typography.labelSmall,
                                 modifier = Modifier.align(Alignment.BottomEnd).padding(2.dp)
-                                    .background(Color.Black.copy(alpha = 0.6f), RoundedCornerShape(2.dp))
+                                    .background(MaterialTheme.colorScheme.background.copy(alpha = 0.6f), RoundedCornerShape(2.dp))
                                     .padding(horizontal = 4.dp, vertical = 1.dp)
                             )
                         }

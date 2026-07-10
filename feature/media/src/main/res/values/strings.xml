@@ -55,6 +55,7 @@
     <string name="filter_result">Result</string>
     <string name="original_image">Original image</string>
     <string name="save_to_gallery">Save to Gallery</string>
+    <string name="saved_to_gallery">Saved to gallery</string>
 
     <string name="filter_grayscale">Grayscale</string>
     <string name="filter_blur">Blur</string>

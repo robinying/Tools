@@ -1,7 +1,9 @@
 package com.robin.tools.feature.media.delegate
 
 import android.graphics.Bitmap
+import com.robin.tools.feature.media.data.FilterManager
 import com.robin.tools.feature.media.data.FilterType
+import kotlinx.coroutines.ensureActive
 import org.opencv.android.Utils
 import org.opencv.core.Core
 import org.opencv.core.CvType
@@ -12,8 +14,8 @@ import org.opencv.imgproc.Imgproc
 /**
  * Implements all [FilterType] filters using the OpenCV Android SDK (Java API).
  *
- * Native libraries are bundled with the `:opencv` Gradle module
- * (OpenCV 4.12.0 SDK, `libopencv_java4.so`). Loaded once on first use.
+ * Native libraries are bundled as a local AAR (OpenCV 4.12.0, libopencv_java4.so).
+ * Loaded once on first use.
  */
 class OpenCVFilterDelegate : FilterDelegate {
 
@@ -46,15 +48,15 @@ class OpenCVFilterDelegate : FilterDelegate {
         if (!ensureLoaded()) {
             return Result.failure(IllegalStateException("OpenCV native library failed to load"))
         }
-
         if (input.isRecycled) {
             return Result.failure(IllegalStateException("Input bitmap is recycled"))
         }
 
-        return try {
-            val src = rgbFromBitmap(input)
-            onProgress(0.1f, "Applying filter…")
+        val src = rgbFromBitmap(input)
+        try {
+            if (FilterManager.isCancelled()) return cancelledResult(src)
 
+            onProgress(0.2f, "Applying filter…")
             val dst = when (type) {
                 FilterType.GRAYSCALE -> applyGrayscale(src)
                 FilterType.BLUR -> applyBlur(src)
@@ -63,17 +65,25 @@ class OpenCVFilterDelegate : FilterDelegate {
                 FilterType.SHARPEN -> applySharpen(src)
                 FilterType.SKETCH -> applySketch(src)
             }
+            try {
+                if (FilterManager.isCancelled()) {
+                    dst.release()
+                    return cancelledResult(src)
+                }
 
-            onProgress(0.8f, "Converting result…")
-            val result = bitmapFromRgb(dst)
-            onProgress(1.0f, "Done")
-
-            src.release()
-            dst.release()
-
-            Result.success(result)
+                onProgress(0.8f, "Converting result…")
+                val result = bitmapFromRgb(dst)
+                onProgress(1.0f, "Done")
+                dst.release()
+                return Result.success(result)
+            } catch (e: Exception) {
+                dst.release()
+                throw e
+            }
         } catch (e: Exception) {
-            Result.failure(e)
+            src.release()
+            if (e is CancellationException) throw e
+            return Result.failure(e)
         }
     }
 
@@ -100,7 +110,6 @@ class OpenCVFilterDelegate : FilterDelegate {
         val dst = Mat()
         Imgproc.cvtColor(src, gray, Imgproc.COLOR_RGB2GRAY)
         Imgproc.Canny(gray, edges, 80.0, 200.0)
-        // Invert so edges become dark lines on white background (sketch feel)
         Core.bitwise_not(edges, edges)
         Imgproc.cvtColor(edges, dst, Imgproc.COLOR_GRAY2RGB)
         gray.release()
@@ -110,34 +119,19 @@ class OpenCVFilterDelegate : FilterDelegate {
 
     private fun applyCartoon(src: Mat): Mat {
         val smoothed = Mat()
-        // Bilateral filter preserves edges while smoothing flat regions
         Imgproc.bilateralFilter(src, smoothed, 9, 75.0, 75.0)
-
         val gray = Mat()
         Imgproc.cvtColor(smoothed, gray, Imgproc.COLOR_RGB2GRAY)
-
         val edges = Mat()
         Imgproc.adaptiveThreshold(
-            gray,
-            edges,
-            255.0,
-            Imgproc.ADAPTIVE_THRESH_MEAN_C,
-            Imgproc.THRESH_BINARY,
-            9,
-            2.0
+            gray, edges, 255.0,
+            Imgproc.ADAPTIVE_THRESH_MEAN_C, Imgproc.THRESH_BINARY, 9, 2.0
         )
-
         val edgesRgb = Mat()
         Imgproc.cvtColor(edges, edgesRgb, Imgproc.COLOR_GRAY2RGB)
-
         val dst = Mat()
-        // Overlay edges onto smoothed image via bitwise AND
         Core.bitwise_and(smoothed, edgesRgb, dst)
-
-        smoothed.release()
-        gray.release()
-        edges.release()
-        edgesRgb.release()
+        smoothed.release(); gray.release(); edges.release(); edgesRgb.release()
         return dst
     }
 
@@ -157,35 +151,28 @@ class OpenCVFilterDelegate : FilterDelegate {
     private fun applySketch(src: Mat): Mat {
         val gray = Mat()
         Imgproc.cvtColor(src, gray, Imgproc.COLOR_RGB2GRAY)
-
         val inverted = Mat()
         Core.bitwise_not(gray, inverted)
-
         val blurred = Mat()
         Imgproc.GaussianBlur(inverted, blurred, Size(21.0, 21.0), 0.0)
-
         val sketch = Mat()
-        // Divide gray by blurred-inverted (dodge blend for pencil-sketch effect)
         Core.divide(gray, blurred, sketch, 255.0)
-
         val dst = Mat()
         Imgproc.cvtColor(sketch, dst, Imgproc.COLOR_GRAY2RGB)
-
-        gray.release()
-        inverted.release()
-        blurred.release()
-        sketch.release()
+        gray.release(); inverted.release(); blurred.release(); sketch.release()
         return dst
     }
 
-    // --- Bitmap ⇔ Mat helpers ------------------------------------------------
+    // --- Bitmap <-> Mat helpers ------------------------------------------------
 
     private fun rgbFromBitmap(bitmap: Bitmap): Mat {
+        // Only copy if the bitmap is not ARGB_8888 (avoids unnecessary 48MB allocation)
+        val source = if (bitmap.config == Bitmap.Config.ARGB_8888) bitmap
+                     else bitmap.copy(Bitmap.Config.ARGB_8888, false)
         val mat = Mat()
-        val copy = bitmap.copy(Bitmap.Config.ARGB_8888, false)
-        Utils.bitmapToMat(copy, mat)
+        Utils.bitmapToMat(source, mat)
         Imgproc.cvtColor(mat, mat, Imgproc.COLOR_RGBA2RGB)
-        copy.recycle()
+        if (source !== bitmap) source.recycle()
         return mat
     }
 
@@ -198,3 +185,10 @@ class OpenCVFilterDelegate : FilterDelegate {
         return bitmap
     }
 }
+
+private fun cancelledResult(src: Mat): Result<Bitmap> {
+    src.release()
+    return Result.failure(kotlinx.coroutines.CancellationException("Cancelled"))
+}
+
+private typealias CancellationException = kotlinx.coroutines.CancellationException

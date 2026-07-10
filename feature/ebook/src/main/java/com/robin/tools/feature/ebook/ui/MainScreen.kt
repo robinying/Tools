@@ -82,7 +82,7 @@ fun MainScreen(viewModel: ConversionViewModel, onBack: () -> Unit = {}, modifier
                 Icon(
                     Icons.Default.CheckCircle,
                     null,
-                    tint = Color(0xFF00BFA5),
+                    tint = MaterialTheme.colorScheme.tertiary,
                     modifier = Modifier.size(80.dp)
                 )
                 Spacer(Modifier.height(16.dp))
@@ -96,7 +96,7 @@ fun MainScreen(viewModel: ConversionViewModel, onBack: () -> Unit = {}, modifier
                 }
             }
             is ConversionState.Error -> {
-                Text(stringResource(R.string.conversion_error, state.message), color = Color.Red)
+                Text(stringResource(R.string.conversion_error, state.message), color = MaterialTheme.colorScheme.error)
                 Spacer(Modifier.height(16.dp))
                 Button(onClick = { viewModel.reset() }) {
                     Text(stringResource(R.string.try_again))

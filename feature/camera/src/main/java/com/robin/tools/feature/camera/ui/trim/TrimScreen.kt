@@ -19,14 +19,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -92,7 +90,7 @@ fun TrimScreen(
                 // Video preview
                 Box(
                     modifier = Modifier.fillMaxWidth().weight(1f).clip(RoundedCornerShape(8.dp))
-                        .background(Color.Black)
+                        .background(MaterialTheme.colorScheme.background)
                 ) {
                     AndroidView(
                         factory = { ctx ->
@@ -123,7 +121,7 @@ fun TrimScreen(
                         Icon(
                             if (uiState.isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
                             "Play",
-                            tint = Color.White,
+                            tint = MaterialTheme.colorScheme.onBackground,
                             modifier = Modifier.size(48.dp)
                         )
                     }
@@ -131,10 +129,10 @@ fun TrimScreen(
                     // Time display
                     Text(
                         "${formatTime(uiState.currentPositionMs)} / ${formatTime(uiState.durationMs)}",
-                        color = Color.White,
-                        fontSize = 13.sp,
+                        color = MaterialTheme.colorScheme.onBackground,
+                        style = MaterialTheme.typography.bodySmall,
                         modifier = Modifier.align(Alignment.BottomEnd).padding(8.dp)
-                            .background(Color.Black.copy(alpha = 0.6f), RoundedCornerShape(4.dp))
+                            .background(MaterialTheme.colorScheme.background.copy(alpha = 0.6f), RoundedCornerShape(4.dp))
                             .padding(horizontal = 8.dp, vertical = 2.dp)
                     )
                 }
@@ -148,7 +146,7 @@ fun TrimScreen(
                         FilterChip(
                             selected = uiState.rotation == deg,
                             onClick = { viewModel.setRotation(deg) },
-                            label = { Text("${deg}°", fontSize = 13.sp) }
+                            label = { Text("${deg}°", style = MaterialTheme.typography.bodySmall) }
                         )
                     }
                 }
@@ -158,9 +156,9 @@ fun TrimScreen(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text("${stringResource(R.string.trim_start)}: ${formatTime(uiState.startMs)}", fontSize = 12.sp, color = Color.Gray)
-                    Text("${stringResource(R.string.trim_end)}: ${formatTime(uiState.endMs)}", fontSize = 12.sp, color = Color.Gray)
-                    Text("${stringResource(R.string.trim_duration)}: ${formatTime(uiState.endMs - uiState.startMs)}", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                    Text("${stringResource(R.string.trim_start)}: ${formatTime(uiState.startMs)}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text("${stringResource(R.string.trim_end)}: ${formatTime(uiState.endMs)}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text("${stringResource(R.string.trim_duration)}: ${formatTime(uiState.endMs - uiState.startMs)}", style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Bold)
                 }
 
                 // Thumbnail strip with trim handles
@@ -196,7 +194,7 @@ fun TrimScreen(
                                 .align(Alignment.CenterStart)
                                 .offset(x = (startFrac * 360).dp)
                                 .width(4.dp).fillMaxHeight()
-                                .background(Color(0xFF00E676))
+                                .background(MaterialTheme.colorScheme.tertiary)
                                 .pointerInput(Unit) {
                                     detectHorizontalDragGestures { _, dragAmount ->
                                         val deltaMs = (dragAmount / 360.dp.toPx() * uiState.durationMs).toLong()
@@ -212,7 +210,7 @@ fun TrimScreen(
                                 .align(Alignment.CenterStart)
                                 .offset(x = (endFrac * 360).dp)
                                 .width(4.dp).fillMaxHeight()
-                                .background(Color.Red)
+                                .background(MaterialTheme.colorScheme.error)
                                 .pointerInput(Unit) {
                                     detectHorizontalDragGestures { _, dragAmount ->
                                         val deltaMs = (dragAmount / 360.dp.toPx() * uiState.durationMs).toLong()
@@ -227,14 +225,14 @@ fun TrimScreen(
                                 .align(Alignment.TopCenter)
                                 .offset(x = (startFrac * 360).dp)
                                 .width(((endFrac - startFrac) * 360).dp).height(2.dp)
-                                .background(Color(0xFF00E676))
+                                .background(MaterialTheme.colorScheme.tertiary)
                         )
                     }
                 }
 
                 // Error
                 uiState.error?.let { err ->
-                    Text(err, color = MaterialTheme.colorScheme.error, fontSize = 13.sp)
+                    Text(err, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
                 }
             }
         }

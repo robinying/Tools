@@ -18,7 +18,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
@@ -96,6 +95,7 @@ fun LightMeterScreen(
 fun LuxChart(data: List<ChartDataPoint>, modifier: Modifier = Modifier) {
     val lineColor = MaterialTheme.colorScheme.primary
     val gridColor = MaterialTheme.colorScheme.outlineVariant
+    val axisColor = MaterialTheme.colorScheme.outline
     Canvas(modifier = modifier.padding(8.dp)) {
         if (data.size < 2) return@Canvas
         val maxLux = (data.maxOf { it.luxValue }.toInt() + 10).coerceAtLeast(100)
@@ -103,7 +103,7 @@ fun LuxChart(data: List<ChartDataPoint>, modifier: Modifier = Modifier) {
         val timeRange = (maxTime - minTime).coerceAtLeast(1L).toFloat()
         val w = size.width; val h = size.height
         for (i in 0..4) { val y = h * i / 4; drawLine(gridColor, Offset(0f, y), Offset(w, y), 1f) }
-        drawLine(Color.Gray, Offset(0f, h), Offset(w, h), 2f); drawLine(Color.Gray, Offset(0f, 0f), Offset(0f, h), 2f)
+        drawLine(axisColor, Offset(0f, h), Offset(w, h), 2f); drawLine(axisColor, Offset(0f, 0f), Offset(0f, h), 2f)
         val path = Path()
         data.forEachIndexed { i, p ->
             val x = ((p.timestamp - minTime) / timeRange) * w; val y = h - (p.luxValue / maxLux) * h

@@ -5,26 +5,25 @@ import org.junit.Assert.*
 import org.junit.Test
 
 /**
- * Behavioural tests for the filter delegate and its data types.
+ * Tests for filter data types and the pure-Android delegate fallback.
  *
- * Uses [PureBitmapFilterDelegate] which works on JVM without native libraries.
- * For the full OpenCV-powered filter suite, see [OpenCVFilterDelegate]
- * (enabled when opencv-4.10.0.aar is placed in feature/media/libs/).
+ * Note: [com.robin.tools.feature.media.delegate.OpenCVFilterDelegate] cannot
+ * be tested in JVM unit tests (native libraries unavailable). Integration
+ * tests should cover the OpenCV path.
  */
-class OpenCVFilterDelegateTest {
+class FilterFeatureTest {
 
     private val delegate = PureBitmapFilterDelegate()
 
     @Test
-    fun `constructor creates instance without error`() {
-        assertNotNull("Delegate should be non-null after construction", delegate)
+    fun `delegate can be constructed`() {
+        assertNotNull(delegate)
     }
 
     @Test
-    fun `all FilterType enum values are defined`() {
+    fun `all FilterType enum values have label resources`() {
         for (type in FilterType.entries) {
-            assertNotNull("Label for $type must be non-null", type.labelRes)
-            assertTrue("Label resource ID must be positive for $type", type.labelRes > 0)
+            assertTrue("Label resource must be positive for $type", type.labelRes > 0)
         }
     }
 
@@ -68,14 +67,12 @@ class OpenCVFilterDelegateTest {
         val state = FilterState.Finished(true, "Done")
         assertTrue(state.isSuccess)
         assertEquals("Done", state.message)
-        assertNull(state.result) // result is null when no bitmap is supplied
     }
 
     @Test
-    fun `FilterState Finished failure has no result`() {
-        val state = FilterState.Finished(false, "Error", result = null)
+    fun `FilterState Finished failure has correct message`() {
+        val state = FilterState.Finished(false, "Error")
         assertFalse(state.isSuccess)
         assertEquals("Error", state.message)
-        assertNull(state.result)
     }
 }

@@ -9,7 +9,6 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
@@ -19,9 +18,9 @@ private val DarkColorScheme = darkColorScheme(
     background = DarkBackground,
     surface = DarkSurface,
     surfaceVariant = DarkSurfaceVariant,
-    onPrimary = Color(0xFF1C1B2E),
-    onSecondary = Color(0xFF003731),
-    onTertiary = Color(0xFF3F001D),
+    onPrimary = DarkOnPrimary,
+    onSecondary = DarkOnSecondary,
+    onTertiary = DarkOnTertiary,
     onBackground = DarkOnSurface,
     onSurface = DarkOnSurface,
     onSurfaceVariant = DarkOnSurfaceVariant,
@@ -36,9 +35,9 @@ private val LightColorScheme = lightColorScheme(
     background = LightBackground,
     surface = LightSurface,
     surfaceVariant = LightSurfaceVariant,
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
+    onPrimary = androidx.compose.ui.graphics.Color.White,
+    onSecondary = androidx.compose.ui.graphics.Color.White,
+    onTertiary = androidx.compose.ui.graphics.Color.White,
     onBackground = LightOnSurface,
     onSurface = LightOnSurface,
     onSurfaceVariant = LightOnSurfaceVariant,
@@ -49,7 +48,6 @@ private val LightColorScheme = lightColorScheme(
 @Composable
 fun ToolsTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
@@ -58,7 +56,6 @@ fun ToolsTheme(
             val context = LocalContext.current
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
-
         darkTheme -> DarkColorScheme
         else -> LightColorScheme
     }
@@ -66,6 +63,7 @@ fun ToolsTheme(
     MaterialTheme(
         colorScheme = colorScheme,
         typography = Typography,
+        shapes = AppShapes,
         content = content
     )
 }

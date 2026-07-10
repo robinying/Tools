@@ -1,10 +1,8 @@
 package com.robin.tools.feature.media.ui.screens
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.FilterAlt
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Slideshow
@@ -13,15 +11,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-
 import androidx.compose.ui.platform.LocalContext
-import android.widget.Toast
+import androidx.compose.ui.res.stringResource
 import com.robin.tools.feature.media.R
 import com.robin.tools.feature.media.utils.FileUtils
+import com.robin.tools.core.ui.Dimension
+import com.robin.tools.core.ui.FeatureCard
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -39,7 +34,7 @@ fun MainScreen(
                 title = { Text(context.getString(R.string.media_compression_tool)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = context.getString(R.string.back))
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = context.getString(R.string.back))
                     }
                 }
             )
@@ -49,103 +44,55 @@ fun MainScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(16.dp),
+                .padding(Dimension.lg),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
                 text = context.getString(R.string.media_compression_tool),
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(bottom = 32.dp)
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier.padding(bottom = Dimension.xxl)
             )
 
-            CompressionCard(
+            FeatureCard(
                 title = context.getString(R.string.video_compress),
                 description = context.getString(R.string.video_compress_desc),
                 icon = Icons.Default.VideoLibrary,
                 onClick = onVideoCompressClick
             )
+            Spacer(Modifier.height(Dimension.lg))
 
-            Spacer(modifier = Modifier.height(16.dp))
-
-            CompressionCard(
+            FeatureCard(
                 title = context.getString(R.string.image_compress),
                 description = context.getString(R.string.image_compress_desc),
                 icon = Icons.Default.Image,
                 onClick = onImageCompressClick
             )
+            Spacer(Modifier.height(Dimension.lg))
 
-            Spacer(modifier = Modifier.height(16.dp))
-
-            CompressionCard(
+            FeatureCard(
                 title = context.getString(R.string.video_to_gif),
                 description = context.getString(R.string.video_to_gif_desc),
                 icon = Icons.Default.Slideshow,
                 onClick = onGifConvertClick
             )
+            Spacer(Modifier.height(Dimension.lg))
 
-            Spacer(modifier = Modifier.height(16.dp))
-
-            CompressionCard(
+            FeatureCard(
                 title = context.getString(R.string.image_filter),
                 description = context.getString(R.string.image_filter_desc),
                 icon = Icons.Default.FilterAlt,
                 onClick = onFilterClick
             )
 
-            Spacer(modifier = Modifier.weight(1f))
+            Spacer(Modifier.weight(1f))
 
             TextButton(
                 onClick = {
                     FileUtils.clearCache(context)
-                    Toast.makeText(context, context.getString(R.string.cache_cleared), Toast.LENGTH_SHORT).show()
+                    android.widget.Toast.makeText(context, context.getString(R.string.cache_cleared), android.widget.Toast.LENGTH_SHORT).show()
                 }
             ) {
                 Text(context.getString(R.string.clear_cache), color = MaterialTheme.colorScheme.secondary)
-            }
-        }
-    }
-}
-
-@Composable
-fun CompressionCard(
-    title: String,
-    description: String,
-    icon: ImageVector,
-    onClick: () -> Unit
-) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(120.dp)
-            .clickable { onClick() },
-        shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                modifier = Modifier.size(48.dp),
-                tint = MaterialTheme.colorScheme.primary
-            )
-            Spacer(modifier = Modifier.width(16.dp))
-            Column {
-                Text(
-                    text = title,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    text = description,
-                    fontSize = 14.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
             }
         }
     }

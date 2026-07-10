@@ -29,7 +29,7 @@ class PureBitmapFilterDelegate : FilterDelegate {
         onProgress(0f, "Processing…")
         val result = withContext(Dispatchers.Default) {
             when (type) {
-                FilterType.GRAYSCALE -> applyGrayscalePinBackgroundThread(input)
+                FilterType.GRAYSCALE -> applyGrayscale(input)
                 else -> input.copy(Bitmap.Config.ARGB_8888, false)
             }
         }
@@ -37,7 +37,7 @@ class PureBitmapFilterDelegate : FilterDelegate {
         return Result.success(result)
     }
 
-    private fun applyGrayscalePinBackgroundThread(source: Bitmap): Bitmap {
+    private fun applyGrayscale(source: Bitmap): Bitmap {
         val out = Bitmap.createBitmap(source.width, source.height, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(out)
         val paint = Paint()

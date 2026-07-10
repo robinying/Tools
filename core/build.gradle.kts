@@ -48,12 +48,13 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.constraintlayout)
 
-    // Compose：供 core 内共享的 Compose 工具（如 SwipeBackContainer）使用
+    // Compose：供 core 内共享的 Compose 工具（如 SwipeBackContainer, FeatureCard）使用
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.runtime)
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.foundation)
     implementation(libs.androidx.compose.animation)
+    implementation(libs.androidx.compose.material3)
 
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)

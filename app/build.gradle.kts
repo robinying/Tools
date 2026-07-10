@@ -5,6 +5,9 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
 }
 
+import java.io.FileInputStream
+import java.util.Properties
+
 android {
     namespace = "com.robin.tools"
     compileSdk = 36
@@ -25,11 +28,47 @@ android {
         }
     }
 
+    signingConfigs {
+        create("release") {
+            val localPropsFile = rootProject.file("local.properties")
+            if (localPropsFile.exists()) {
+                val localProps = FileInputStream(localPropsFile).use { Properties().apply { load(it) } }
+                val keystorePath = localProps.getProperty("RELEASE_STORE_FILE")
+                    ?: System.getenv("RELEASE_STORE_FILE")
+                if (keystorePath != null) {
+                    storeFile = file(keystorePath)
+                    storePassword = localProps.getProperty("RELEASE_STORE_PASSWORD")
+                        ?: System.getenv("RELEASE_STORE_PASSWORD") ?: ""
+                    keyAlias = localProps.getProperty("RELEASE_KEY_ALIAS")
+                        ?: System.getenv("RELEASE_KEY_ALIAS") ?: ""
+                    keyPassword = localProps.getProperty("RELEASE_KEY_PASSWORD")
+                        ?: System.getenv("RELEASE_KEY_PASSWORD") ?: ""
+                }
+            }
+        }
+    }
+
     buildTypes {
+        debug {
+            val localPropsFile = rootProject.file("local.properties")
+            if (localPropsFile.exists()) {
+                val localProps = FileInputStream(localPropsFile).use { Properties().apply { load(it) } }
+                if (localProps.getProperty("RELEASE_STORE_FILE") != null) {
+                    signingConfig = signingConfigs.getByName("release")
+                }
+            }
+        }
         release {
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            val localPropsFile = rootProject.file("local.properties")
+            if (localPropsFile.exists()) {
+                val localProps = FileInputStream(localPropsFile).use { Properties().apply { load(it) } }
+                if (localProps.getProperty("RELEASE_STORE_FILE") != null) {
+                    signingConfig = signingConfigs.getByName("release")
+                }
+            }
         }
     }
 

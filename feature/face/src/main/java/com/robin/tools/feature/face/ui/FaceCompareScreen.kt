@@ -47,19 +47,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.res.stringResource
 import coil.compose.AsyncImage
 import com.robin.tools.feature.face.R
 import com.robin.tools.feature.face.data.CompareResult
 import com.robin.tools.feature.face.data.SimilarityLevel
+import com.robin.tools.core.ui.Dimension
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -111,7 +110,7 @@ fun FaceCompareScreen(
                 onSwap = { viewModel.swapImages() }
             )
 
-            Spacer(Modifier.height(24.dp))
+            Spacer(Modifier.height(Dimension.xl))
 
             Button(
                 onClick = { viewModel.compare() },
@@ -129,14 +128,14 @@ fun FaceCompareScreen(
                         strokeWidth = 2.dp,
                         color = MaterialTheme.colorScheme.onPrimary
                     )
-                    Spacer(Modifier.width(12.dp))
+                    Spacer(Modifier.width(Dimension.md))
                     Text(stringResource(R.string.face_compare_analyzing))
                 } else {
-                    Text(stringResource(R.string.face_compare_action), fontSize = 16.sp)
+                    Text(stringResource(R.string.face_compare_action), style = MaterialTheme.typography.titleMedium)
                 }
             }
 
-            Spacer(Modifier.height(24.dp))
+            Spacer(Modifier.height(Dimension.xl))
 
             AnimatedVisibility(
                 visible = uiState.result != null && uiState.result!!.errorMessage == null,
@@ -249,7 +248,7 @@ private fun ImageSelectorCard(
                             modifier = Modifier.size(32.dp),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
-                        Spacer(Modifier.height(4.dp))
+                        Spacer(Modifier.height(Dimension.xs))
                         Text(
                             stringResource(R.string.face_compare_select_photo),
                             style = MaterialTheme.typography.bodySmall,
@@ -260,7 +259,7 @@ private fun ImageSelectorCard(
             }
         }
 
-        Spacer(Modifier.height(4.dp))
+        Spacer(Modifier.height(Dimension.xs))
 
         Text(
             text = stringResource(R.string.face_compare_photo_label, label),
@@ -288,8 +287,8 @@ private fun ImageSelectorCard(
 private fun ResultCard(result: CompareResult) {
     val (color, labelResId) = when (result.level) {
         SimilarityLevel.HIGH -> MaterialTheme.colorScheme.primary to R.string.face_compare_high
-        SimilarityLevel.MEDIUM -> Color(0xFFFFA000) to R.string.face_compare_medium
-        SimilarityLevel.LOW -> Color(0xFFFF7043) to R.string.face_compare_low
+        SimilarityLevel.MEDIUM -> MaterialTheme.colorScheme.tertiary to R.string.face_compare_medium
+        SimilarityLevel.LOW -> MaterialTheme.colorScheme.error to R.string.face_compare_low
         SimilarityLevel.NONE -> MaterialTheme.colorScheme.error to R.string.face_compare_none
     }
 
@@ -304,20 +303,20 @@ private fun ResultCard(result: CompareResult) {
         ) {
             Text(
                 text = stringResource(R.string.face_compare_result, result.similarityScore * 100f),
-                fontSize = 24.sp,
+                style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold
             )
 
-            Spacer(Modifier.height(8.dp))
+            Spacer(Modifier.height(Dimension.sm))
 
             Text(
                 text = stringResource(labelResId),
-                fontSize = 16.sp,
+                style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
                 color = color
             )
 
-            Spacer(Modifier.height(12.dp))
+            Spacer(Modifier.height(Dimension.md))
 
             LinearProgressIndicator(
                 progress = { result.similarityScore.coerceIn(0f, 1f) },
@@ -330,7 +329,7 @@ private fun ResultCard(result: CompareResult) {
                 strokeCap = StrokeCap.Round
             )
 
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(Dimension.lg))
 
             Row(
                 modifier = Modifier.fillMaxWidth(),

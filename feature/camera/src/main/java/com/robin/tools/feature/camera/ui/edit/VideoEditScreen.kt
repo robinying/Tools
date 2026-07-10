@@ -17,12 +17,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
+
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -113,7 +112,7 @@ fun VideoEditScreen(
                 // Video preview
                 Box(
                     modifier = Modifier.fillMaxWidth().weight(1f).clip(RoundedCornerShape(8.dp))
-                        .background(Color.Black)
+                        .background(MaterialTheme.colorScheme.background)
                 ) {
                     AndroidView(
                         factory = { ctx ->
@@ -135,8 +134,8 @@ fun VideoEditScreen(
                     if (uiState.watermarkText.isNotEmpty()) {
                         Text(
                             uiState.watermarkText,
-                            color = Color.White.copy(alpha = 0.7f),
-                            fontSize = 24.sp,
+                            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
+                            style = MaterialTheme.typography.headlineSmall,
                             fontWeight = FontWeight.Bold,
                             modifier = Modifier.align(Alignment.Center)
                         )
@@ -149,7 +148,7 @@ fun VideoEditScreen(
                     ) {
                         Icon(
                             if (uiState.isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
-                            "Play", tint = Color.White, modifier = Modifier.size(48.dp)
+                            "Play", tint = MaterialTheme.colorScheme.onBackground, modifier = Modifier.size(48.dp)
                         )
                     }
                 }
@@ -164,7 +163,7 @@ fun VideoEditScreen(
                         FilterChip(
                             selected = sel,
                             onClick = { viewModel.setFilter(filter) },
-                            label = { Text(stringResource(filter.stringRes()), fontSize = 12.sp) },
+                            label = { Text(stringResource(filter.stringRes()), style = MaterialTheme.typography.labelSmall) },
                             colors = FilterChipDefaults.filterChipColors(
                                 selectedContainerColor = MaterialTheme.colorScheme.primaryContainer
                             )
@@ -180,13 +179,13 @@ fun VideoEditScreen(
                     IconButton(onClick = { showWatermarkDialog = true }) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Icon(Icons.Default.TextFields, "Watermark")
-                            Text(stringResource(R.string.edit_watermark), fontSize = 10.sp)
+                            Text(stringResource(R.string.edit_watermark), style = MaterialTheme.typography.labelSmall)
                         }
                     }
                     IconButton(onClick = {}) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Icon(Icons.Default.EmojiEmotions, "Sticker")
-                            Text(stringResource(R.string.edit_sticker), fontSize = 10.sp)
+                            Text(stringResource(R.string.edit_sticker), style = MaterialTheme.typography.labelSmall)
                         }
                     }
                 }
