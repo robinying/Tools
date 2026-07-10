@@ -57,6 +57,9 @@ dependencies {
     // FFmpegKit (bundle from local aar)
     implementation(files("libs/ffmpeg-kit.aar"))
 
+    // OpenCV Android SDK v4.12.0 (Java API, no NDK/JNI required)
+    implementation(files("libs/opencv.aar"))
+
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.mockk)

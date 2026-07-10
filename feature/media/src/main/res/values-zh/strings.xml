@@ -40,4 +40,26 @@
     <string name="clear_cache">清除缓存</string>
     <string name="service_cancelled">任务已取消</string>
     <string name="service_unknown_error">未知错误</string>
+
+    <!-- Image filter -->
+    <string name="filter_tool">图像滤镜</string>
+    <string name="image_filter">图像滤镜</string>
+    <string name="image_filter_desc">灰度、模糊、素描、卡通化等风格化效果</string>
+    <string name="select_image">选择图片</string>
+    <string name="select_filter">选择滤镜</string>
+    <string name="start_filter">应用滤镜</string>
+    <string name="filter_processing">正在应用滤镜…</string>
+    <string name="filter_complete">滤镜效果已应用</string>
+    <string name="filter_error">滤镜处理出错</string>
+    <string name="original">原图</string>
+    <string name="filter_result">效果图</string>
+    <string name="original_image">原始图片</string>
+    <string name="save_to_gallery">保存到相册</string>
+
+    <string name="filter_grayscale">灰度</string>
+    <string name="filter_blur">模糊</string>
+    <string name="filter_edge_detection">边缘检测</string>
+    <string name="filter_cartoon">卡通化</string>
+    <string name="filter_sharpen">锐化</string>
+    <string name="filter_sketch">素描</string>
 </resources>

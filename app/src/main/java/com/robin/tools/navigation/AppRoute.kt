@@ -37,5 +37,9 @@ sealed interface AppRoute {
     data class VideoTrim(val videoPath: String) : AppRoute
 
     @Serializable
-    data class CoverSelect(val videoPath: String) : AppRoute
+    data object CoverSelect(val videoPath: String) : AppRoute
+
+    // Media tool routes — filter
+    @Serializable
+    data object Filter : AppRoute
 }

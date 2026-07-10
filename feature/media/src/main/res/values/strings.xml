@@ -40,4 +40,26 @@
     <string name="clear_cache">Clear cache</string>
     <string name="service_cancelled">Task cancelled</string>
     <string name="service_unknown_error">Unknown error</string>
+
+    <!-- Image filter -->
+    <string name="filter_tool">Image Filter</string>
+    <string name="image_filter">Image Filter</string>
+    <string name="image_filter_desc">Grayscale, blur, sketch, cartoon, and more stylization effects</string>
+    <string name="select_image">Select Image</string>
+    <string name="select_filter">Select Filter</string>
+    <string name="start_filter">Apply Filter</string>
+    <string name="filter_processing">Applying filter…</string>
+    <string name="filter_complete">Filter applied</string>
+    <string name="filter_error">Filter error</string>
+    <string name="original">Original</string>
+    <string name="filter_result">Result</string>
+    <string name="original_image">Original image</string>
+    <string name="save_to_gallery">Save to Gallery</string>
+
+    <string name="filter_grayscale">Grayscale</string>
+    <string name="filter_blur">Blur</string>
+    <string name="filter_edge_detection">Edge Detection</string>
+    <string name="filter_cartoon">Cartoon</string>
+    <string name="filter_sharpen">Sharpen</string>
+    <string name="filter_sketch">Sketch</string>
 </resources>

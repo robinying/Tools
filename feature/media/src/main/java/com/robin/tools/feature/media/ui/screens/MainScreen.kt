@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.FilterAlt
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Slideshow
 import androidx.compose.material.icons.filled.VideoLibrary
@@ -28,7 +29,8 @@ fun MainScreen(
     onBack: () -> Unit = {},
     onVideoCompressClick: () -> Unit,
     onImageCompressClick: () -> Unit,
-    onGifConvertClick: () -> Unit
+    onGifConvertClick: () -> Unit,
+    onFilterClick: () -> Unit
 ) {
     val context = LocalContext.current
     Scaffold(
@@ -80,6 +82,15 @@ fun MainScreen(
                 description = context.getString(R.string.video_to_gif_desc),
                 icon = Icons.Default.Slideshow,
                 onClick = onGifConvertClick
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            CompressionCard(
+                title = context.getString(R.string.image_filter),
+                description = context.getString(R.string.image_filter_desc),
+                icon = Icons.Default.FilterAlt,
+                onClick = onFilterClick
             )
 
             Spacer(modifier = Modifier.weight(1f))

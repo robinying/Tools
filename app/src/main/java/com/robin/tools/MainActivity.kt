@@ -40,6 +40,7 @@ import com.robin.tools.feature.lightlux.data.SnapshotListViewModel
 import com.robin.tools.feature.lightlux.presentation.LightLuxScreen
 import com.robin.tools.feature.media.data.CompressionType
 import com.robin.tools.feature.media.ui.screens.CompressionScreen
+import com.robin.tools.feature.media.ui.screens.FilterScreen
 import com.robin.tools.feature.media.ui.screens.MainScreen as MediaMainScreen
 import com.robin.tools.navigation.AppRoute
 import com.robin.tools.ui.screens.HomeScreen
@@ -117,6 +118,11 @@ class MainActivity : ComponentActivity() {
                             val route = backStackEntry.toRoute<AppRoute.CoverSelect>()
                             CoverSelectWrapper(navController, route.videoPath)
                         }
+
+                        // Media tool routes — filter
+                        composable<AppRoute.Filter> {
+                            FilterWrapper(navController)
+                        }
                     }
                 }
             }
@@ -131,6 +137,7 @@ private fun MediaMainWrapper(navController: NavHostController) {
             onVideoCompressClick = { navController.navigate(AppRoute.Compression(CompressionType.VIDEO)) },
             onImageCompressClick = { navController.navigate(AppRoute.Compression(CompressionType.IMAGE)) },
             onGifConvertClick = { navController.navigate(AppRoute.Compression(CompressionType.GIF)) },
+            onFilterClick = { navController.navigate(AppRoute.Filter) },
             onBack = { navController.popBackStack() }
         )
     }
@@ -272,6 +279,15 @@ private fun CoverSelectWrapper(navController: NavHostController, videoPath: Stri
             videoPath = videoPath,
             onBack = { navController.popBackStack() },
             onComplete = { navController.popBackStack() }
+        )
+    }
+}
+
+@Composable
+private fun FilterWrapper(navController: NavHostController) {
+    SwipeBackContainer(onBack = { navController.popBackStack() }) {
+        FilterScreen(
+            onBack = { navController.popBackStack() }
         )
     }
 }
