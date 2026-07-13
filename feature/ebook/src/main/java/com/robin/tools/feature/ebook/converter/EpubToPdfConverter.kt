@@ -337,18 +337,22 @@ class EpubToPdfConverter(private val context: Context) {
             // Write compressed result directly to file — no ByteArrayOutputStream buffer
             val tempFile = File(file.parent, file.name + ".tmp")
             try {
-                tempFile.outputStream().use { fos ->
-                    if (!bitmap.compress(format, quality, fos)) {
-                        Log.w(TAG, "Bitmap.compress returned false for ${file.name}")
-                        return false
+                val compressed = tempFile.outputStream().use { fos ->
+                    val ok = bitmap.compress(format, quality, fos)
+                    if (ok) {
+                        fos.flush()
+                        fos.fd.sync()
                     }
-                    fos.flush()
-                    fos.fd.sync()
+                    ok
+                }
+                if (!compressed) {
+                    Log.w(TAG, "Bitmap.compress returned false for ${file.name}")
+                    tempFile.delete()
+                    return false
                 }
                 // Capture dimensions BEFORE recycle
                 val newW = bitmap.width
                 val newH = bitmap.height
-                bitmap.recycle()
 
                 // Replace original with resized version
                 if (!file.delete() || !tempFile.renameTo(file)) {
@@ -360,10 +364,13 @@ class EpubToPdfConverter(private val context: Context) {
                     "${newW}x${newH} ${file.length() / 1024}KB (sample=$sampleSize)")
                 true
             } catch (e: Exception) {
-                bitmap.recycle()
                 tempFile.delete()
                 Log.w(TAG, "Failed to resize image ${file.name}: ${e.message}")
                 false
+            } finally {
+                if (!bitmap.isRecycled) {
+                    bitmap.recycle()
+                }
             }
         } catch (e: Exception) {
             Log.w(TAG, "Failed to resize image ${file.name}, using original", e)

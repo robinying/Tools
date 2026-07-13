@@ -1,18 +1,20 @@
 package com.robin.tools.ui.screens
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.LightMode
-import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.filled.Videocam
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -49,44 +51,69 @@ fun HomeScreen(
             text = stringResource(R.string.home_subtitle),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(bottom = Dimension.xxxl)
+            modifier = Modifier.padding(bottom = Dimension.xxl)
         )
 
-        FeatureCard(
-            title = stringResource(R.string.media_editor_title),
-            description = stringResource(R.string.media_editor_desc),
-            icon = Icons.Default.Image,
-            onClick = onMediaClick
-        )
-        Spacer(Modifier.height(Dimension.lg))
-        FeatureCard(
-            title = stringResource(R.string.ebook_converter_title),
-            description = stringResource(R.string.ebook_converter_desc),
-            icon = Icons.AutoMirrored.Filled.MenuBook,
-            onClick = onEbookClick
-        )
-        Spacer(Modifier.height(Dimension.lg))
-        FeatureCard(
-            title = stringResource(R.string.light_meter_title),
-            description = stringResource(R.string.light_meter_desc),
-            icon = Icons.Default.LightMode,
-            onClick = onLightLuxClick
-        )
-        Spacer(Modifier.height(Dimension.lg))
-        FeatureCard(
-            title = stringResource(R.string.face_compare_title),
-            description = stringResource(R.string.face_compare_desc),
-            icon = Icons.Default.Face,
-            onClick = onFaceCompareClick
-        )
-        Spacer(Modifier.height(Dimension.lg))
-        FeatureCard(
-            title = stringResource(R.string.camera_title),
-            description = stringResource(R.string.camera_desc),
-            icon = Icons.Default.Videocam,
-            onClick = onCameraClick
-        )
+        HomeSectionHeader(title = stringResource(R.string.home_section_create))
+        Spacer(Modifier.height(Dimension.md))
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(Dimension.md)
+        ) {
+            FeatureCard(
+                title = stringResource(R.string.camera_title),
+                description = stringResource(R.string.camera_desc),
+                icon = Icons.Default.Videocam,
+                onClick = onCameraClick
+            )
+            FeatureCard(
+                title = stringResource(R.string.media_editor_title),
+                description = stringResource(R.string.media_editor_desc),
+                icon = Icons.Default.Image,
+                onClick = onMediaClick
+            )
+        }
+
+        Spacer(Modifier.height(Dimension.xl))
+
+        HomeSectionHeader(title = stringResource(R.string.home_section_utility))
+        Spacer(Modifier.height(Dimension.md))
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(Dimension.md)
+        ) {
+            FeatureCard(
+                title = stringResource(R.string.ebook_converter_title),
+                description = stringResource(R.string.ebook_converter_desc),
+                icon = Icons.AutoMirrored.Filled.MenuBook,
+                onClick = onEbookClick
+            )
+            FeatureCard(
+                title = stringResource(R.string.light_meter_title),
+                description = stringResource(R.string.light_meter_desc),
+                icon = Icons.Default.LightMode,
+                onClick = onLightLuxClick
+            )
+            FeatureCard(
+                title = stringResource(R.string.face_compare_title),
+                description = stringResource(R.string.face_compare_desc),
+                icon = Icons.Default.Face,
+                onClick = onFaceCompareClick
+            )
+        }
 
         Spacer(Modifier.height(Dimension.xxl))
     }
+}
+
+@Composable
+private fun HomeSectionHeader(title: String) {
+    Text(
+        text = title,
+        style = MaterialTheme.typography.labelLarge,
+        color = MaterialTheme.colorScheme.primary,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = Dimension.xs)
+    )
 }

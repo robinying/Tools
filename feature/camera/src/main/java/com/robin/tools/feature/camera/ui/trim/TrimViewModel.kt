@@ -38,9 +38,9 @@ class TrimViewModel : ViewModel() {
 
     fun loadVideo(context: Context, path: String) {
         viewModelScope.launch(Dispatchers.IO) {
+            val retriever = MediaMetadataRetriever()
             try {
                 videoPath = VideoPathResolver.resolve(context, path)
-                val retriever = MediaMetadataRetriever()
                 retriever.setDataSource(videoPath)
                 val dur = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toLongOrNull() ?: 0L
                 val thumbs = mutableListOf<Bitmap>()
@@ -52,10 +52,16 @@ class TrimViewModel : ViewModel() {
                         if (frame != thumbs.last()) frame.recycle()
                     }
                 }
-                retriever.release()
-                _uiState.update { it.copy(durationMs = dur, endMs = dur, thumbnails = thumbs) }
+                val oldThumbs = _uiState.value.thumbnails
+                _uiState.update { it.copy(durationMs = dur, endMs = dur, thumbnails = thumbs, error = null) }
+                recycleBitmaps(oldThumbs)
             } catch (e: Exception) {
                 _uiState.update { it.copy(error = "Failed to load: ${e.message}") }
+            } finally {
+                try {
+                    retriever.release()
+                } catch (_: Exception) {
+                }
             }
         }
     }
@@ -137,6 +143,13 @@ class TrimViewModel : ViewModel() {
 
     override fun onCleared() {
         mediaPlayer?.release()
+        recycleBitmaps(_uiState.value.thumbnails)
         super.onCleared()
+    }
+
+    private fun recycleBitmaps(bitmaps: List<Bitmap>) {
+        bitmaps.forEach { bmp ->
+            if (!bmp.isRecycled) bmp.recycle()
+        }
     }
 }

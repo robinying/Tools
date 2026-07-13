@@ -4,7 +4,6 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.media.MediaMetadataRetriever
 import android.media.MediaPlayer
-import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.robin.tools.feature.camera.editor.VideoClipper
@@ -39,15 +38,19 @@ class VideoEditViewModel : ViewModel() {
 
     fun loadVideo(context: Context, path: String) {
         viewModelScope.launch(Dispatchers.IO) {
+            val retriever = MediaMetadataRetriever()
             try {
                 videoPath = VideoPathResolver.resolve(context, path)
-                val retriever = MediaMetadataRetriever()
                 retriever.setDataSource(videoPath)
                 val dur = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toLongOrNull() ?: 0L
-                retriever.release()
-                _uiState.update { it.copy(durationMs = dur) }
+                _uiState.update { it.copy(durationMs = dur, error = null) }
             } catch (e: Exception) {
                 _uiState.update { it.copy(error = "Failed to load: ${e.message}") }
+            } finally {
+                try {
+                    retriever.release()
+                } catch (_: Exception) {
+                }
             }
         }
     }
@@ -100,5 +103,11 @@ class VideoEditViewModel : ViewModel() {
         }
     }
 
-    override fun onCleared() { mediaPlayer?.release(); super.onCleared() }
+    override fun onCleared() {
+        mediaPlayer?.release()
+        _uiState.value.stickers.forEach { bmp ->
+            if (!bmp.isRecycled) bmp.recycle()
+        }
+        super.onCleared()
+    }
 }

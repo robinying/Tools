@@ -3,6 +3,8 @@
     <string name="app_name">工具箱</string>
     <string name="home_title">工具箱</string>
     <string name="home_subtitle">媒体压缩 · 电子书转换 · 光线测量 · 相机</string>
+    <string name="home_section_create">创作与编辑</string>
+    <string name="home_section_utility">实用工具</string>
     <string name="media_editor_title">媒体编辑</string>
     <string name="media_editor_desc">压缩视频/图片，转换视频为 GIF</string>
     <string name="ebook_converter_title">电子书转换</string>

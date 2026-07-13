@@ -31,9 +31,9 @@ class CoverViewModel : ViewModel() {
 
     fun loadVideo(context: Context, path: String) {
         viewModelScope.launch(Dispatchers.IO) {
+            val retriever = MediaMetadataRetriever()
             try {
                 videoPath = VideoPathResolver.resolve(context, path)
-                val retriever = MediaMetadataRetriever()
                 retriever.setDataSource(videoPath)
                 val dur = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toLongOrNull() ?: 0L
 
@@ -48,24 +48,47 @@ class CoverViewModel : ViewModel() {
                     }
                     t += interval
                 }
-                retriever.release()
-                _uiState.update { it.copy(durationMs = dur, thumbnails = frames) }
+                val oldThumbs = _uiState.value.thumbnails
+                val oldSelected = _uiState.value.selectedBitmap
+                _uiState.update {
+                    it.copy(
+                        durationMs = dur,
+                        thumbnails = frames,
+                        selectedBitmap = null,
+                        error = null
+                    )
+                }
+                recycleThumbnailPairs(oldThumbs)
+                recycleQuietly(oldSelected)
             } catch (e: Exception) {
                 _uiState.update { it.copy(error = "Failed to load: ${e.message}") }
+            } finally {
+                try {
+                    retriever.release()
+                } catch (_: Exception) {
+                }
             }
         }
     }
 
     fun selectFrame(timeMs: Long) {
         viewModelScope.launch(Dispatchers.IO) {
+            val retriever = MediaMetadataRetriever()
             try {
-                val retriever = MediaMetadataRetriever()
                 retriever.setDataSource(videoPath)
                 val fullFrame = retriever.getFrameAtTime(timeMs * 1000L, MediaMetadataRetriever.OPTION_CLOSEST_SYNC)
-                retriever.release()
+                val previous = _uiState.value.selectedBitmap
                 _uiState.update { it.copy(selectedTimeMs = timeMs, selectedBitmap = fullFrame) }
+                if (previous != null && previous !== fullFrame) {
+                    recycleQuietly(previous)
+                }
             } catch (e: Exception) {
                 _uiState.update { it.copy(error = "Failed to get frame: ${e.message}") }
+            } finally {
+                try {
+                    retriever.release()
+                } catch (_: Exception) {
+                }
             }
         }
     }
@@ -86,6 +109,22 @@ class CoverViewModel : ViewModel() {
             } catch (e: Exception) {
                 _uiState.update { it.copy(error = "Save failed: ${e.message}") }
             }
+        }
+    }
+
+    override fun onCleared() {
+        recycleThumbnailPairs(_uiState.value.thumbnails)
+        recycleQuietly(_uiState.value.selectedBitmap)
+        super.onCleared()
+    }
+
+    private fun recycleThumbnailPairs(pairs: List<Pair<Long, Bitmap>>) {
+        pairs.forEach { (_, bmp) -> recycleQuietly(bmp) }
+    }
+
+    private fun recycleQuietly(bitmap: Bitmap?) {
+        if (bitmap != null && !bitmap.isRecycled) {
+            bitmap.recycle()
         }
     }
 }

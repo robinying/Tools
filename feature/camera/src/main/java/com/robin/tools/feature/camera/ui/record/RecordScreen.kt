@@ -26,6 +26,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.robin.tools.feature.camera.R
 import com.robin.tools.feature.camera.filter.FilterType
 import com.robin.tools.feature.camera.filter.stringRes
 import com.robin.tools.feature.camera.opengl.CameraGlSurfaceView
@@ -60,7 +61,11 @@ fun RecordScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(onClick = onBack) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = MaterialTheme.colorScheme.onBackground)
+                Icon(
+                    Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = stringResource(R.string.record_back),
+                    tint = MaterialTheme.colorScheme.onBackground
+                )
             }
             IconButton(onClick = { viewModel.switchCamera() }) {
                 Icon(Icons.Default.SwitchCamera, "Flip", tint = MaterialTheme.colorScheme.onBackground)

@@ -3,6 +3,8 @@
     <string name="app_name">Strumenti</string>
     <string name="home_title">Strumenti</string>
     <string name="home_subtitle">Compressione Media · Conversione Ebook · Misuratore di Luce</string>
+    <string name="home_section_create">Crea e modifica</string>
+    <string name="home_section_utility">Utilità</string>
     <string name="media_editor_title">Editor Media</string>
     <string name="media_editor_desc">Comprimere video/immagini, convertire video in GIF</string>
     <string name="ebook_converter_title">Convertitore Ebook</string>

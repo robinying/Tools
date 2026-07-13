@@ -9,7 +9,6 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -24,6 +23,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.robin.tools.core.ui.ToolsTopAppBar
 import com.robin.tools.feature.camera.R
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -41,11 +41,10 @@ fun CoverScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.cover_title)) },
-                navigationIcon = {
-                    IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back") }
-                },
+            ToolsTopAppBar(
+                title = stringResource(R.string.cover_title),
+                onBack = onBack,
+                backContentDescription = stringResource(R.string.record_back),
                 actions = {
                     if (uiState.selectedBitmap != null) {
                         TextButton(onClick = { viewModel.saveCover(context, onComplete) }) {

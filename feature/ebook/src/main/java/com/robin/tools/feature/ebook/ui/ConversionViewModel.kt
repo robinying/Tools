@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.Uri
 import android.provider.OpenableColumns
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.robin.tools.feature.ebook.R
 import com.robin.tools.feature.ebook.converter.EpubToPdfConverter
@@ -56,5 +57,15 @@ class ConversionViewModel(private val context: Context) : ViewModel() {
                 } else null
             }
         } catch (_: Exception) { null }
+    }
+
+    class Factory(private val appContext: Context) : ViewModelProvider.Factory {
+        @Suppress("UNCHECKED_CAST")
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            require(modelClass.isAssignableFrom(ConversionViewModel::class.java)) {
+                "Unknown ViewModel class: ${modelClass.name}"
+            }
+            return ConversionViewModel(appContext.applicationContext) as T
+        }
     }
 }

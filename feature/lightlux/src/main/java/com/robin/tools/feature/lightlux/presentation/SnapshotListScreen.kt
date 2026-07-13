@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -15,6 +14,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.robin.tools.core.ui.ToolsTopAppBar
 import com.robin.tools.feature.lightlux.R
 import com.robin.tools.feature.lightlux.data.SnapshotListViewModel
 import java.text.SimpleDateFormat
@@ -32,13 +32,10 @@ fun SnapshotListScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.snapshots_title)) },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.back))
-                    }
-                },
+            ToolsTopAppBar(
+                title = stringResource(R.string.snapshots_title),
+                onBack = onBack,
+                backContentDescription = stringResource(R.string.back),
                 actions = {
                     if (entries.isNotEmpty()) {
                         IconButton(onClick = { viewModel.deleteAll() }) {

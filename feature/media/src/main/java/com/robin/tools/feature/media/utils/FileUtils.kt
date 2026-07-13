@@ -12,11 +12,26 @@ import java.io.FileInputStream
 import java.io.FileOutputStream
 
 object FileUtils {
+    private const val TAG = "FileUtils"
+    /** Scoped input cache — only this dir is wiped by [clearCache]. */
+    private const val MEDIA_TMP_DIR = "media_tmp"
+    /** Scoped output dir under external files / cache. */
+    private const val MEDIA_OUT_DIR = "media_out"
+
     fun getFileFromUri(context: Context, uri: Uri): File? {
         return try {
             val inputStream = context.contentResolver.openInputStream(uri) ?: return null
-            val fileName = getFileName(context, uri) ?: "temp_${System.currentTimeMillis()}"
-            val tempFile = File(context.cacheDir, fileName)
+            val rawName = getFileName(context, uri)
+            val safeName = sanitizeFileName(rawName)
+            val tmpDir = File(context.cacheDir, MEDIA_TMP_DIR).apply { mkdirs() }
+            val tempFile = File(tmpDir, "in_${System.currentTimeMillis()}_$safeName")
+
+            val cacheCanonical = context.cacheDir.canonicalPath
+            if (!tempFile.canonicalPath.startsWith(cacheCanonical + File.separator)) {
+                Log.w(TAG, "Rejected path outside cacheDir: ${tempFile.path}")
+                return null
+            }
+
             inputStream.use { input ->
                 FileOutputStream(tempFile).use { output ->
                     input.copyTo(output)
@@ -24,8 +39,24 @@ object FileUtils {
             }
             tempFile
         } catch (e: Exception) {
+            Log.e(TAG, "getFileFromUri failed", e)
             null
         }
+    }
+
+    /**
+     * Strips path separators and non-safe characters so DISPLAY_NAME cannot
+     * escape [cacheDir] via path traversal.
+     */
+    internal fun sanitizeFileName(name: String?): String {
+        val base = name
+            ?.substringAfterLast('/')
+            ?.substringAfterLast('\\')
+            ?.trim()
+            .orEmpty()
+        val cleaned = base.replace(Regex("[^A-Za-z0-9._-]"), "_")
+            .take(120)
+        return cleaned.ifBlank { "temp.bin" }
     }
 
     private fun getFileName(context: Context, uri: Uri): String? {
@@ -52,8 +83,9 @@ object FileUtils {
     }
 
     fun createOutputFile(context: Context, extension: String): File {
+        val parent = context.getExternalFilesDir(null) ?: context.cacheDir
+        val dir = File(parent, MEDIA_OUT_DIR).apply { mkdirs() }
         val fileName = "compressed_${System.currentTimeMillis()}.$extension"
-        val dir = context.getExternalFilesDir(null) ?: context.cacheDir
         return File(dir, fileName)
     }
 
@@ -114,33 +146,49 @@ object FileUtils {
         return saveToGallery(context, file, values, collection)
     }
 
+    /**
+     * Clears only media-scoped temp/output directories so concurrent ebook/camera
+     * work under other cache subdirs is not deleted.
+     */
     fun clearCache(context: Context) {
         try {
-            context.cacheDir.deleteRecursively()
-            context.getExternalFilesDir(null)?.deleteRecursively()
+            File(context.cacheDir, MEDIA_TMP_DIR).deleteRecursively()
+            val externalRoot = context.getExternalFilesDir(null)
+            if (externalRoot != null) {
+                File(externalRoot, MEDIA_OUT_DIR).deleteRecursively()
+            }
+            File(context.cacheDir, MEDIA_OUT_DIR).deleteRecursively()
         } catch (e: Exception) {
-            Log.e("FileUtils", "Failed to clear cache", e)
+            Log.e(TAG, "Failed to clear cache", e)
         }
     }
 
     private fun saveToGallery(context: Context, file: File, values: ContentValues, collection: Uri): Uri? {
-        val itemUri = context.contentResolver.insert(collection, values) ?: return null
+        val resolver = context.contentResolver
+        val itemUri = resolver.insert(collection, values) ?: return null
 
         return try {
-            context.contentResolver.openOutputStream(itemUri)?.use { outputStream ->
-                FileInputStream(file).use { inputStream ->
-                    inputStream.copyTo(outputStream)
+            val outputStream = resolver.openOutputStream(itemUri)
+                ?: throw IllegalStateException("openOutputStream returned null for $itemUri")
+            outputStream.use { out ->
+                FileInputStream(file).use { input ->
+                    input.copyTo(out)
                 }
             }
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 values.clear()
                 values.put(MediaStore.MediaColumns.IS_PENDING, 0)
-                context.contentResolver.update(itemUri, values, null, null)
+                resolver.update(itemUri, values, null, null)
             }
             itemUri
         } catch (e: Exception) {
-            context.contentResolver.delete(itemUri, null, null)
+            Log.e(TAG, "saveToGallery failed, deleting pending row", e)
+            try {
+                resolver.delete(itemUri, null, null)
+            } catch (deleteError: Exception) {
+                Log.e(TAG, "Failed to delete pending MediaStore row", deleteError)
+            }
             null
         }
     }

@@ -3,6 +3,8 @@
     <string name="app_name">Tools</string>
     <string name="home_title">Tools</string>
     <string name="home_subtitle">Media Compression · Ebook Conversion · Light Meter · Camera</string>
+    <string name="home_section_create">Create &amp; Edit</string>
+    <string name="home_section_utility">Utilities</string>
     <string name="media_editor_title">Media Editor</string>
     <string name="media_editor_desc">Compress video/image, convert video to GIF</string>
     <string name="ebook_converter_title">Ebook Converter</string>

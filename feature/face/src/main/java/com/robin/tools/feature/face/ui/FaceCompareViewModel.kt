@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.robin.tools.feature.face.data.CompareResult
 import com.robin.tools.feature.face.data.FaceAligner
@@ -88,91 +89,99 @@ class FaceCompareViewModel(
                 val compareResult = withContext(Dispatchers.IO) {
                     val leftBitmap = loadBitmap(left)
                     val rightBitmap = loadBitmap(right)
+                    try {
+                        val leftRotation = faceDetector.getRotationFromUri(appContext, left)
+                        val rightRotation = faceDetector.getRotationFromUri(appContext, right)
 
-                    val leftRotation = faceDetector.getRotationFromUri(appContext, left)
-                    val rightRotation = faceDetector.getRotationFromUri(appContext, right)
+                        val leftFaces = faceDetector.detect(leftBitmap, leftRotation)
+                        val rightFaces = faceDetector.detect(rightBitmap, rightRotation)
 
-                    val leftFaces = faceDetector.detect(leftBitmap, leftRotation)
-                    val rightFaces = faceDetector.detect(rightBitmap, rightRotation)
-
-                    if (leftFaces.isEmpty() || rightFaces.isEmpty()) {
-                        val errorMsg = when {
-                            leftFaces.isEmpty() && rightFaces.isEmpty() ->
-                                appContext.getString(R.string.face_compare_no_faces)
-                            leftFaces.isEmpty() ->
-                                appContext.getString(R.string.face_compare_no_face_left)
-                            else ->
-                                appContext.getString(R.string.face_compare_no_face_right)
-                        }
-                        return@withContext CompareResult(
-                            similarityScore = 0f,
-                            level = SimilarityLevel.NONE,
-                            faceCountLeft = leftFaces.size,
-                            faceCountRight = rightFaces.size,
-                            errorMessage = errorMsg
-                        )
-                    }
-
-                    val leftAligned = FaceAligner.align(leftBitmap, leftFaces.first())
-                    val rightAligned = FaceAligner.align(rightBitmap, rightFaces.first())
-
-                    if (leftAligned == null || rightAligned == null) {
-                        val errorMsg = when {
-                            leftAligned == null && rightAligned == null ->
-                                appContext.getString(R.string.face_compare_align_failed_both)
-                            leftAligned == null ->
-                                appContext.getString(R.string.face_compare_align_failed_left)
-                            else ->
-                                appContext.getString(R.string.face_compare_align_failed_right)
-                        }
-                        return@withContext CompareResult(
-                            similarityScore = 0f,
-                            level = SimilarityLevel.NONE,
-                            faceCountLeft = leftFaces.size,
-                            faceCountRight = rightFaces.size,
-                            errorMessage = errorMsg
-                        )
-                    }
-
-                    val leftEmbedding: FloatArray
-                    val rightEmbedding: FloatArray
-                    val useEuclidean: Boolean
-                    if (embeddingExtractor.isModelLoaded) {
-                        leftEmbedding = embeddingExtractor.extract(leftAligned)
-                        rightEmbedding = embeddingExtractor.extract(rightAligned)
-                        useEuclidean = false
-                    } else {
-                        leftEmbedding = LandmarkFeatureExtractor.extract(leftFaces.first())
-                            ?: return@withContext CompareResult(
+                        if (leftFaces.isEmpty() || rightFaces.isEmpty()) {
+                            val errorMsg = when {
+                                leftFaces.isEmpty() && rightFaces.isEmpty() ->
+                                    appContext.getString(R.string.face_compare_no_faces)
+                                leftFaces.isEmpty() ->
+                                    appContext.getString(R.string.face_compare_no_face_left)
+                                else ->
+                                    appContext.getString(R.string.face_compare_no_face_right)
+                            }
+                            return@withContext CompareResult(
                                 similarityScore = 0f,
                                 level = SimilarityLevel.NONE,
                                 faceCountLeft = leftFaces.size,
                                 faceCountRight = rightFaces.size,
-                                errorMessage = appContext.getString(R.string.face_compare_feature_failed_left)
+                                errorMessage = errorMsg
                             )
-                        rightEmbedding = LandmarkFeatureExtractor.extract(rightFaces.first())
-                            ?: return@withContext CompareResult(
-                                similarityScore = 0f,
-                                level = SimilarityLevel.NONE,
-                                faceCountLeft = leftFaces.size,
-                                faceCountRight = rightFaces.size,
-                                errorMessage = appContext.getString(R.string.face_compare_feature_failed_right)
-                            )
-                        useEuclidean = true
-                    }
+                        }
 
-                    val score = if (useEuclidean) {
-                        FaceSimilarityCalculator.euclideanSimilarity(leftEmbedding, rightEmbedding)
-                    } else {
-                        FaceSimilarityCalculator.cosineSimilarity(leftEmbedding, rightEmbedding)
+                        val leftAligned = FaceAligner.align(leftBitmap, leftFaces.first())
+                        val rightAligned = FaceAligner.align(rightBitmap, rightFaces.first())
+                        try {
+                            if (leftAligned == null || rightAligned == null) {
+                                val errorMsg = when {
+                                    leftAligned == null && rightAligned == null ->
+                                        appContext.getString(R.string.face_compare_align_failed_both)
+                                    leftAligned == null ->
+                                        appContext.getString(R.string.face_compare_align_failed_left)
+                                    else ->
+                                        appContext.getString(R.string.face_compare_align_failed_right)
+                                }
+                                return@withContext CompareResult(
+                                    similarityScore = 0f,
+                                    level = SimilarityLevel.NONE,
+                                    faceCountLeft = leftFaces.size,
+                                    faceCountRight = rightFaces.size,
+                                    errorMessage = errorMsg
+                                )
+                            }
+
+                            val leftEmbedding: FloatArray
+                            val rightEmbedding: FloatArray
+                            val useEuclidean: Boolean
+                            if (embeddingExtractor.isModelLoaded) {
+                                leftEmbedding = embeddingExtractor.extract(leftAligned)
+                                rightEmbedding = embeddingExtractor.extract(rightAligned)
+                                useEuclidean = false
+                            } else {
+                                leftEmbedding = LandmarkFeatureExtractor.extract(leftFaces.first())
+                                    ?: return@withContext CompareResult(
+                                        similarityScore = 0f,
+                                        level = SimilarityLevel.NONE,
+                                        faceCountLeft = leftFaces.size,
+                                        faceCountRight = rightFaces.size,
+                                        errorMessage = appContext.getString(R.string.face_compare_feature_failed_left)
+                                    )
+                                rightEmbedding = LandmarkFeatureExtractor.extract(rightFaces.first())
+                                    ?: return@withContext CompareResult(
+                                        similarityScore = 0f,
+                                        level = SimilarityLevel.NONE,
+                                        faceCountLeft = leftFaces.size,
+                                        faceCountRight = rightFaces.size,
+                                        errorMessage = appContext.getString(R.string.face_compare_feature_failed_right)
+                                    )
+                                useEuclidean = true
+                            }
+
+                            val score = if (useEuclidean) {
+                                FaceSimilarityCalculator.euclideanSimilarity(leftEmbedding, rightEmbedding)
+                            } else {
+                                FaceSimilarityCalculator.cosineSimilarity(leftEmbedding, rightEmbedding)
+                            }
+                            val level = FaceSimilarityCalculator.classify(score)
+                            CompareResult(
+                                similarityScore = score,
+                                level = level,
+                                faceCountLeft = leftFaces.size,
+                                faceCountRight = rightFaces.size
+                            )
+                        } finally {
+                            recycleIfDifferent(leftAligned, leftBitmap)
+                            recycleIfDifferent(rightAligned, rightBitmap)
+                        }
+                    } finally {
+                        recycleQuietly(leftBitmap)
+                        recycleQuietly(rightBitmap)
                     }
-                    val level = FaceSimilarityCalculator.classify(score)
-                    CompareResult(
-                        similarityScore = score,
-                        level = level,
-                        faceCountLeft = leftFaces.size,
-                        faceCountRight = rightFaces.size
-                    )
                 }
                 _uiState.update { it.copy(isProcessing = false, result = compareResult) }
             } catch (e: Exception) {
@@ -197,11 +206,15 @@ class FaceCompareViewModel(
             try {
                 withContext(Dispatchers.IO) {
                     val bitmap = loadBitmap(uri)
-                    val rotation = faceDetector.getRotationFromUri(appContext, uri)
-                    val faces = faceDetector.detect(bitmap, rotation)
-                    _uiState.update {
-                        if (isLeft) it.copy(leftFaceCount = faces.size)
-                        else it.copy(rightFaceCount = faces.size)
+                    try {
+                        val rotation = faceDetector.getRotationFromUri(appContext, uri)
+                        val faces = faceDetector.detect(bitmap, rotation)
+                        _uiState.update {
+                            if (isLeft) it.copy(leftFaceCount = faces.size)
+                            else it.copy(rightFaceCount = faces.size)
+                        }
+                    } finally {
+                        recycleQuietly(bitmap)
                     }
                 }
             } catch (_: Exception) {
@@ -210,6 +223,18 @@ class FaceCompareViewModel(
                     else it.copy(rightFaceCount = 0)
                 }
             }
+        }
+    }
+
+    private fun recycleQuietly(bitmap: Bitmap?) {
+        if (bitmap != null && !bitmap.isRecycled) {
+            bitmap.recycle()
+        }
+    }
+
+    private fun recycleIfDifferent(candidate: Bitmap?, original: Bitmap) {
+        if (candidate != null && candidate !== original && !candidate.isRecycled) {
+            candidate.recycle()
         }
     }
 
@@ -238,5 +263,15 @@ class FaceCompareViewModel(
             sampleSize *= 2
         }
         return sampleSize
+    }
+
+    class Factory(private val appContext: Context) : ViewModelProvider.Factory {
+        @Suppress("UNCHECKED_CAST")
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            require(modelClass.isAssignableFrom(FaceCompareViewModel::class.java)) {
+                "Unknown ViewModel class: ${modelClass.name}"
+            }
+            return FaceCompareViewModel(appContext.applicationContext) as T
+        }
     }
 }

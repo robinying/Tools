@@ -10,7 +10,6 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -25,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.robin.tools.core.ui.ToolsTopAppBar
 import com.robin.tools.feature.camera.R
 import com.robin.tools.feature.camera.filter.FilterType
 import com.robin.tools.feature.camera.filter.stringRes
@@ -77,11 +77,10 @@ fun VideoEditScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.edit_title)) },
-                navigationIcon = {
-                    IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back") }
-                },
+            ToolsTopAppBar(
+                title = stringResource(R.string.edit_title),
+                onBack = onBack,
+                backContentDescription = stringResource(R.string.record_back),
                 actions = {
                     TextButton(
                         onClick = {

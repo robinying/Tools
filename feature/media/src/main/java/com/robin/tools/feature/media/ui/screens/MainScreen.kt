@@ -1,22 +1,29 @@
 package com.robin.tools.feature.media.ui.screens
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.FilterAlt
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Slideshow
 import androidx.compose.material.icons.filled.VideoLibrary
-import androidx.compose.material3.*
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
-import com.robin.tools.feature.media.R
-import com.robin.tools.feature.media.utils.FileUtils
 import com.robin.tools.core.ui.Dimension
 import com.robin.tools.core.ui.FeatureCard
+import com.robin.tools.core.ui.ToolsTopAppBar
+import com.robin.tools.feature.media.R
+import com.robin.tools.feature.media.utils.FileUtils
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -30,13 +37,10 @@ fun MainScreen(
     val context = LocalContext.current
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text(context.getString(R.string.media_compression_tool)) },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = context.getString(R.string.back))
-                    }
-                }
+            ToolsTopAppBar(
+                title = context.getString(R.string.media_compression_tool),
+                onBack = onBack,
+                backContentDescription = context.getString(R.string.back)
             )
         }
     ) { innerPadding ->
@@ -47,11 +51,7 @@ fun MainScreen(
                 .padding(Dimension.lg),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
-                text = context.getString(R.string.media_compression_tool),
-                style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.padding(bottom = Dimension.xxl)
-            )
+            // Title only in TopAppBar — avoid duplicate headline in body
 
             FeatureCard(
                 title = context.getString(R.string.video_compress),
@@ -59,7 +59,7 @@ fun MainScreen(
                 icon = Icons.Default.VideoLibrary,
                 onClick = onVideoCompressClick
             )
-            Spacer(Modifier.height(Dimension.lg))
+            Spacer(Modifier.height(Dimension.md))
 
             FeatureCard(
                 title = context.getString(R.string.image_compress),
@@ -67,7 +67,7 @@ fun MainScreen(
                 icon = Icons.Default.Image,
                 onClick = onImageCompressClick
             )
-            Spacer(Modifier.height(Dimension.lg))
+            Spacer(Modifier.height(Dimension.md))
 
             FeatureCard(
                 title = context.getString(R.string.video_to_gif),
@@ -75,7 +75,7 @@ fun MainScreen(
                 icon = Icons.Default.Slideshow,
                 onClick = onGifConvertClick
             )
-            Spacer(Modifier.height(Dimension.lg))
+            Spacer(Modifier.height(Dimension.md))
 
             FeatureCard(
                 title = context.getString(R.string.image_filter),
@@ -89,10 +89,17 @@ fun MainScreen(
             TextButton(
                 onClick = {
                     FileUtils.clearCache(context)
-                    android.widget.Toast.makeText(context, context.getString(R.string.cache_cleared), android.widget.Toast.LENGTH_SHORT).show()
+                    android.widget.Toast.makeText(
+                        context,
+                        context.getString(R.string.cache_cleared),
+                        android.widget.Toast.LENGTH_SHORT
+                    ).show()
                 }
             ) {
-                Text(context.getString(R.string.clear_cache), color = MaterialTheme.colorScheme.secondary)
+                Text(
+                    context.getString(R.string.clear_cache),
+                    color = MaterialTheme.colorScheme.secondary
+                )
             }
         }
     }

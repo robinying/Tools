@@ -4,6 +4,9 @@
     <string name="ebook_title">Ebook para PDF</string>
     <string name="back">Voltar</string>
     <string name="select_epub">Selecionar EPUB</string>
+    <string name="idle_hint_title">Convert EPUB to PDF</string>
+    <string name="idle_hint_desc">Choose an EPUB file from your device.</string>
+    <string name="error_hint_title">Conversion failed</string>
     <string name="converting_progress">Convertendo… %1$d%%</string>
     <string name="conversion_success">Conversão bem-sucedida!</string>
     <string name="conversion_error">Ops, algo deu errado: %s</string>

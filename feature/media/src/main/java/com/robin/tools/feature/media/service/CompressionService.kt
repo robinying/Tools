@@ -31,6 +31,7 @@ class CompressionService : Service() {
     }
 
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+    @Volatile
     private var isRunning = false
 
     override fun onBind(intent: Intent?): IBinder? = null

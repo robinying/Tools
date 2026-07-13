@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.*
@@ -23,9 +22,9 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.robin.tools.core.ui.ToolsTopAppBar
 import com.robin.tools.feature.lightlux.R
 import com.robin.tools.feature.lightlux.data.ChartDataPoint
 import com.robin.tools.feature.lightlux.data.MainViewModel
@@ -61,18 +60,26 @@ fun LightMeterScreen(
     }
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text(stringResource(R.string.light_meter_title)) }, navigationIcon = {
-                IconButton(onClick = onBack) {
-                    Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.back))
+            ToolsTopAppBar(
+                title = stringResource(R.string.light_meter_title),
+                onBack = onBack,
+                backContentDescription = stringResource(R.string.back),
+                actions = {
+                    IconButton(onClick = onNavigateToSnapshots) {
+                        Icon(Icons.Default.History, contentDescription = stringResource(R.string.history))
+                    }
                 }
-            }, actions = {
-                IconButton(onClick = onNavigateToSnapshots) { Icon(Icons.Default.History, stringResource(R.string.history)) }
-            })
+            )
         }
     ) { innerPadding ->
         Column(Modifier.fillMaxSize().padding(innerPadding).padding(16.dp).verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(String.format("%.1f", currentLux), fontSize = 72.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+            Text(
+                String.format("%.1f", currentLux),
+                style = MaterialTheme.typography.displayLarge,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary
+            )
             Text(stringResource(R.string.lux_unit), style = MaterialTheme.typography.titleMedium)
             Spacer(Modifier.height(16.dp))
             Button(onClick = { viewModel.saveSnapshot() }, modifier = Modifier.fillMaxWidth()) {

@@ -9,9 +9,9 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -25,6 +25,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.stringResource
 import androidx.core.content.FileProvider
+import com.robin.tools.core.ui.Dimension
+import com.robin.tools.core.ui.EmptyState
+import com.robin.tools.core.ui.ProgressBlock
+import com.robin.tools.core.ui.ToolsTopAppBar
 import com.robin.tools.feature.ebook.R
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -38,71 +42,77 @@ fun MainScreen(viewModel: ConversionViewModel, onBack: () -> Unit = {}, modifier
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.ebook_title)) },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.back))
-                    }
-                }
+            ToolsTopAppBar(
+                title = stringResource(R.string.ebook_title),
+                onBack = onBack,
+                backContentDescription = stringResource(R.string.back)
             )
         }
     ) { innerPadding ->
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(innerPadding)
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Spacer(Modifier.height(32.dp))
-
-        when (val state = uiState) {
-            is ConversionState.Idle -> {
-                Button(onClick = { launcher.launch(arrayOf("application/epub+zip")) }) {
-                    Icon(Icons.Default.Add, null)
-                    Spacer(Modifier.width(8.dp))
-                    Text(stringResource(R.string.select_epub))
-                }
-            }
-            is ConversionState.Converting -> {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    LivelyLogoAnimation()
-                    Spacer(Modifier.height(16.dp))
-                    LinearProgressIndicator(
-                        progress = { state.progress / 100f },
-                        modifier = Modifier.width(200.dp).graphicsLayer(clip = true, shape = RoundedCornerShape(4.dp))
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .padding(Dimension.xl),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            when (val state = uiState) {
+                is ConversionState.Idle -> {
+                    EmptyState(
+                        icon = Icons.AutoMirrored.Filled.MenuBook,
+                        title = stringResource(R.string.idle_hint_title),
+                        description = stringResource(R.string.idle_hint_desc),
+                        actionLabel = stringResource(R.string.select_epub),
+                        onAction = { launcher.launch(arrayOf("application/epub+zip")) },
+                        modifier = Modifier.fillMaxWidth()
                     )
-                    Spacer(Modifier.height(8.dp))
-                    Text(stringResource(R.string.converting_progress, state.progress), style = MaterialTheme.typography.bodyLarge)
+                }
+                is ConversionState.Converting -> {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        LivelyLogoAnimation()
+                        Spacer(Modifier.height(Dimension.lg))
+                        ProgressBlock(
+                            progress = state.progress / 100f,
+                            message = stringResource(R.string.converting_progress, state.progress),
+                            modifier = Modifier.fillMaxWidth(0.85f)
+                        )
+                    }
+                }
+                is ConversionState.Success -> {
+                    Icon(
+                        Icons.Default.CheckCircle,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.tertiary,
+                        modifier = Modifier.size(80.dp)
+                    )
+                    Spacer(Modifier.height(Dimension.lg))
+                    Text(
+                        stringResource(R.string.conversion_success),
+                        style = MaterialTheme.typography.headlineSmall
+                    )
+                    Spacer(Modifier.height(Dimension.xl))
+                    Button(
+                        onClick = { openPdf(context, state.cacheFile) },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(stringResource(R.string.open_pdf))
+                    }
+                    TextButton(onClick = { viewModel.reset() }) {
+                        Text(stringResource(R.string.continue_converting))
+                    }
+                }
+                is ConversionState.Error -> {
+                    EmptyState(
+                        icon = Icons.Default.ErrorOutline,
+                        title = stringResource(R.string.error_hint_title),
+                        description = stringResource(R.string.conversion_error, state.message),
+                        actionLabel = stringResource(R.string.try_again),
+                        onAction = { viewModel.reset() },
+                        modifier = Modifier.fillMaxWidth()
+                    )
                 }
             }
-            is ConversionState.Success -> {
-                Icon(
-                    Icons.Default.CheckCircle,
-                    null,
-                    tint = MaterialTheme.colorScheme.tertiary,
-                    modifier = Modifier.size(80.dp)
-                )
-                Spacer(Modifier.height(16.dp))
-                Text(stringResource(R.string.conversion_success), style = MaterialTheme.typography.headlineSmall)
-                Spacer(Modifier.height(24.dp))
-                Button(onClick = { openPdf(context, state.cacheFile) }) {
-                    Text(stringResource(R.string.open_pdf))
-                }
-                TextButton(onClick = { viewModel.reset() }) {
-                    Text(stringResource(R.string.continue_converting))
-                }
-            }
-            is ConversionState.Error -> {
-                Text(stringResource(R.string.conversion_error, state.message), color = MaterialTheme.colorScheme.error)
-                Spacer(Modifier.height(16.dp))
-                Button(onClick = { viewModel.reset() }) {
-                    Text(stringResource(R.string.try_again))
-                }
-            }
-        }
         }
     }
 }

@@ -13,6 +13,12 @@
     <string name="camera_trim_desc">Trim, rotate, and adjust video orientation</string>
     <string name="camera_cover_title">Select Cover</string>
     <string name="camera_cover_desc">Choose a cover frame from your video</string>
+    <string name="camera_text_to_video_title">Text to Video</string>
+    <string name="camera_text_to_video_desc">Generate a video from text content</string>
+
+    <string name="camera_permission_title">Camera access needed</string>
+    <string name="camera_permission_desc">Allow camera and microphone to record video. You can still use edit tools after granting access.</string>
+    <string name="grant_permission">Grant permission</string>
 
     <!-- Recording -->
     <string name="record_back">Back</string>

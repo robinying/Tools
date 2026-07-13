@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <paths>
+    <!-- EPUB → PDF share -->
+    <cache-path name="pdf_output" path="pdf_output/" />
+    <!-- Camera capture / edit -->
     <files-path name="camera_files" path="camera/" />
     <cache-path name="camera_cache" path="camera/" />
     <external-files-path name="camera_external" path="camera/" />

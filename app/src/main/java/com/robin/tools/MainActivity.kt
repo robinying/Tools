@@ -157,7 +157,9 @@ private fun CompressionWrapper(navController: NavHostController, type: Compressi
 private fun EbookWrapper(navController: NavHostController) {
     SwipeBackContainer(onBack = { navController.popBackStack() }) {
         val context = LocalContext.current
-        val ebookViewModel = remember { ConversionViewModel(context.applicationContext) }
+        val ebookViewModel: ConversionViewModel = viewModel(
+            factory = ConversionViewModel.Factory(context.applicationContext)
+        )
         EbookScreen(
             viewModel = ebookViewModel,
             onBack = { navController.popBackStack() }
@@ -190,9 +192,9 @@ private fun LightLuxWrapper(navController: NavHostController) {
 private fun FaceCompareWrapper(navController: NavHostController) {
     SwipeBackContainer(onBack = { navController.popBackStack() }) {
         val context = LocalContext.current
-        val faceViewModel = remember {
-            FaceCompareViewModel(context.applicationContext)
-        }
+        val faceViewModel: FaceCompareViewModel = viewModel(
+            factory = FaceCompareViewModel.Factory(context.applicationContext)
+        )
         FaceCompareScreen(
             viewModel = faceViewModel,
             onBack = { navController.popBackStack() }

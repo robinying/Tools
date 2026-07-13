@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Videocam
@@ -37,6 +36,9 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
+import com.robin.tools.core.ui.Dimension
+import com.robin.tools.core.ui.ProgressBlock
+import com.robin.tools.core.ui.ToolsTopAppBar
 import com.robin.tools.feature.media.R
 import com.robin.tools.feature.media.data.*
 import com.robin.tools.feature.media.ui.viewmodel.CompressionViewModel
@@ -151,19 +153,14 @@ fun CompressionScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { 
-                    Text(when (type) {
-                        CompressionType.VIDEO -> context.getString(R.string.video_compress)
-                        CompressionType.IMAGE -> context.getString(R.string.image_compress)
-                        CompressionType.GIF -> context.getString(R.string.video_to_gif)
-                    })
+            ToolsTopAppBar(
+                title = when (type) {
+                    CompressionType.VIDEO -> context.getString(R.string.video_compress)
+                    CompressionType.IMAGE -> context.getString(R.string.image_compress)
+                    CompressionType.GIF -> context.getString(R.string.video_to_gif)
                 },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = context.getString(R.string.back))
-                    }
-                }
+                onBack = onBack,
+                backContentDescription = context.getString(R.string.back)
             )
         }
     ) { innerPadding ->
@@ -171,12 +168,12 @@ fun CompressionScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(16.dp),
+                .padding(Dimension.lg),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(Dimension.lg)
         ) {
             val isProcessing = taskState is CompressionTaskState.Processing
-            
+
             Button(
                 onClick = {
                     if (type == CompressionType.VIDEO || type == CompressionType.GIF) {
@@ -188,7 +185,10 @@ fun CompressionScreen(
                 enabled = !isProcessing,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text(if (selectedUris.isEmpty()) context.getString(R.string.select_file) else context.getString(R.string.reselect_file))
+                Text(
+                    if (selectedUris.isEmpty()) context.getString(R.string.select_file)
+                    else context.getString(R.string.reselect_file)
+                )
             }
 
             if (selectedUris.isNotEmpty()) {
@@ -199,7 +199,10 @@ fun CompressionScreen(
                 )
             }
 
-            Text(if (type == CompressionType.GIF) context.getString(R.string.select_gif_quality) else context.getString(R.string.select_compression_level))
+            Text(
+                if (type == CompressionType.GIF) context.getString(R.string.select_gif_quality)
+                else context.getString(R.string.select_compression_level)
+            )
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
@@ -216,19 +219,12 @@ fun CompressionScreen(
 
             if (isProcessing) {
                 val state = taskState as CompressionTaskState.Processing
-                LinearProgressIndicator(
+                ProgressBlock(
                     progress = state.progress,
-                    modifier = Modifier.fillMaxWidth()
+                    message = state.message,
+                    onCancel = { viewModel.cancelCompression() },
+                    cancelLabel = context.getString(R.string.cancel)
                 )
-                Text(state.message)
-                
-                Button(
-                    onClick = { viewModel.cancelCompression() },
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(context.getString(R.string.close)) // Or add a "Cancel" string
-                }
             } else {
                 Button(
                     onClick = {
@@ -243,7 +239,10 @@ fun CompressionScreen(
                     enabled = selectedUris.isNotEmpty(),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(if (type == CompressionType.GIF) context.getString(R.string.start_conversion) else context.getString(R.string.start_compression))
+                    Text(
+                        if (type == CompressionType.GIF) context.getString(R.string.start_conversion)
+                        else context.getString(R.string.start_compression)
+                    )
                 }
             }
         }
@@ -378,11 +377,24 @@ private fun VideoPreviewCard(
     val fileName = remember(uri) { resolveFileName(context, uri) }
     val fileSize = remember(uri) { resolveFileSize(context, uri) }
 
-    // Load video thumbnail asynchronously
+    // Load video thumbnail asynchronously; recycle on leave / URI change
     var thumbnail by remember { mutableStateOf<Bitmap?>(null) }
     LaunchedEffect(uri) {
-        thumbnail = withContext(Dispatchers.IO) {
+        val previous = thumbnail
+        val next = withContext(Dispatchers.IO) {
             loadVideoThumbnail(context, uri)
+        }
+        thumbnail = next
+        if (previous != null && previous !== next && !previous.isRecycled) {
+            previous.recycle()
+        }
+    }
+    DisposableEffect(uri) {
+        onDispose {
+            thumbnail?.let { bmp ->
+                if (!bmp.isRecycled) bmp.recycle()
+            }
+            thumbnail = null
         }
     }
 

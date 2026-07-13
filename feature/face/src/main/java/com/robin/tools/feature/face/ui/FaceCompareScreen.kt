@@ -22,7 +22,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AddAPhoto
 import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material3.Button
@@ -38,7 +37,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -55,10 +53,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.stringResource
 import coil.compose.AsyncImage
+import com.robin.tools.core.ui.Dimension
+import com.robin.tools.core.ui.ToolsTopAppBar
 import com.robin.tools.feature.face.R
 import com.robin.tools.feature.face.data.CompareResult
 import com.robin.tools.feature.face.data.SimilarityLevel
-import com.robin.tools.core.ui.Dimension
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -80,13 +79,10 @@ fun FaceCompareScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.face_compare_title)) },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.face_compare_back))
-                    }
-                }
+            ToolsTopAppBar(
+                title = stringResource(R.string.face_compare_title),
+                onBack = onBack,
+                backContentDescription = stringResource(R.string.face_compare_back)
             )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) }

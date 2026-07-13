@@ -6,10 +6,13 @@ import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
+import android.util.Log
 import java.io.File
 import java.io.FileInputStream
 
 object StorageUtils {
+    private const val TAG = "StorageUtils"
+
     fun savePdfToDownloads(context: Context, cacheFile: File, fileName: String): Uri? {
         val resolver = context.contentResolver
         val contentValues = ContentValues().apply {
@@ -29,17 +32,29 @@ object StorageUtils {
 
         val uri = resolver.insert(collection, contentValues) ?: return null
 
-        resolver.openOutputStream(uri)?.use { outputStream ->
-            FileInputStream(cacheFile).use { inputStream ->
-                inputStream.copyTo(outputStream)
+        return try {
+            val outputStream = resolver.openOutputStream(uri)
+                ?: throw IllegalStateException("openOutputStream returned null for $uri")
+            outputStream.use { out ->
+                FileInputStream(cacheFile).use { input ->
+                    input.copyTo(out)
+                }
             }
-        }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            contentValues.clear()
-            contentValues.put(MediaStore.MediaColumns.IS_PENDING, 0)
-            resolver.update(uri, contentValues, null, null)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                contentValues.clear()
+                contentValues.put(MediaStore.MediaColumns.IS_PENDING, 0)
+                resolver.update(uri, contentValues, null, null)
+            }
+            uri
+        } catch (e: Exception) {
+            Log.e(TAG, "savePdfToDownloads failed, deleting pending row", e)
+            try {
+                resolver.delete(uri, null, null)
+            } catch (deleteError: Exception) {
+                Log.e(TAG, "Failed to delete pending MediaStore row", deleteError)
+            }
+            null
         }
-        return uri
     }
 }

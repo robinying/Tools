@@ -10,7 +10,6 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -22,6 +21,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.robin.tools.core.ui.ToolsTopAppBar
 import com.robin.tools.feature.media.R
 import com.robin.tools.feature.media.data.FilterManager
 import com.robin.tools.feature.media.data.FilterState
@@ -121,13 +121,10 @@ fun FilterScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text(context.getString(R.string.filter_tool)) },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = context.getString(R.string.back))
-                    }
-                }
+            ToolsTopAppBar(
+                title = context.getString(R.string.filter_tool),
+                onBack = onBack,
+                backContentDescription = context.getString(R.string.back)
             )
         }
     ) { innerPadding ->
