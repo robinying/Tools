@@ -48,31 +48,43 @@ class FilterFeatureTest {
     }
 
     @Test
-    fun `FilterManager reset returns to Idle`() {
+    fun `FilterManager complete lifecycle resets state and cancellation`() {
+        val finished = FilterState.Finished(true, "Saved")
+
         FilterManager.reset()
-        FilterManager.updateState(FilterState.Processing(0.5f, "Test"))
+        FilterManager.startTask()
+        FilterManager.updateState(FilterState.Processing(0.5f, "Applying filter"))
+        FilterManager.updateState(finished)
+        FilterManager.cancelTask()
+
+        assertEquals(finished, FilterManager.state.value)
+        assertTrue(FilterManager.isCancelled())
+
         FilterManager.reset()
+
         assertTrue("State should be Idle after reset", FilterManager.state.value is FilterState.Idle)
+        assertFalse("Reset should clear cancellation", FilterManager.isCancelled())
     }
 
     @Test
-    fun `FilterState Processing holds correct values`() {
-        val state = FilterState.Processing(0.75f, "Processing…")
-        assertEquals(0.75f, state.progress, 0.001f)
-        assertEquals("Processing…", state.message)
+    fun `FilterManager preserves complete processing details`() {
+        val state = FilterState.Processing(0.75f, "Applying grayscale")
+
+        FilterManager.reset()
+        FilterManager.updateState(state)
+
+        assertEquals(state, FilterManager.state.value)
     }
 
     @Test
-    fun `FilterState Finished success holds correct message`() {
-        val state = FilterState.Finished(true, "Done")
-        assertTrue(state.isSuccess)
-        assertEquals("Done", state.message)
-    }
-
-    @Test
-    fun `FilterState Finished failure has correct message`() {
-        val state = FilterState.Finished(false, "Error")
-        assertFalse(state.isSuccess)
-        assertEquals("Error", state.message)
+    fun `FilterState processing data classes compare by content`() {
+        assertEquals(
+            FilterState.Processing(0.75f, "Processing"),
+            FilterState.Processing(0.75f, "Processing")
+        )
+        assertNotEquals(
+            FilterState.Processing(0.75f, "Processing"),
+            FilterState.Processing(0.5f, "Processing")
+        )
     }
 }

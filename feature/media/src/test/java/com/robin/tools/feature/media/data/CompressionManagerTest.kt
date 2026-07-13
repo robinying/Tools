@@ -39,10 +39,31 @@ class CompressionManagerTest {
     }
 
     @Test
-    fun `reset returns to Idle`() {
+    fun `complete task lifecycle resets state and cancellation`() {
+        val finished = CompressionTaskState.Finished(true, "Done", "content://output")
+
         CompressionManager.reset()
-        CompressionManager.updateState(CompressionTaskState.Processing(0.3f, "Test", 1, 1))
+        CompressionManager.startTask()
+        CompressionManager.updateState(CompressionTaskState.Processing(0.5f, "Processing", 1, 2))
+        CompressionManager.updateState(finished)
+        CompressionManager.cancelTask()
+
+        assertEquals(finished, CompressionManager.taskState.value)
+        assertTrue(CompressionManager.isCancelled())
+
         CompressionManager.reset()
+
         assertTrue("Should be Idle after reset", CompressionManager.taskState.value is CompressionTaskState.Idle)
+        assertTrue("Reset should clear cancellation", !CompressionManager.isCancelled())
+    }
+
+    @Test
+    fun `updateState preserves complete processing details`() {
+        val state = CompressionTaskState.Processing(0.75f, "Compressing second file", 2, 3)
+
+        CompressionManager.reset()
+        CompressionManager.updateState(state)
+
+        assertEquals(state, CompressionManager.taskState.value)
     }
 }

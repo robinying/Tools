@@ -66,23 +66,24 @@ class MainViewModelTest {
     }
 
     @Test
-    fun `saveSnapshot inserts entry and verifies repository call`() = runTest {
+    fun `saveSnapshot persists current lux and publishes success status`() = runTest {
         coEvery { repository.insertEntry(any()) } returns Unit
-
         viewModel.updateLuxFromSensor(50f)
+
         viewModel.saveSnapshot()
 
-        coVerify { repository.insertEntry(match { it.luxValue == 50f }) }
-        // Note: saveStatus formatting uses Application.getString() which
-        // requires an instrumentation test (androidTest) with a real context.
-        // The status is set but its exact content depends on the Android framework.
+        coVerify { repository.insertEntry(match { it.id == 0L && it.luxValue == 50f && it.timestamp > 0L }) }
+        assertEquals("Saved: 50.0 lux", viewModel.saveStatus.value)
     }
 
     @Test
-    fun `clearSaveStatus resets save status`() = runTest {
+    fun `clearSaveStatus clears a published status`() = runTest {
         coEvery { repository.insertEntry(any()) } returns Unit
-
         viewModel.updateLuxFromSensor(30f)
+        viewModel.saveSnapshot()
+
+        assertEquals("Saved: 50.0 lux", viewModel.saveStatus.value)
+
         viewModel.clearSaveStatus()
 
         assertEquals(null, viewModel.saveStatus.value)

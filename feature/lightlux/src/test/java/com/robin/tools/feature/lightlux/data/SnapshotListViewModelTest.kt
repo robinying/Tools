@@ -57,6 +57,21 @@ class SnapshotListViewModelTest {
     }
 
     @Test
+    fun `entries follow later repository flow emissions`() {
+        val source = MutableStateFlow(emptyList<LightEntry>())
+        val firstEntry = LightEntry(id = 1L, timestamp = 100L, luxValue = 10f)
+        val secondEntry = LightEntry(id = 2L, timestamp = 200L, luxValue = 20f)
+        every { repository.getAllEntries() } returns source
+
+        viewModel = SnapshotListViewModel(repository)
+        source.value = listOf(firstEntry)
+        assertEquals(listOf(firstEntry), viewModel.entries.value)
+
+        source.value = listOf(secondEntry, firstEntry)
+        assertEquals(listOf(secondEntry, firstEntry), viewModel.entries.value)
+    }
+
+    @Test
     fun `deleteAll calls repository deleteAllEntries`() = runTest {
         every { repository.getAllEntries() } returns MutableStateFlow(emptyList())
         coEvery { repository.deleteAllEntries() } returns Unit

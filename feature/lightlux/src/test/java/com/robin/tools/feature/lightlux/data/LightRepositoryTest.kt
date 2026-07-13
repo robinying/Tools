@@ -13,6 +13,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -146,28 +147,69 @@ class LightRepositoryTest {
         coVerify { dao.getRecentEntries(50) }
     }
 
-    // region error paths
-
     @Test
-    fun `insertEntry propagates DAO exception`() = runTest {
-        val entry = LightEntry(timestamp = 0, luxValue = 0f)
-        coEvery { dao.insert(entry) } throws RuntimeException("DB error")
+    fun `getRecentEntriesOnce default limit is 20`() = runTest {
+        coEvery { dao.getRecentEntriesOnce(20) } returns emptyList()
 
-        try {
-            repository.insertEntry(entry)
-        } catch (e: RuntimeException) {
-            assertEquals("DB error", e.message)
-        }
+        repository.getRecentEntriesOnce()
+
+        coVerify { dao.getRecentEntriesOnce(20) }
     }
 
     @Test
-    fun `getRecentEntriesOnce propagates DAO exception`() = runTest {
+    fun `getRecentEntriesOnce custom limit is respected`() = runTest {
+        coEvery { dao.getRecentEntriesOnce(5) } returns emptyList()
+
+        repository.getRecentEntriesOnce(5)
+
+        coVerify { dao.getRecentEntriesOnce(5) }
+    }
+
+    // region error paths
+
+    @Test
+    fun `insertEntry propagates DAO exception`() {
+        val entry = LightEntry(timestamp = 0, luxValue = 0f)
+        coEvery { dao.insert(entry) } throws RuntimeException("DB error")
+
+        val exception = assertThrows(RuntimeException::class.java) {
+            runTest { repository.insertEntry(entry) }
+        }
+
+        assertEquals("DB error", exception.message)
+    }
+
+    @Test
+    fun `getRecentEntriesOnce propagates DAO exception`() {
         coEvery { dao.getRecentEntriesOnce(any()) } throws RuntimeException("Query error")
 
-        try {
-            repository.getRecentEntriesOnce()
-        } catch (e: RuntimeException) {
-            assertEquals("Query error", e.message)
+        val exception = assertThrows(RuntimeException::class.java) {
+            runTest { repository.getRecentEntriesOnce() }
         }
+
+        assertEquals("Query error", exception.message)
+    }
+
+    @Test
+    fun `deleteEntry propagates DAO exception`() {
+        val entry = LightEntry(timestamp = 0, luxValue = 0f)
+        coEvery { dao.delete(entry) } throws RuntimeException("Delete error")
+
+        val exception = assertThrows(RuntimeException::class.java) {
+            runTest { repository.deleteEntry(entry) }
+        }
+
+        assertEquals("Delete error", exception.message)
+    }
+
+    @Test
+    fun `deleteAllEntries propagates DAO exception`() {
+        coEvery { dao.deleteAll() } throws RuntimeException("Clear error")
+
+        val exception = assertThrows(RuntimeException::class.java) {
+            runTest { repository.deleteAllEntries() }
+        }
+
+        assertEquals("Clear error", exception.message)
     }
 }
