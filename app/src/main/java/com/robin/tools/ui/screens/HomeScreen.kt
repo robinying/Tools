@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.Image
@@ -34,6 +36,7 @@ fun HomeScreen(
         modifier = Modifier
             .fillMaxSize()
             .systemBarsPadding()
+            .verticalScroll(rememberScrollState())
             .padding(Dimension.xl),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -83,5 +86,7 @@ fun HomeScreen(
             icon = Icons.Default.Videocam,
             onClick = onCameraClick
         )
+
+        Spacer(Modifier.height(Dimension.xxl))
     }
 }

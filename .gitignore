@@ -49,3 +49,5 @@ proguard/
 /captures
 CLAUDE.md
 face_compare.md
+docs/
+DESIGN.md
