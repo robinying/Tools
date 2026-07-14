@@ -35,10 +35,14 @@ class FaceCompareViewModel(
         val isProcessing: Boolean = false,
         val result: CompareResult? = null,
         val leftFaceCount: Int = -1,
-        val rightFaceCount: Int = -1
+        val rightFaceCount: Int = -1,
+        /** True when MobileFaceNet TFLite model is loaded (higher accuracy path). */
+        val deepModelReady: Boolean = false
     )
 
-    private val _uiState = MutableStateFlow(UiState())
+    private val _uiState = MutableStateFlow(
+        UiState(deepModelReady = embeddingExtractor.isModelLoaded)
+    )
     val uiState: StateFlow<UiState> = _uiState.asStateFlow()
 
     private val appContext = context.applicationContext
@@ -66,7 +70,9 @@ class FaceCompareViewModel(
     }
 
     fun reset() {
-        _uiState.update { UiState() }
+        _uiState.update {
+            UiState(deepModelReady = embeddingExtractor.isModelLoaded)
+        }
     }
 
     fun clearResult() {

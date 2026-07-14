@@ -1,24 +1,25 @@
 # Face Recognition Model
 
-Place the MobileFaceNet TFLite model file here:
+Bundled model file:
 
     mobile_face_net.tflite
 
-## Model Requirements
+## Model Spec (current bundle)
 
-- Input: 112×112×3 RGB, normalized to [-1, 1]
-- Output: 128-dimensional L2-normalized embedding
-- Format: TensorFlow Lite FlatBuffer (.tflite)
+| Property | Value |
+|----------|--------|
+| Architecture | MobileFaceNet |
+| Input | 112×112×3 RGB, float32 NHWC, normalized ≈ `[-1, 1]` via `(x - 127.5) / 128` |
+| Output | 192-d L2-normalized embedding (`embeddings`) |
+| Size | ~5 MB |
+| Source | Community MobileFaceNet TFLite export (on-device, no network) |
 
-## Recommended Source
+`FaceEmbeddingExtractor` reads input/output tensor shapes from the interpreter at load time, so alternate MobileFaceNet exports (128-d or 192-d) keep working without code changes.
 
-Download a pre-trained MobileFaceNet TFLite model from:
-https://github.com/sirius-ai/MobileFaceNet_TensorFlow
+## Fallback
 
-Or convert from InsightFace model zoo:
-https://github.com/deepinsight/insightface
+If the model file is missing or fails to load, the app falls back to ML Kit landmark geometry features (lower accuracy). The UI shows which engine is active.
 
 ## APK Packaging
 
-The build.gradle.kts includes `noCompress("tflite")` so the model
-file is NOT compressed in the APK — TFLite reads it via memory-map.
+`build.gradle.kts` sets `noCompress("tflite")` so the model is memory-mapped from the APK.

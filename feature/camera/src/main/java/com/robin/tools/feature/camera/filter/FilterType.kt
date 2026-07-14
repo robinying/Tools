@@ -3,11 +3,23 @@ package com.robin.tools.feature.camera.filter
 import com.robin.tools.feature.camera.R
 
 enum class FilterType {
-    NONE, WARM, ANTIQUE, COOL, BRANNAN, FREUD, HEFE, HUDSON, INKWELL, N1977, NASHVILLE
+    NONE,
+    BEAUTY,
+    WARM,
+    ANTIQUE,
+    COOL,
+    BRANNAN,
+    FREUD,
+    HEFE,
+    HUDSON,
+    INKWELL,
+    N1977,
+    NASHVILLE
 }
 
 fun FilterType.stringRes(): Int = when (this) {
     FilterType.NONE -> R.string.filter_none
+    FilterType.BEAUTY -> R.string.filter_beauty
     FilterType.WARM -> R.string.filter_warm
     FilterType.ANTIQUE -> R.string.filter_antique
     FilterType.COOL -> R.string.filter_cool

@@ -7,6 +7,7 @@ import android.media.MediaPlayer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.robin.tools.feature.camera.editor.VideoClipper
+import com.robin.tools.feature.camera.editor.VideoEffectsExporter
 import com.robin.tools.feature.camera.filter.FilterType
 import com.robin.tools.feature.camera.storage.VideoPathResolver
 import kotlinx.coroutines.Dispatchers
@@ -34,9 +35,12 @@ class VideoEditViewModel : ViewModel() {
     val uiState: StateFlow<VideoEditUiState> = _uiState.asStateFlow()
     private var mediaPlayer: MediaPlayer? = null
     private var videoPath: String = ""
+    private var appContext: Context? = null
     private val videoClipper = VideoClipper()
+    private val effectsExporter = VideoEffectsExporter()
 
     fun loadVideo(context: Context, path: String) {
+        appContext = context.applicationContext
         viewModelScope.launch(Dispatchers.IO) {
             val retriever = MediaMetadataRetriever()
             try {
@@ -55,21 +59,32 @@ class VideoEditViewModel : ViewModel() {
         }
     }
 
-    fun setFilter(type: FilterType) { _uiState.update { it.copy(currentFilter = type) } }
-    fun setWatermark(text: String) { _uiState.update { it.copy(watermarkText = text) } }
+    fun setFilter(type: FilterType) {
+        _uiState.update { it.copy(currentFilter = type) }
+    }
+
+    fun setWatermark(text: String) {
+        _uiState.update { it.copy(watermarkText = text) }
+    }
+
     fun addSticker(bitmap: Bitmap) {
         _uiState.update { it.copy(stickers = it.stickers + bitmap) }
     }
 
-    fun togglePlayback() { if (_uiState.value.isPlaying) pause() else play() }
+    fun togglePlayback() {
+        if (_uiState.value.isPlaying) pause() else play()
+    }
+
     fun play() {
         mediaPlayer?.start()
         _uiState.update { it.copy(isPlaying = true) }
     }
+
     fun pause() {
         mediaPlayer?.pause()
         _uiState.update { it.copy(isPlaying = false) }
     }
+
     fun seekTo(ms: Long) {
         mediaPlayer?.seekTo(ms.toInt())
         _uiState.update { it.copy(currentPositionMs = ms) }
@@ -86,20 +101,50 @@ class VideoEditViewModel : ViewModel() {
         }
     }
 
+    /**
+     * Export with real filter / watermark burn-in when needed.
+     * Passthrough remux (with audio) when no visual effects are applied.
+     */
     fun export(outputFile: File, onComplete: (String) -> Unit) {
         val s = _uiState.value
         if (videoPath.isEmpty()) {
             _uiState.update { it.copy(error = "No video loaded") }
             return
         }
-        _uiState.update { it.copy(isExporting = true) }
+        val context = appContext
+        if (context == null) {
+            _uiState.update { it.copy(error = "Context unavailable") }
+            return
+        }
+
+        _uiState.update { it.copy(isExporting = true, error = null) }
         viewModelScope.launch(Dispatchers.IO) {
-            val ok = videoClipper.clip(videoPath, outputFile.absolutePath, 0, s.durationMs)
+            val needsEffects =
+                s.currentFilter != FilterType.NONE ||
+                    s.watermarkText.isNotBlank() ||
+                    s.stickers.isNotEmpty()
+
+            val ok = if (needsEffects) {
+                effectsExporter.export(
+                    context = context,
+                    inputPath = videoPath,
+                    outputPath = outputFile.absolutePath,
+                    filterType = s.currentFilter,
+                    watermarkText = s.watermarkText,
+                    stickers = s.stickers
+                )
+            } else {
+                // Fast path: remux full range, keep audio
+                videoClipper.clip(videoPath, outputFile.absolutePath, 0, s.durationMs.coerceAtLeast(1))
+            }
+
             _uiState.update {
                 if (ok) it.copy(isExporting = false, exportDone = true)
                 else it.copy(isExporting = false, error = "Export failed")
             }
-            if (ok) launch(Dispatchers.Main) { onComplete(outputFile.absolutePath) }
+            if (ok) {
+                launch(Dispatchers.Main) { onComplete(outputFile.absolutePath) }
+            }
         }
     }
 

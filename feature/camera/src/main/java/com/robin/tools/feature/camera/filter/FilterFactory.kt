@@ -7,6 +7,7 @@ object FilterFactory {
     fun create(type: FilterType, resources: Resources): GpuImageFilter {
         return when (type) {
             FilterType.NONE -> NoFilter(resources)
+            FilterType.BEAUTY -> BeautyFilter(resources)
             FilterType.WARM -> MagicWarmFilter(resources)
             FilterType.ANTIQUE -> MagicAntiqueFilter(resources)
             FilterType.COOL -> MagicCoolFilter(resources)

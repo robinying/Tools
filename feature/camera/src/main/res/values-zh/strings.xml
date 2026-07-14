@@ -48,6 +48,7 @@
     <string name="cover_frame">%1$s 处的帧</string>
 
     <string name="filter_none">原图</string>
+    <string name="filter_beauty">美颜</string>
     <string name="filter_warm">暖色</string>
     <string name="filter_antique">复古</string>
     <string name="filter_cool">冷色</string>

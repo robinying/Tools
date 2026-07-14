@@ -95,6 +95,23 @@ fun FaceCompareScreen(
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Text(
+                text = stringResource(
+                    if (uiState.deepModelReady) R.string.face_compare_engine_deep
+                    else R.string.face_compare_engine_fallback
+                ),
+                style = MaterialTheme.typography.labelMedium,
+                color = if (uiState.deepModelReady) {
+                    MaterialTheme.colorScheme.primary
+                } else {
+                    MaterialTheme.colorScheme.onSurfaceVariant
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = Dimension.sm),
+                textAlign = TextAlign.Center
+            )
+
             ImageSelectionRow(
                 leftUri = uiState.leftImageUri,
                 rightUri = uiState.rightImageUri,

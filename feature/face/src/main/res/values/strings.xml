@@ -31,4 +31,6 @@
     <string name="face_compare_model_missing">Face recognition model not found. Place mobile_face_net.tflite in assets/.</string>
     <string name="face_compare_feature_failed_left">Feature extraction failed for left image</string>
     <string name="face_compare_feature_failed_right">Feature extraction failed for right image</string>
+    <string name="face_compare_engine_deep">Engine: MobileFaceNet (on-device)</string>
+    <string name="face_compare_engine_fallback">Engine: Landmark geometry (model not loaded)</string>
 </resources>

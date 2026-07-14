@@ -55,6 +55,7 @@
 
     <!-- Filter names -->
     <string name="filter_none">None</string>
+    <string name="filter_beauty">Beauty</string>
     <string name="filter_warm">Warm</string>
     <string name="filter_antique">Antique</string>
     <string name="filter_cool">Cool</string>
