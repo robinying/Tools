@@ -3,8 +3,20 @@
     <string name="camera_feature_title">相机</string>
     <string name="camera_feature_desc">录制和编辑视频，添加滤镜和特效</string>
 
+    <string name="camera_photo_title">拍照</string>
+    <string name="camera_photo_desc">实时滤镜抓拍静帧</string>
     <string name="camera_record_title">录制视频</string>
     <string name="camera_record_desc">分段录制、倒计时和滤镜效果</string>
+    <string name="photo_saved">照片已保存到相册</string>
+    <string name="photo_failed">保存照片失败</string>
+    <string name="ttv_hint">输入要显示在视频卡片上的文字</string>
+    <string name="ttv_duration">时长：%1$d 秒</string>
+    <string name="ttv_generate">生成视频</string>
+    <string name="ttv_empty">请先输入文字</string>
+    <string name="ttv_done">视频已生成</string>
+    <string name="ttv_failed">生成视频失败</string>
+    <string name="ttv_footer">文件保存在应用相机输出目录</string>
+    <string name="edit_sticker_added">已添加贴纸</string>
     <string name="camera_edit_title">编辑视频</string>
     <string name="camera_edit_desc">添加水印、贴纸、字幕和滤镜</string>
     <string name="camera_trim_title">裁剪视频</string>

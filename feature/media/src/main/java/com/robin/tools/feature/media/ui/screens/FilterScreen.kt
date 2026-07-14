@@ -21,6 +21,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.robin.tools.core.ui.TextOptionChip
 import com.robin.tools.core.ui.ToolsTopAppBar
 import com.robin.tools.feature.media.R
 import com.robin.tools.feature.media.data.FilterManager
@@ -165,10 +166,10 @@ fun FilterScreen(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 FilterType.entries.forEach { filter ->
-                    FilterChip(
+                    TextOptionChip(
                         selected = selectedFilter == filter,
                         onClick = { if (!isProcessing) selectedFilter = filter },
-                        label = { Text(stringResource(filter.labelRes)) },
+                        label = stringResource(filter.labelRes),
                         enabled = !isProcessing
                     )
                 }

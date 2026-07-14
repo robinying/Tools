@@ -127,6 +127,28 @@ object FileUtils {
         return saveToGallery(context, file, values, collection)
     }
 
+    fun saveAudioToGallery(context: Context, file: File): Uri? {
+        val mime = when (file.extension.lowercase()) {
+            "m4a", "aac" -> "audio/mp4"
+            "mp3" -> "audio/mpeg"
+            else -> "audio/*"
+        }
+        val values = ContentValues().apply {
+            put(MediaStore.Audio.Media.DISPLAY_NAME, file.name)
+            put(MediaStore.Audio.Media.MIME_TYPE, mime)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                put(MediaStore.Audio.Media.RELATIVE_PATH, Environment.DIRECTORY_MUSIC + "/Tools")
+                put(MediaStore.Audio.Media.IS_PENDING, 1)
+            }
+        }
+        val collection = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
+        } else {
+            MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
+        }
+        return saveToGallery(context, file, values, collection)
+    }
+
     fun saveGifToGallery(context: Context, file: File): Uri? {
         val values = ContentValues().apply {
             put(MediaStore.Images.Media.DISPLAY_NAME, file.name)

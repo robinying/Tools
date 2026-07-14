@@ -22,6 +22,14 @@
     <string name="video_compress">Video Compress</string>
     <string name="image_compress">Image Compress</string>
     <string name="video_to_gif">Video to GIF</string>
+    <string name="extract_audio">Extract Audio</string>
+    <string name="extract_audio_desc">Pull AAC/M4A audio from a video</string>
+    <string name="strip_audio">Remove Audio</string>
+    <string name="strip_audio_desc">Export video without sound track</string>
+    <string name="transcode_mp4">Transcode to MP4</string>
+    <string name="transcode_mp4_desc">Convert video to MP4 for wider compatibility</string>
+    <string name="select_quality">Select quality</string>
+    <string name="start_process">Start</string>
     <string name="back">Back</string>
     <string name="select_file">Select file</string>
     <string name="reselect_file">Reselect file</string>

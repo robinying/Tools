@@ -1,10 +1,15 @@
 package com.robin.tools.feature.camera.ui.edit
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.SurfaceTexture
 import android.view.Surface
 import android.view.TextureView
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -16,7 +21,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -24,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.robin.tools.core.ui.TextOptionChip
 import com.robin.tools.core.ui.ToolsTopAppBar
 import com.robin.tools.feature.camera.R
 import com.robin.tools.feature.camera.filter.FilterType
@@ -44,6 +51,34 @@ fun VideoEditScreen(
     val fileManager = remember { CameraFileManager(context) }
     var showWatermarkDialog by remember { mutableStateOf(false) }
     var watermarkInput by remember { mutableStateOf("") }
+
+    val stickerPicker = rememberLauncherForActivityResult(
+        ActivityResultContracts.GetContent()
+    ) { uri ->
+        uri ?: return@rememberLauncherForActivityResult
+        try {
+            context.contentResolver.openInputStream(uri)?.use { stream ->
+                val bmp = BitmapFactory.decodeStream(stream)
+                if (bmp != null) {
+                    val maxEdge = 512
+                    val scale = maxOf(bmp.width, bmp.height).toFloat() / maxEdge
+                    val sticker = if (scale > 1f) {
+                        Bitmap.createScaledBitmap(
+                            bmp,
+                            (bmp.width / scale).toInt().coerceAtLeast(1),
+                            (bmp.height / scale).toInt().coerceAtLeast(1),
+                            true
+                        ).also { if (it !== bmp) bmp.recycle() }
+                    } else {
+                        bmp
+                    }
+                    viewModel.addSticker(sticker)
+                    Toast.makeText(context, R.string.edit_sticker_added, Toast.LENGTH_SHORT).show()
+                }
+            }
+        } catch (_: Exception) {
+        }
+    }
 
     LaunchedEffect(videoPath) { viewModel.loadVideo(context, videoPath) }
 
@@ -140,6 +175,21 @@ fun VideoEditScreen(
                         )
                     }
 
+                    // Sticker previews (top-start stack)
+                    uiState.stickers.forEachIndexed { index, sticker ->
+                        if (!sticker.isRecycled) {
+                            Image(
+                                bitmap = sticker.asImageBitmap(),
+                                contentDescription = null,
+                                contentScale = ContentScale.Fit,
+                                modifier = Modifier
+                                    .align(Alignment.TopStart)
+                                    .padding(start = (12 + index * 24).dp, top = 12.dp)
+                                    .size(72.dp)
+                            )
+                        }
+                    }
+
                     // Play/Pause
                     IconButton(
                         onClick = { viewModel.togglePlayback() },
@@ -158,14 +208,10 @@ fun VideoEditScreen(
                     horizontalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
                     items(FilterType.entries) { filter ->
-                        val sel = filter == uiState.currentFilter
-                        FilterChip(
-                            selected = sel,
+                        TextOptionChip(
+                            selected = filter == uiState.currentFilter,
                             onClick = { viewModel.setFilter(filter) },
-                            label = { Text(stringResource(filter.stringRes()), style = MaterialTheme.typography.labelSmall) },
-                            colors = FilterChipDefaults.filterChipColors(
-                                selectedContainerColor = MaterialTheme.colorScheme.primaryContainer
-                            )
+                            label = stringResource(filter.stringRes())
                         )
                     }
                 }
@@ -181,9 +227,9 @@ fun VideoEditScreen(
                             Text(stringResource(R.string.edit_watermark), style = MaterialTheme.typography.labelSmall)
                         }
                     }
-                    IconButton(onClick = {}) {
+                    IconButton(onClick = { stickerPicker.launch("image/*") }) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Icon(Icons.Default.EmojiEmotions, "Sticker")
+                            Icon(Icons.Default.EmojiEmotions, stringResource(R.string.edit_sticker))
                             Text(stringResource(R.string.edit_sticker), style = MaterialTheme.typography.labelSmall)
                         }
                     }

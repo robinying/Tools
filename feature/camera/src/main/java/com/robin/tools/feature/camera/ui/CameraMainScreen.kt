@@ -15,6 +15,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Collections
 import androidx.compose.material.icons.filled.ContentCut
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material.icons.filled.TextFields
 import androidx.compose.material.icons.filled.Videocam
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -41,6 +42,7 @@ import com.robin.tools.feature.camera.R
 fun CameraMainScreen(
     onBack: () -> Unit,
     onRecord: () -> Unit,
+    onPhoto: () -> Unit = {},
     onEditVideo: () -> Unit,
     onTrimVideo: () -> Unit,
     onCoverSelect: () -> Unit,
@@ -108,6 +110,12 @@ fun CameraMainScreen(
                     .padding(Dimension.lg),
                 verticalArrangement = Arrangement.spacedBy(Dimension.md)
             ) {
+                FeatureCard(
+                    title = stringResource(R.string.camera_photo_title),
+                    description = stringResource(R.string.camera_photo_desc),
+                    icon = Icons.Default.PhotoCamera,
+                    onClick = onPhoto
+                )
                 FeatureCard(
                     title = stringResource(R.string.camera_record_title),
                     description = stringResource(R.string.camera_record_desc),

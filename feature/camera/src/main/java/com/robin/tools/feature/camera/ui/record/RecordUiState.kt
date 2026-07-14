@@ -12,6 +12,8 @@ data class RecordUiState(
     val totalRecordedMs: Long = 0,
     val isFrontCamera: Boolean = false,
     val isCameraReady: Boolean = false,
+    /** True while closing one camera and opening the other — blocks double-tap. */
+    val isSwitchingCamera: Boolean = false,
     val isProcessing: Boolean = false,
     val outputVideoPath: String? = null,
     val error: String? = null

@@ -57,6 +57,16 @@ abstract class GpuImageFilter(protected val resources: Resources) {
         outputHeight = height
     }
 
+    /** Replace texture coordinates used on the next [draw] (vertex order BL, BR, TL, TR). */
+    fun setTextureCoordinates(coords: FloatArray) {
+        require(coords.size >= 8) { "Need 4 vec2 texture coordinates" }
+        glTextureBuffer = GlUtil.createFloatBuffer(coords)
+    }
+
+    fun resetTextureCoordinates() {
+        glTextureBuffer = GlUtil.textureVertices
+    }
+
     open fun draw(textureId: Int) {
         GLES20.glUseProgram(programId)
 

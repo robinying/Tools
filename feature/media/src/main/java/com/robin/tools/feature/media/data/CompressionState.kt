@@ -7,7 +7,15 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 enum class CompressionType {
-    VIDEO, IMAGE, GIF
+    VIDEO,
+    IMAGE,
+    GIF,
+    /** Extract audio from video → M4A */
+    EXTRACT_AUDIO,
+    /** Remove audio track from video */
+    STRIP_AUDIO,
+    /** Transcode to MP4 */
+    TRANSCODE
 }
 
 enum class CompressionLevel(@StringRes val labelRes: Int) {

@@ -5,8 +5,20 @@
     <string name="camera_feature_desc">Record, edit, and enhance videos with filters and effects</string>
 
     <!-- Camera main -->
+    <string name="camera_photo_title">Take Photo</string>
+    <string name="camera_photo_desc">Capture a still with live filters</string>
     <string name="camera_record_title">Record Video</string>
     <string name="camera_record_desc">Multi-segment recording with filters and countdown</string>
+    <string name="photo_saved">Photo saved to gallery</string>
+    <string name="photo_failed">Failed to save photo</string>
+    <string name="ttv_hint">Enter text for the video card</string>
+    <string name="ttv_duration">Duration: %1$d s</string>
+    <string name="ttv_generate">Generate video</string>
+    <string name="ttv_empty">Please enter some text</string>
+    <string name="ttv_done">Video created</string>
+    <string name="ttv_failed">Failed to generate video</string>
+    <string name="ttv_footer">Saved under app camera output folder</string>
+    <string name="edit_sticker_added">Sticker added</string>
     <string name="camera_edit_title">Edit Video</string>
     <string name="camera_edit_desc">Add watermarks, stickers, subtitles, and apply filters</string>
     <string name="camera_trim_title">Trim Video</string>

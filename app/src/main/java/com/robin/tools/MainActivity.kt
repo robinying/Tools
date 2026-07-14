@@ -33,6 +33,8 @@ import com.robin.tools.feature.camera.ui.record.RecordScreen
 import com.robin.tools.feature.camera.ui.edit.VideoEditScreen
 import com.robin.tools.feature.camera.ui.trim.TrimScreen
 import com.robin.tools.feature.camera.ui.cover.CoverScreen
+import com.robin.tools.feature.camera.ui.photo.PhotoCaptureScreen
+import com.robin.tools.feature.camera.ui.text.TextToVideoScreen
 import com.robin.tools.feature.lightlux.data.AppDatabase
 import com.robin.tools.feature.lightlux.data.LightRepository
 import com.robin.tools.feature.lightlux.data.MainViewModel
@@ -104,6 +106,14 @@ class MainActivity : ComponentActivity() {
                             CameraRecordWrapper(navController)
                         }
 
+                        composable<AppRoute.CameraPhoto> {
+                            CameraPhotoWrapper(navController)
+                        }
+
+                        composable<AppRoute.TextToVideo> {
+                            TextToVideoWrapper(navController)
+                        }
+
                         composable<AppRoute.VideoEdit> { backStackEntry ->
                             val route = backStackEntry.toRoute<AppRoute.VideoEdit>()
                             VideoEditWrapper(navController, route.videoPath)
@@ -138,6 +148,15 @@ private fun MediaMainWrapper(navController: NavHostController) {
             onImageCompressClick = { navController.navigate(AppRoute.Compression(CompressionType.IMAGE)) },
             onGifConvertClick = { navController.navigate(AppRoute.Compression(CompressionType.GIF)) },
             onFilterClick = { navController.navigate(AppRoute.Filter) },
+            onExtractAudioClick = {
+                navController.navigate(AppRoute.Compression(CompressionType.EXTRACT_AUDIO))
+            },
+            onStripAudioClick = {
+                navController.navigate(AppRoute.Compression(CompressionType.STRIP_AUDIO))
+            },
+            onTranscodeClick = {
+                navController.navigate(AppRoute.Compression(CompressionType.TRANSCODE))
+            },
             onBack = { navController.popBackStack() }
         )
     }
@@ -223,6 +242,7 @@ private fun CameraMainWrapper(navController: NavHostController) {
         CameraMainScreen(
             onBack = { navController.popBackStack() },
             onRecord = { navController.navigate(AppRoute.CameraRecord) },
+            onPhoto = { navController.navigate(AppRoute.CameraPhoto) },
             onEditVideo = {
                 pendingAction = "edit"
                 videoPickerLauncher.launch("video/*")
@@ -235,7 +255,7 @@ private fun CameraMainWrapper(navController: NavHostController) {
                 pendingAction = "cover"
                 videoPickerLauncher.launch("video/*")
             },
-            onTextToVideo = null
+            onTextToVideo = { navController.navigate(AppRoute.TextToVideo) }
         )
     }
 }
@@ -250,6 +270,27 @@ private fun CameraRecordWrapper(navController: NavHostController) {
             }
         }
     )
+}
+
+@Composable
+private fun CameraPhotoWrapper(navController: NavHostController) {
+    PhotoCaptureScreen(
+        onBack = { navController.popBackStack() }
+    )
+}
+
+@Composable
+private fun TextToVideoWrapper(navController: NavHostController) {
+    SwipeBackContainer(onBack = { navController.popBackStack() }) {
+        TextToVideoScreen(
+            onBack = { navController.popBackStack() },
+            onGenerated = { path ->
+                navController.navigate(AppRoute.VideoEdit(path)) {
+                    popUpTo(AppRoute.CameraMain)
+                }
+            }
+        )
+    }
 }
 
 @Composable

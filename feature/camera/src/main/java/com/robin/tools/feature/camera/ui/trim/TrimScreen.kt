@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.robin.tools.core.ui.TextOptionChip
 import com.robin.tools.core.ui.ToolsTopAppBar
 import com.robin.tools.feature.camera.R
 import com.robin.tools.feature.camera.storage.CameraFileManager
@@ -140,10 +141,10 @@ fun TrimScreen(
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
                     listOf(0, 90, 180, 270).forEach { deg ->
-                        FilterChip(
+                        TextOptionChip(
                             selected = uiState.rotation == deg,
                             onClick = { viewModel.setRotation(deg) },
-                            label = { Text("${deg}°", style = MaterialTheme.typography.bodySmall) }
+                            label = "${deg}°"
                         )
                     }
                 }

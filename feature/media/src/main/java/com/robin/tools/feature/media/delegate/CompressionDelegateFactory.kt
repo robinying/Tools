@@ -8,6 +8,9 @@ object CompressionDelegateFactory {
             CompressionType.VIDEO -> VideoCompressionDelegate()
             CompressionType.GIF -> GifConversionDelegate()
             CompressionType.IMAGE -> ImageCompressionDelegate()
+            CompressionType.EXTRACT_AUDIO -> AudioExtractDelegate()
+            CompressionType.STRIP_AUDIO -> StripAudioDelegate()
+            CompressionType.TRANSCODE -> TranscodeDelegate()
         }
     }
 }

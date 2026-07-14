@@ -38,6 +38,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.robin.tools.core.ui.Dimension
 import com.robin.tools.core.ui.ProgressBlock
+import com.robin.tools.core.ui.TextOptionChip
 import com.robin.tools.core.ui.ToolsTopAppBar
 import com.robin.tools.feature.media.R
 import com.robin.tools.feature.media.data.*
@@ -112,9 +113,12 @@ fun CompressionScreen(
                             if (selectedUris.size == 1 && outputUri != null) {
                                 try {
                                     val mimeType = when (type) {
-                                        CompressionType.VIDEO -> "video/*"
+                                        CompressionType.VIDEO,
+                                        CompressionType.STRIP_AUDIO,
+                                        CompressionType.TRANSCODE -> "video/*"
                                         CompressionType.GIF -> "image/gif"
                                         CompressionType.IMAGE -> "image/*"
+                                        CompressionType.EXTRACT_AUDIO -> "audio/*"
                                     }
                                     val intent = Intent(Intent.ACTION_VIEW).apply {
                                         setDataAndType(Uri.parse(outputUri), mimeType)
@@ -158,6 +162,9 @@ fun CompressionScreen(
                     CompressionType.VIDEO -> context.getString(R.string.video_compress)
                     CompressionType.IMAGE -> context.getString(R.string.image_compress)
                     CompressionType.GIF -> context.getString(R.string.video_to_gif)
+                    CompressionType.EXTRACT_AUDIO -> context.getString(R.string.extract_audio)
+                    CompressionType.STRIP_AUDIO -> context.getString(R.string.strip_audio)
+                    CompressionType.TRANSCODE -> context.getString(R.string.transcode_mp4)
                 },
                 onBack = onBack,
                 backContentDescription = context.getString(R.string.back)
@@ -176,10 +183,9 @@ fun CompressionScreen(
 
             Button(
                 onClick = {
-                    if (type == CompressionType.VIDEO || type == CompressionType.GIF) {
-                        singleVideoLauncher.launch("video/*")
-                    } else {
-                        multipleImagesLauncher.launch("image/*")
+                    when (type) {
+                        CompressionType.IMAGE -> multipleImagesLauncher.launch("image/*")
+                        else -> singleVideoLauncher.launch("video/*")
                     }
                 },
                 enabled = !isProcessing,
@@ -200,18 +206,21 @@ fun CompressionScreen(
             }
 
             Text(
-                if (type == CompressionType.GIF) context.getString(R.string.select_gif_quality)
-                else context.getString(R.string.select_compression_level)
+                when (type) {
+                    CompressionType.GIF -> context.getString(R.string.select_gif_quality)
+                    CompressionType.STRIP_AUDIO -> context.getString(R.string.select_quality)
+                    else -> context.getString(R.string.select_compression_level)
+                }
             )
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 CompressionLevel.values().forEach { level ->
-                    FilterChip(
+                    TextOptionChip(
                         selected = compressionLevel == level,
                         onClick = { if (!isProcessing) compressionLevel = level },
-                        label = { Text(stringResource(level.labelRes)) },
+                        label = stringResource(level.labelRes),
                         enabled = !isProcessing
                     )
                 }
@@ -240,8 +249,12 @@ fun CompressionScreen(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
-                        if (type == CompressionType.GIF) context.getString(R.string.start_conversion)
-                        else context.getString(R.string.start_compression)
+                        when (type) {
+                            CompressionType.GIF -> context.getString(R.string.start_conversion)
+                            CompressionType.VIDEO, CompressionType.IMAGE ->
+                                context.getString(R.string.start_compression)
+                            else -> context.getString(R.string.start_process)
+                        }
                     )
                 }
             }

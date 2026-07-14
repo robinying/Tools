@@ -20,12 +20,14 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.robin.tools.core.ui.TextOptionChip
 import com.robin.tools.feature.camera.R
 import com.robin.tools.feature.camera.filter.FilterType
 import com.robin.tools.feature.camera.filter.stringRes
@@ -40,6 +42,12 @@ fun RecordScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    val configuration = LocalConfiguration.current
+
+    // Keep preview upright if display rotation changes while recording UI is open.
+    LaunchedEffect(configuration.orientation) {
+        viewModel.refreshDisplayOrientation()
+    }
 
     Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
 
@@ -67,8 +75,23 @@ fun RecordScreen(
                     tint = MaterialTheme.colorScheme.onBackground
                 )
             }
-            IconButton(onClick = { viewModel.switchCamera() }) {
-                Icon(Icons.Default.SwitchCamera, "Flip", tint = MaterialTheme.colorScheme.onBackground)
+            IconButton(
+                onClick = { viewModel.switchCamera() },
+                enabled = !uiState.isSwitchingCamera && !uiState.isRecording && !uiState.isCountingDown
+            ) {
+                if (uiState.isSwitchingCamera) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(24.dp),
+                        strokeWidth = 2.dp,
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
+                } else {
+                    Icon(
+                        Icons.Default.SwitchCamera,
+                        contentDescription = stringResource(R.string.record_flip_camera),
+                        tint = MaterialTheme.colorScheme.onBackground
+                    )
+                }
             }
         }
 
@@ -193,26 +216,13 @@ fun FilterSwipeSelector(
 ) {
     LazyRow(
         modifier = modifier.fillMaxWidth().padding(horizontal = 8.dp),
-        horizontalArrangement = Arrangement.spacedBy(6.dp)
+        horizontalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         items(FilterType.entries) { filter ->
-            val isSelected = filter == currentFilter
-            FilterChip(
+            TextOptionChip(
+                selected = filter == currentFilter,
                 onClick = { onFilterChanged(filter) },
-                label = {
-                    Text(
-                        stringResource(filter.stringRes()),
-                        style = MaterialTheme.typography.labelSmall,
-                        maxLines = 1,
-                        color = if (isSelected) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
-                    )
-                },
-                selected = isSelected,
-                colors = FilterChipDefaults.filterChipColors(
-                    selectedContainerColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.3f),
-                    containerColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.15f)
-                ),
-                border = null
+                label = stringResource(filter.stringRes())
             )
         }
     }

@@ -3,26 +3,31 @@ package com.robin.tools.feature.camera.ui.record
 import android.app.Application
 import android.graphics.SurfaceTexture
 import android.opengl.EGL14
+import android.util.Log
+import android.view.Surface
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import android.view.Surface
 import com.robin.tools.feature.camera.camera2.Camera2Controller
 import com.robin.tools.feature.camera.camera2.CameraConfig
-import com.robin.tools.feature.camera.camera2.CameraFacing
 import com.robin.tools.feature.camera.encoder.EncoderConfig
 import com.robin.tools.feature.camera.encoder.TextureMovieEncoder
 import com.robin.tools.feature.camera.filter.FilterType
 import com.robin.tools.feature.camera.opengl.CameraGlRenderer
+import com.robin.tools.feature.camera.opengl.CameraOrientation
 import com.robin.tools.feature.camera.segment.SegmentMerger
 import com.robin.tools.feature.camera.segment.SegmentRecorder
 import com.robin.tools.feature.camera.storage.CameraFileManager
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 
 class RecordViewModel(application: Application) : AndroidViewModel(application) {
     private val _uiState = MutableStateFlow(RecordUiState())
@@ -36,7 +41,12 @@ class RecordViewModel(application: Application) : AndroidViewModel(application) 
     private val cameraConfig = CameraConfig()
 
     private var currentSurfaceTexture: SurfaceTexture? = null
+    /** Reused across camera switches — recreating Surface is expensive. */
+    private var previewSurface: Surface? = null
     private var isRecordingInProgress: Boolean = false
+
+    private val cameraMutex = Mutex()
+    private var switchJob: Job? = null
 
     init {
         renderer.setFilterResources(application.resources)
@@ -53,42 +63,101 @@ class RecordViewModel(application: Application) : AndroidViewModel(application) 
         }
     }
 
-    private suspend fun openCamera(front: Boolean) {
+    private suspend fun openCamera(front: Boolean) = cameraMutex.withLock {
         try {
             val cameraId = cameraController.getCameraId(front)
-                ?: run { _uiState.update { it.copy(error = "No camera found") }; return }
-            val device = cameraController.openCamera(cameraId)
-            val st = currentSurfaceTexture ?: return
+                ?: run {
+                    _uiState.update { it.copy(error = "No camera found", isSwitchingCamera = false) }
+                    return
+                }
 
+            // Warm characteristics / size from cache before open to minimize gap after open.
             val previewSize = cameraController.getPreviewSize(cameraId)
+            val sensorOrientation = cameraController.getSensorOrientation(cameraId)
+            val displayRotation = CameraOrientation.displayRotationDegrees(getApplication())
+
+            val st = currentSurfaceTexture ?: return
             st.setDefaultBufferSize(previewSize.width, previewSize.height)
             renderer.setPreviewSize(previewSize.width, previewSize.height)
-            val surface = Surface(st)
+            renderer.setCameraOrientation(
+                isFront = front,
+                sensorOrientation = sensorOrientation,
+                displayRotationDegrees = displayRotation
+            )
+
+            val surface = previewSurface?.takeIf { it.isValid } ?: Surface(st).also {
+                previewSurface = it
+            }
+
+            val device = cameraController.openCamera(cameraId)
             val session = cameraController.createCaptureSession(device, listOf(surface))
             val request = cameraController.createPreviewRequest(device, surface)
-
-            renderer.isFrontCamera = front
-            renderer.sensorOrientation = cameraController.getSensorOrientation(cameraId)
-            renderer.setFilterResources(getApplication<Application>().resources)
-
             cameraController.startRepeatingRequest(session, request)
+
             _uiState.update {
-                it.copy(isCameraReady = true, isFrontCamera = front)
+                it.copy(
+                    isCameraReady = true,
+                    isFrontCamera = front,
+                    isSwitchingCamera = false,
+                    error = null
+                )
             }
         } catch (e: Exception) {
-            _uiState.update { it.copy(error = "Camera error: ${e.message}") }
+            Log.e(TAG, "openCamera failed", e)
+            _uiState.update {
+                it.copy(
+                    error = "Camera error: ${e.message}",
+                    isCameraReady = false,
+                    isSwitchingCamera = false
+                )
+            }
         }
     }
 
+    /** Call when activity/display rotation may have changed so preview stays upright. */
+    fun refreshDisplayOrientation() {
+        val isFront = _uiState.value.isFrontCamera
+        val sensorOrientation = cameraController.getCameraId(isFront)?.let { id ->
+            cameraController.getSensorOrientation(id)
+        } ?: 90
+        renderer.setCameraOrientation(
+            isFront = isFront,
+            sensorOrientation = sensorOrientation,
+            displayRotationDegrees = CameraOrientation.displayRotationDegrees(getApplication())
+        )
+    }
+
     fun switchCamera() {
-        viewModelScope.launch {
-            cameraController.close()
+        if (isRecordingInProgress || _uiState.value.isCountingDown) return
+        if (_uiState.value.isSwitchingCamera) return
+
+        // Cancel a stale switch (rapid taps) and start fresh.
+        switchJob?.cancel()
+        switchJob = viewModelScope.launch {
             val newFront = !_uiState.value.isFrontCamera
-            openCamera(newFront)
+            _uiState.update {
+                it.copy(isSwitchingCamera = true, isCameraReady = false, error = null)
+            }
+            try {
+                // Close on background path; wait for onClosed before open to avoid HAL stalls.
+                withContext(Dispatchers.Default) {
+                    cameraController.closeAsync()
+                }
+                openCamera(newFront)
+            } catch (e: Exception) {
+                Log.e(TAG, "switchCamera failed", e)
+                _uiState.update {
+                    it.copy(
+                        isSwitchingCamera = false,
+                        error = "Camera switch failed: ${e.message}"
+                    )
+                }
+            }
         }
     }
 
     fun startCountdown() {
+        if (_uiState.value.isSwitchingCamera) return
         viewModelScope.launch {
             _uiState.update { it.copy(isCountingDown = true, countdownValue = 3) }
             repeat(3) { i ->
@@ -103,7 +172,12 @@ class RecordViewModel(application: Application) : AndroidViewModel(application) 
 
     private fun startRecordingInternal() {
         val outputPath = segmentRecorder.startNewSegment()
-        val config = EncoderConfig(outputPath, cameraConfig.videoWidth, cameraConfig.videoHeight, cameraConfig.videoBitRate)
+        val config = EncoderConfig(
+            outputPath,
+            cameraConfig.videoWidth,
+            cameraConfig.videoHeight,
+            cameraConfig.videoBitRate
+        )
 
         val eglContext = EGL14.eglGetCurrentContext()
         encoder.startRecording(config, eglContext)
@@ -151,9 +225,19 @@ class RecordViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     override fun onCleared() {
+        switchJob?.cancel()
         cameraController.release()
         encoder.stopRecording()
+        try {
+            previewSurface?.release()
+        } catch (_: Exception) {
+        }
+        previewSurface = null
         renderer.release()
         super.onCleared()
+    }
+
+    companion object {
+        private const val TAG = "RecordViewModel"
     }
 }

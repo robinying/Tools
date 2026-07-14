@@ -4,10 +4,20 @@ import android.content.res.Resources
 import android.opengl.GLES11Ext
 import android.opengl.GLES20
 import android.opengl.Matrix
+import com.robin.tools.feature.camera.opengl.GlUtil
+import com.robin.tools.feature.camera.opengl.TextureRotation
+import java.nio.FloatBuffer
 
 class CameraFilter(resources: Resources, private var cameraFacingFront: Boolean = false) : GpuImageFilter(resources) {
 
     private val textureTransform = FloatArray(16)
+
+    /**
+     * OES sampling UVs in [0,1] without pre Y-flip.
+     * [android.graphics.SurfaceTexture.getTransformMatrix] already encodes buffer layout / flip.
+     */
+    private val oesTexCoords: FloatBuffer =
+        GlUtil.createFloatBuffer(TextureRotation.OES_NO_ROTATION)
 
     init {
         Matrix.setIdentityM(textureTransform, 0)
@@ -60,10 +70,10 @@ class CameraFilter(resources: Resources, private var cameraFacingFront: Boolean 
 
         GLES20.glVertexAttribPointer(positionHandle, 2, GLES20.GL_FLOAT, false, 8, glCubeBuffer)
         GLES20.glEnableVertexAttribArray(positionHandle)
-        GLES20.glVertexAttribPointer(texCoordHandle, 2, GLES20.GL_FLOAT, false, 8, glTextureBuffer)
+        // Must use OES [0,1] coords — not the Y-flipped 2D filter buffer.
+        GLES20.glVertexAttribPointer(texCoordHandle, 2, GLES20.GL_FLOAT, false, 8, oesTexCoords)
         GLES20.glEnableVertexAttribArray(texCoordHandle)
 
-        // vMatrix = identity (full-screen quad), texture transform handles orientation
         GLES20.glUniformMatrix4fv(mvpMatrixHandle, 1, false, mvpMatrix, 0)
         if (texTransformHandle >= 0) {
             GLES20.glUniformMatrix4fv(texTransformHandle, 1, false, textureTransform, 0)

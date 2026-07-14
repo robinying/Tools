@@ -5,10 +5,15 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AudioFile
 import androidx.compose.material.icons.filled.FilterAlt
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Slideshow
+import androidx.compose.material.icons.filled.Transform
+import androidx.compose.material.icons.filled.VolumeOff
 import androidx.compose.material.icons.filled.VideoLibrary
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -32,7 +37,10 @@ fun MainScreen(
     onVideoCompressClick: () -> Unit,
     onImageCompressClick: () -> Unit,
     onGifConvertClick: () -> Unit,
-    onFilterClick: () -> Unit
+    onFilterClick: () -> Unit,
+    onExtractAudioClick: () -> Unit = {},
+    onStripAudioClick: () -> Unit = {},
+    onTranscodeClick: () -> Unit = {},
 ) {
     val context = LocalContext.current
     Scaffold(
@@ -48,11 +56,10 @@ fun MainScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
+                .verticalScroll(rememberScrollState())
                 .padding(Dimension.lg),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Title only in TopAppBar — avoid duplicate headline in body
-
             FeatureCard(
                 title = context.getString(R.string.video_compress),
                 description = context.getString(R.string.video_compress_desc),
@@ -78,13 +85,37 @@ fun MainScreen(
             Spacer(Modifier.height(Dimension.md))
 
             FeatureCard(
+                title = context.getString(R.string.extract_audio),
+                description = context.getString(R.string.extract_audio_desc),
+                icon = Icons.Default.AudioFile,
+                onClick = onExtractAudioClick
+            )
+            Spacer(Modifier.height(Dimension.md))
+
+            FeatureCard(
+                title = context.getString(R.string.strip_audio),
+                description = context.getString(R.string.strip_audio_desc),
+                icon = Icons.Default.VolumeOff,
+                onClick = onStripAudioClick
+            )
+            Spacer(Modifier.height(Dimension.md))
+
+            FeatureCard(
+                title = context.getString(R.string.transcode_mp4),
+                description = context.getString(R.string.transcode_mp4_desc),
+                icon = Icons.Default.Transform,
+                onClick = onTranscodeClick
+            )
+            Spacer(Modifier.height(Dimension.md))
+
+            FeatureCard(
                 title = context.getString(R.string.image_filter),
                 description = context.getString(R.string.image_filter_desc),
                 icon = Icons.Default.FilterAlt,
                 onClick = onFilterClick
             )
 
-            Spacer(Modifier.weight(1f))
+            Spacer(Modifier.height(Dimension.xl))
 
             TextButton(
                 onClick = {

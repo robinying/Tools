@@ -22,6 +22,14 @@
     <string name="video_compress">视频压缩</string>
     <string name="image_compress">图片压缩</string>
     <string name="video_to_gif">视频转 GIF</string>
+    <string name="extract_audio">提取音频</string>
+    <string name="extract_audio_desc">从视频导出 AAC/M4A 音轨</string>
+    <string name="strip_audio">去除音轨</string>
+    <string name="strip_audio_desc">导出无声视频</string>
+    <string name="transcode_mp4">转码为 MP4</string>
+    <string name="transcode_mp4_desc">转为更通用的 MP4 格式</string>
+    <string name="select_quality">选择质量</string>
+    <string name="start_process">开始</string>
     <string name="back">返回</string>
     <string name="select_file">选择文件</string>
     <string name="reselect_file">重新选择</string>
