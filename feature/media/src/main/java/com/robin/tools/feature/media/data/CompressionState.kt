@@ -15,7 +15,17 @@ enum class CompressionType {
     /** Remove audio track from video */
     STRIP_AUDIO,
     /** Transcode to MP4 */
-    TRANSCODE
+    TRANSCODE,
+    /** Speed change: 0.5x / 1.5x / 2x */
+    SPEED,
+    /** Reverse video */
+    REVERSE,
+    /** Concatenate multiple videos */
+    CONCAT,
+    /** Center crop to 1:1 / 9:16 / 16:9 */
+    CROP,
+    /** Volume + fade in/out */
+    VOLUME_FADE
 }
 
 enum class CompressionLevel(@StringRes val labelRes: Int) {

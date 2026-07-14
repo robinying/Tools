@@ -34,6 +34,7 @@ import com.robin.tools.feature.camera.ui.edit.VideoEditScreen
 import com.robin.tools.feature.camera.ui.trim.TrimScreen
 import com.robin.tools.feature.camera.ui.cover.CoverScreen
 import com.robin.tools.feature.camera.ui.photo.PhotoCaptureScreen
+import com.robin.tools.feature.camera.ui.slideshow.SlideshowScreen
 import com.robin.tools.feature.camera.ui.text.TextToVideoScreen
 import com.robin.tools.feature.lightlux.data.AppDatabase
 import com.robin.tools.feature.lightlux.data.LightRepository
@@ -114,6 +115,10 @@ class MainActivity : ComponentActivity() {
                             TextToVideoWrapper(navController)
                         }
 
+                        composable<AppRoute.Slideshow> {
+                            SlideshowWrapper(navController)
+                        }
+
                         composable<AppRoute.VideoEdit> { backStackEntry ->
                             val route = backStackEntry.toRoute<AppRoute.VideoEdit>()
                             VideoEditWrapper(navController, route.videoPath)
@@ -156,6 +161,21 @@ private fun MediaMainWrapper(navController: NavHostController) {
             },
             onTranscodeClick = {
                 navController.navigate(AppRoute.Compression(CompressionType.TRANSCODE))
+            },
+            onSpeedClick = {
+                navController.navigate(AppRoute.Compression(CompressionType.SPEED))
+            },
+            onReverseClick = {
+                navController.navigate(AppRoute.Compression(CompressionType.REVERSE))
+            },
+            onConcatClick = {
+                navController.navigate(AppRoute.Compression(CompressionType.CONCAT))
+            },
+            onCropClick = {
+                navController.navigate(AppRoute.Compression(CompressionType.CROP))
+            },
+            onVolumeFadeClick = {
+                navController.navigate(AppRoute.Compression(CompressionType.VOLUME_FADE))
             },
             onBack = { navController.popBackStack() }
         )
@@ -255,7 +275,8 @@ private fun CameraMainWrapper(navController: NavHostController) {
                 pendingAction = "cover"
                 videoPickerLauncher.launch("video/*")
             },
-            onTextToVideo = { navController.navigate(AppRoute.TextToVideo) }
+            onTextToVideo = { navController.navigate(AppRoute.TextToVideo) },
+            onSlideshow = { navController.navigate(AppRoute.Slideshow) }
         )
     }
 }
@@ -283,6 +304,20 @@ private fun CameraPhotoWrapper(navController: NavHostController) {
 private fun TextToVideoWrapper(navController: NavHostController) {
     SwipeBackContainer(onBack = { navController.popBackStack() }) {
         TextToVideoScreen(
+            onBack = { navController.popBackStack() },
+            onGenerated = { path ->
+                navController.navigate(AppRoute.VideoEdit(path)) {
+                    popUpTo(AppRoute.CameraMain)
+                }
+            }
+        )
+    }
+}
+
+@Composable
+private fun SlideshowWrapper(navController: NavHostController) {
+    SwipeBackContainer(onBack = { navController.popBackStack() }) {
+        SlideshowScreen(
             onBack = { navController.popBackStack() },
             onGenerated = { path ->
                 navController.navigate(AppRoute.VideoEdit(path)) {

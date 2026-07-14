@@ -9,11 +9,16 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AudioFile
+import androidx.compose.material.icons.filled.CallMerge
+import androidx.compose.material.icons.filled.Crop
 import androidx.compose.material.icons.filled.FilterAlt
 import androidx.compose.material.icons.filled.Image
+import androidx.compose.material.icons.filled.Replay
 import androidx.compose.material.icons.filled.Slideshow
+import androidx.compose.material.icons.filled.Speed
 import androidx.compose.material.icons.filled.Transform
 import androidx.compose.material.icons.filled.VolumeOff
+import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.material.icons.filled.VideoLibrary
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -41,6 +46,11 @@ fun MainScreen(
     onExtractAudioClick: () -> Unit = {},
     onStripAudioClick: () -> Unit = {},
     onTranscodeClick: () -> Unit = {},
+    onSpeedClick: () -> Unit = {},
+    onReverseClick: () -> Unit = {},
+    onConcatClick: () -> Unit = {},
+    onCropClick: () -> Unit = {},
+    onVolumeFadeClick: () -> Unit = {},
 ) {
     val context = LocalContext.current
     Scaffold(
@@ -105,6 +115,46 @@ fun MainScreen(
                 description = context.getString(R.string.transcode_mp4_desc),
                 icon = Icons.Default.Transform,
                 onClick = onTranscodeClick
+            )
+            Spacer(Modifier.height(Dimension.md))
+
+            FeatureCard(
+                title = context.getString(R.string.speed_change),
+                description = context.getString(R.string.speed_change_desc),
+                icon = Icons.Default.Speed,
+                onClick = onSpeedClick
+            )
+            Spacer(Modifier.height(Dimension.md))
+
+            FeatureCard(
+                title = context.getString(R.string.reverse_video),
+                description = context.getString(R.string.reverse_video_desc),
+                icon = Icons.Default.Replay,
+                onClick = onReverseClick
+            )
+            Spacer(Modifier.height(Dimension.md))
+
+            FeatureCard(
+                title = context.getString(R.string.concat_video),
+                description = context.getString(R.string.concat_video_desc),
+                icon = Icons.Default.CallMerge,
+                onClick = onConcatClick
+            )
+            Spacer(Modifier.height(Dimension.md))
+
+            FeatureCard(
+                title = context.getString(R.string.crop_aspect),
+                description = context.getString(R.string.crop_aspect_desc),
+                icon = Icons.Default.Crop,
+                onClick = onCropClick
+            )
+            Spacer(Modifier.height(Dimension.md))
+
+            FeatureCard(
+                title = context.getString(R.string.volume_fade),
+                description = context.getString(R.string.volume_fade_desc),
+                icon = Icons.Default.VolumeUp,
+                onClick = onVolumeFadeClick
             )
             Spacer(Modifier.height(Dimension.md))
 

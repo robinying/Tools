@@ -16,6 +16,7 @@ import androidx.core.app.NotificationCompat
 import com.robin.tools.feature.media.R
 import com.robin.tools.feature.media.data.*
 import com.robin.tools.feature.media.delegate.CompressionDelegateFactory
+import com.robin.tools.feature.media.delegate.ConcatDelegate
 import kotlinx.coroutines.*
 
 class CompressionService : Service() {
@@ -26,8 +27,28 @@ class CompressionService : Service() {
         const val NOTIFICATION_ID = 1
         
         const val EXTRA_URIS = "extra_uris"
+        /** Absolute filesystem paths; converted to file:// URIs when [EXTRA_URIS] is absent. */
+        const val EXTRA_FILE_PATHS = "extra_file_paths"
         const val EXTRA_TYPE = "extra_type"
         const val EXTRA_LEVEL = "extra_level"
+
+        /**
+         * Start processing without going through the system multi-select UI.
+         * Intended for instrumentation / debug harnesses (same-app only; service is not exported).
+         */
+        fun startWithFilePaths(
+            context: Context,
+            absolutePaths: List<String>,
+            type: CompressionType,
+            level: CompressionLevel = CompressionLevel.MEDIUM
+        ) {
+            val intent = Intent(context, CompressionService::class.java).apply {
+                putStringArrayListExtra(EXTRA_FILE_PATHS, ArrayList(absolutePaths))
+                putExtra(EXTRA_TYPE, type.name)
+                putExtra(EXTRA_LEVEL, level.name)
+            }
+            androidx.core.content.ContextCompat.startForegroundService(context, intent)
+        }
     }
 
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
@@ -56,17 +77,26 @@ class CompressionService : Service() {
             return START_NOT_STICKY
         }
 
-        val uris = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        val urisFromExtra = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             intent.getParcelableArrayListExtra(EXTRA_URIS, Uri::class.java)
         } else {
             @Suppress("DEPRECATION")
             intent.getParcelableArrayListExtra(EXTRA_URIS)
+        }
+        val pathList = intent.getStringArrayListExtra(EXTRA_FILE_PATHS).orEmpty()
+        val uris = when {
+            !urisFromExtra.isNullOrEmpty() -> urisFromExtra
+            pathList.isNotEmpty() -> ArrayList(
+                pathList.map { path -> Uri.fromFile(java.io.File(path)) }
+            )
+            else -> null
         }
         
         val typeName = intent.getStringExtra(EXTRA_TYPE)
         val levelName = intent.getStringExtra(EXTRA_LEVEL)
 
         if (uris.isNullOrEmpty() || typeName == null || levelName == null) {
+            Log.e(TAG, "Missing uris/paths or type/level")
             stopForeground(STOP_FOREGROUND_REMOVE)
             stopSelf()
             return START_NOT_STICKY
@@ -145,37 +175,70 @@ class CompressionService : Service() {
         serviceScope.launch {
             var successCount = 0
             var failCount = 0
-            val total = uris.size
+            val total = if (type == CompressionType.CONCAT) 1 else uris.size
             var lastOutputUri = ""
             var lastErrorMsg = ""
 
-            for ((index, uri) in uris.withIndex()) {
-                if (CompressionManager.isCancelled()) break
-
-                val currentFileNum = index + 1
-                
+            // Multi-input concat is a single job over all URIs.
+            if (type == CompressionType.CONCAT) {
                 val onProgress: (Float, String) -> Unit = { p, msg ->
-                    val globalProgress = (index.toFloat() + p) / total.toFloat()
-                    val statusMsg = getString(R.string.processing, currentFileNum, total, msg)
-                    
-                    updateNotification((globalProgress * 100).toInt(), 100, statusMsg)
-                    CompressionManager.updateState(CompressionTaskState.Processing(globalProgress, statusMsg, currentFileNum, total))
+                    val statusMsg = getString(R.string.processing, 1, 1, msg)
+                    updateNotification((p * 100).toInt(), 100, statusMsg)
+                    CompressionManager.updateState(
+                        CompressionTaskState.Processing(p, statusMsg, 1, 1)
+                    )
                 }
-
-                val delegate = CompressionDelegateFactory.create(type)
                 val result = try {
-                    delegate.process(this@CompressionService, uri, level, onProgress)
+                    ConcatDelegate().processAll(this@CompressionService, uris, level, onProgress)
                 } catch (e: Exception) {
-                    Log.e(TAG, "Unexpected error processing file $currentFileNum", e)
+                    Log.e(TAG, "Concat failed", e)
                     Result.failure(e)
                 }
-
                 if (result.isSuccess) {
-                    successCount++
+                    successCount = 1
                     lastOutputUri = result.getOrThrow()
                 } else {
-                    failCount++
-                    lastErrorMsg = result.exceptionOrNull()?.message ?: getString(R.string.service_unknown_error)
+                    failCount = 1
+                    lastErrorMsg = result.exceptionOrNull()?.message
+                        ?: getString(R.string.service_unknown_error)
+                }
+            } else {
+                for ((index, uri) in uris.withIndex()) {
+                    if (CompressionManager.isCancelled()) break
+
+                    val currentFileNum = index + 1
+
+                    val onProgress: (Float, String) -> Unit = { p, msg ->
+                        val globalProgress = (index.toFloat() + p) / total.toFloat()
+                        val statusMsg = getString(R.string.processing, currentFileNum, total, msg)
+
+                        updateNotification((globalProgress * 100).toInt(), 100, statusMsg)
+                        CompressionManager.updateState(
+                            CompressionTaskState.Processing(
+                                globalProgress,
+                                statusMsg,
+                                currentFileNum,
+                                total
+                            )
+                        )
+                    }
+
+                    val delegate = CompressionDelegateFactory.create(type)
+                    val result = try {
+                        delegate.process(this@CompressionService, uri, level, onProgress)
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Unexpected error processing file $currentFileNum", e)
+                        Result.failure(e)
+                    }
+
+                    if (result.isSuccess) {
+                        successCount++
+                        lastOutputUri = result.getOrThrow()
+                    } else {
+                        failCount++
+                        lastErrorMsg = result.exceptionOrNull()?.message
+                            ?: getString(R.string.service_unknown_error)
+                    }
                 }
             }
 

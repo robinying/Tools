@@ -17,7 +17,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -33,6 +39,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.robin.tools.core.ui.TextOptionChip
 import com.robin.tools.core.ui.ToolsTopAppBar
 import com.robin.tools.feature.camera.R
+import com.robin.tools.feature.camera.editor.SubtitleCue
 import com.robin.tools.feature.camera.filter.FilterType
 import com.robin.tools.feature.camera.filter.stringRes
 import com.robin.tools.feature.camera.storage.CameraFileManager
@@ -51,6 +58,10 @@ fun VideoEditScreen(
     val fileManager = remember { CameraFileManager(context) }
     var showWatermarkDialog by remember { mutableStateOf(false) }
     var watermarkInput by remember { mutableStateOf("") }
+    var showSubtitleDialog by remember { mutableStateOf(false) }
+    var subtitleInput by remember { mutableStateOf("") }
+    var subtitleStartSec by remember { mutableFloatStateOf(0f) }
+    var subtitleEndSec by remember { mutableFloatStateOf(3f) }
 
     val stickerPicker = rememberLauncherForActivityResult(
         ActivityResultContracts.GetContent()
@@ -80,6 +91,20 @@ fun VideoEditScreen(
         }
     }
 
+    val srtPicker = rememberLauncherForActivityResult(
+        ActivityResultContracts.GetContent()
+    ) { uri ->
+        uri ?: return@rememberLauncherForActivityResult
+        try {
+            context.contentResolver.openInputStream(uri)?.bufferedReader()?.use { reader ->
+                viewModel.importSrt(reader.readText())
+                Toast.makeText(context, R.string.edit_srt_imported, Toast.LENGTH_SHORT).show()
+            }
+        } catch (_: Exception) {
+            Toast.makeText(context, R.string.edit_srt_failed, Toast.LENGTH_SHORT).show()
+        }
+    }
+
     LaunchedEffect(videoPath) { viewModel.loadVideo(context, videoPath) }
 
     // Watermark input dialog
@@ -106,6 +131,64 @@ fun VideoEditScreen(
             },
             dismissButton = {
                 TextButton(onClick = { showWatermarkDialog = false }) { Text(stringResource(R.string.edit_cancel)) }
+            }
+        )
+    }
+
+    if (showSubtitleDialog) {
+        val durSec = (uiState.durationMs / 1000f).coerceAtLeast(1f)
+        AlertDialog(
+            onDismissRequest = { showSubtitleDialog = false },
+            title = { Text(stringResource(R.string.edit_subtitle_title)) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    OutlinedTextField(
+                        value = subtitleInput,
+                        onValueChange = { subtitleInput = it.take(120) },
+                        label = { Text(stringResource(R.string.edit_subtitle_hint)) },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    Text(stringResource(R.string.edit_subtitle_start, subtitleStartSec.toInt()))
+                    Slider(
+                        value = subtitleStartSec,
+                        onValueChange = {
+                            subtitleStartSec = it
+                            if (subtitleEndSec <= subtitleStartSec) {
+                                subtitleEndSec = (subtitleStartSec + 1f).coerceAtMost(durSec)
+                            }
+                        },
+                        valueRange = 0f..durSec
+                    )
+                    Text(stringResource(R.string.edit_subtitle_end, subtitleEndSec.toInt()))
+                    Slider(
+                        value = subtitleEndSec,
+                        onValueChange = { subtitleEndSec = it.coerceAtLeast(subtitleStartSec + 0.5f) },
+                        valueRange = 0f..durSec
+                    )
+                    TextButton(onClick = { srtPicker.launch("*/*") }) {
+                        Text(stringResource(R.string.edit_import_srt))
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    if (subtitleInput.isNotBlank()) {
+                        viewModel.addSubtitle(
+                            SubtitleCue(
+                                startMs = (subtitleStartSec * 1000).toLong(),
+                                endMs = (subtitleEndSec * 1000).toLong(),
+                                text = subtitleInput.trim()
+                            )
+                        )
+                        subtitleInput = ""
+                    }
+                    showSubtitleDialog = false
+                }) { Text(stringResource(R.string.edit_add)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { showSubtitleDialog = false }) {
+                    Text(stringResource(R.string.edit_cancel))
+                }
             }
         )
     }
@@ -233,6 +316,28 @@ fun VideoEditScreen(
                             Text(stringResource(R.string.edit_sticker), style = MaterialTheme.typography.labelSmall)
                         }
                     }
+                    IconButton(onClick = {
+                        subtitleStartSec = (uiState.currentPositionMs / 1000f).coerceAtLeast(0f)
+                        subtitleEndSec = (subtitleStartSec + 3f)
+                            .coerceAtMost((uiState.durationMs / 1000f).coerceAtLeast(1f))
+                        showSubtitleDialog = true
+                    }) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Icon(Icons.Default.ClosedCaption, stringResource(R.string.edit_subtitle))
+                            Text(
+                                stringResource(R.string.edit_subtitle),
+                                style = MaterialTheme.typography.labelSmall
+                            )
+                        }
+                    }
+                }
+
+                if (uiState.subtitles.isNotEmpty()) {
+                    Text(
+                        stringResource(R.string.edit_subtitle_count, uiState.subtitles.size),
+                        style = MaterialTheme.typography.labelMedium,
+                        modifier = Modifier.padding(horizontal = 16.dp)
+                    )
                 }
 
                 Spacer(Modifier.height(16.dp))

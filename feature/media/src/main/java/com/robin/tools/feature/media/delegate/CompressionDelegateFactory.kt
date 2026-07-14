@@ -11,6 +11,11 @@ object CompressionDelegateFactory {
             CompressionType.EXTRACT_AUDIO -> AudioExtractDelegate()
             CompressionType.STRIP_AUDIO -> StripAudioDelegate()
             CompressionType.TRANSCODE -> TranscodeDelegate()
+            CompressionType.SPEED -> SpeedChangeDelegate()
+            CompressionType.REVERSE -> ReverseDelegate()
+            CompressionType.CONCAT -> ConcatDelegate()
+            CompressionType.CROP -> CropAspectDelegate()
+            CompressionType.VOLUME_FADE -> VolumeFadeDelegate()
         }
     }
 }

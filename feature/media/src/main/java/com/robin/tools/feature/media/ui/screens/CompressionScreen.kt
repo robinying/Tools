@@ -115,7 +115,12 @@ fun CompressionScreen(
                                     val mimeType = when (type) {
                                         CompressionType.VIDEO,
                                         CompressionType.STRIP_AUDIO,
-                                        CompressionType.TRANSCODE -> "video/*"
+                                        CompressionType.TRANSCODE,
+                                        CompressionType.SPEED,
+                                        CompressionType.REVERSE,
+                                        CompressionType.CONCAT,
+                                        CompressionType.CROP,
+                                        CompressionType.VOLUME_FADE -> "video/*"
                                         CompressionType.GIF -> "image/gif"
                                         CompressionType.IMAGE -> "image/*"
                                         CompressionType.EXTRACT_AUDIO -> "audio/*"
@@ -165,6 +170,11 @@ fun CompressionScreen(
                     CompressionType.EXTRACT_AUDIO -> context.getString(R.string.extract_audio)
                     CompressionType.STRIP_AUDIO -> context.getString(R.string.strip_audio)
                     CompressionType.TRANSCODE -> context.getString(R.string.transcode_mp4)
+                    CompressionType.SPEED -> context.getString(R.string.speed_change)
+                    CompressionType.REVERSE -> context.getString(R.string.reverse_video)
+                    CompressionType.CONCAT -> context.getString(R.string.concat_video)
+                    CompressionType.CROP -> context.getString(R.string.crop_aspect)
+                    CompressionType.VOLUME_FADE -> context.getString(R.string.volume_fade)
                 },
                 onBack = onBack,
                 backContentDescription = context.getString(R.string.back)
@@ -185,6 +195,7 @@ fun CompressionScreen(
                 onClick = {
                     when (type) {
                         CompressionType.IMAGE -> multipleImagesLauncher.launch("image/*")
+                        CompressionType.CONCAT -> multipleImagesLauncher.launch("video/*")
                         else -> singleVideoLauncher.launch("video/*")
                     }
                 },
@@ -205,13 +216,7 @@ fun CompressionScreen(
                 )
             }
 
-            Text(
-                when (type) {
-                    CompressionType.GIF -> context.getString(R.string.select_gif_quality)
-                    CompressionType.STRIP_AUDIO -> context.getString(R.string.select_quality)
-                    else -> context.getString(R.string.select_compression_level)
-                }
-            )
+            Text(optionSectionTitle(type, context))
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
@@ -220,7 +225,7 @@ fun CompressionScreen(
                     TextOptionChip(
                         selected = compressionLevel == level,
                         onClick = { if (!isProcessing) compressionLevel = level },
-                        label = stringResource(level.labelRes),
+                        label = optionLabel(type, level, context),
                         enabled = !isProcessing
                     )
                 }
@@ -245,7 +250,8 @@ fun CompressionScreen(
                             }
                         }
                     },
-                    enabled = selectedUris.isNotEmpty(),
+                    enabled = selectedUris.isNotEmpty() &&
+                        (type != CompressionType.CONCAT || selectedUris.size >= 2),
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
@@ -259,6 +265,48 @@ fun CompressionScreen(
                 }
             }
         }
+    }
+}
+
+private fun optionSectionTitle(type: CompressionType, context: android.content.Context): String {
+    return when (type) {
+        CompressionType.GIF -> context.getString(R.string.select_gif_quality)
+        CompressionType.SPEED -> context.getString(R.string.select_speed)
+        CompressionType.REVERSE -> context.getString(R.string.select_reverse_mode)
+        CompressionType.CROP -> context.getString(R.string.select_aspect)
+        CompressionType.VOLUME_FADE -> context.getString(R.string.select_volume)
+        CompressionType.STRIP_AUDIO -> context.getString(R.string.select_quality)
+        else -> context.getString(R.string.select_compression_level)
+    }
+}
+
+private fun optionLabel(
+    type: CompressionType,
+    level: CompressionLevel,
+    context: android.content.Context
+): String {
+    return when (type) {
+        CompressionType.SPEED -> when (level) {
+            CompressionLevel.LOW -> context.getString(R.string.option_speed_05)
+            CompressionLevel.MEDIUM -> context.getString(R.string.option_speed_15)
+            CompressionLevel.HIGH -> context.getString(R.string.option_speed_20)
+        }
+        CompressionType.REVERSE -> when (level) {
+            CompressionLevel.LOW, CompressionLevel.HIGH ->
+                context.getString(R.string.option_reverse_mute)
+            CompressionLevel.MEDIUM -> context.getString(R.string.option_reverse_audio)
+        }
+        CompressionType.CROP -> when (level) {
+            CompressionLevel.LOW -> context.getString(R.string.option_aspect_11)
+            CompressionLevel.MEDIUM -> context.getString(R.string.option_aspect_916)
+            CompressionLevel.HIGH -> context.getString(R.string.option_aspect_169)
+        }
+        CompressionType.VOLUME_FADE -> when (level) {
+            CompressionLevel.LOW -> context.getString(R.string.option_vol_soft)
+            CompressionLevel.MEDIUM -> context.getString(R.string.option_vol_normal)
+            CompressionLevel.HIGH -> context.getString(R.string.option_vol_loud)
+        }
+        else -> context.getString(level.labelRes)
     }
 }
 
@@ -284,8 +332,8 @@ private fun MediaPreviewSection(
             modifier = Modifier.padding(bottom = 8.dp)
         )
 
-        if (type == CompressionType.IMAGE) {
-            // Multiple images: horizontal scrollable row
+        if (type == CompressionType.IMAGE || type == CompressionType.CONCAT) {
+            // Multiple files: horizontal scrollable row
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -293,7 +341,11 @@ private fun MediaPreviewSection(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 uris.forEach { uri ->
-                    ImageThumbnail(uri = uri, onRemove = { onRemove(uri) })
+                    if (type == CompressionType.IMAGE) {
+                        ImageThumbnail(uri = uri, onRemove = { onRemove(uri) })
+                    } else {
+                        VideoPreviewCard(uri = uri, onRemove = { onRemove(uri) })
+                    }
                 }
             }
         } else {

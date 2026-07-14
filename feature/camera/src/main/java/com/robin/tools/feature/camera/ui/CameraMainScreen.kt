@@ -16,6 +16,7 @@ import androidx.compose.material.icons.filled.Collections
 import androidx.compose.material.icons.filled.ContentCut
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.PhotoCamera
+import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material.icons.filled.TextFields
 import androidx.compose.material.icons.filled.Videocam
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -46,7 +47,8 @@ fun CameraMainScreen(
     onEditVideo: () -> Unit,
     onTrimVideo: () -> Unit,
     onCoverSelect: () -> Unit,
-    onTextToVideo: (() -> Unit)? = null
+    onTextToVideo: (() -> Unit)? = null,
+    onSlideshow: (() -> Unit)? = null
 ) {
     val context = LocalContext.current
     var permissionsGranted by remember {
@@ -146,6 +148,14 @@ fun CameraMainScreen(
                         description = stringResource(R.string.camera_text_to_video_desc),
                         icon = Icons.Default.TextFields,
                         onClick = onTextToVideo
+                    )
+                }
+                if (onSlideshow != null) {
+                    FeatureCard(
+                        title = stringResource(R.string.camera_slideshow_title),
+                        description = stringResource(R.string.camera_slideshow_desc),
+                        icon = Icons.Default.PhotoLibrary,
+                        onClick = onSlideshow
                     )
                 }
             }

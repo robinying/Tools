@@ -32,6 +32,16 @@ import java.nio.ByteOrder
 import java.nio.FloatBuffer
 
 /**
+ * Timed subtitle cue burned into the video during export.
+ * [startMs] inclusive, [endMs] exclusive (milliseconds).
+ */
+data class SubtitleCue(
+    val startMs: Long,
+    val endMs: Long,
+    val text: String
+)
+
+/**
  * Re-encodes a video while applying a GPU filter and optional watermark/sticker overlays.
  * Audio is remuxed from the source without re-encoding.
  */
@@ -43,7 +53,8 @@ class VideoEffectsExporter {
         outputPath: String,
         filterType: FilterType,
         watermarkText: String = "",
-        stickers: List<Bitmap> = emptyList()
+        stickers: List<Bitmap> = emptyList(),
+        subtitles: List<SubtitleCue> = emptyList()
     ): Boolean {
         val meta = readMeta(inputPath) ?: return false
         val width = alignEven(meta.width.coerceAtLeast(16))
@@ -121,11 +132,26 @@ class VideoEffectsExporter {
 
             fbo = GlFrameBuffer().also { it.create(width, height) }
 
-            val overlayBitmap = buildOverlayBitmap(width, height, watermarkText, stickers)
-            if (overlayBitmap != null) {
-                overlayTextureId = uploadBitmapTexture(overlayBitmap)
-                if (!overlayBitmap.isRecycled) overlayBitmap.recycle()
+            var lastSubtitleKey: String? = null
+            fun ensureOverlayForTime(timeMs: Long) {
+                val activeSub = subtitles.firstOrNull { timeMs >= it.startMs && timeMs < it.endMs }?.text.orEmpty()
+                val key = "${watermarkText.hashCode()}_${stickers.size}_$activeSub"
+                if (key == lastSubtitleKey) return
+                lastSubtitleKey = key
+                if (overlayTextureId != 0) {
+                    GlTexture.deleteTexture(overlayTextureId)
+                    overlayTextureId = 0
+                }
+                val overlayBitmap = buildOverlayBitmap(
+                    width, height, watermarkText, stickers, activeSub
+                )
+                if (overlayBitmap != null) {
+                    overlayTextureId = uploadBitmapTexture(overlayBitmap)
+                    if (!overlayBitmap.isRecycled) overlayBitmap.recycle()
+                }
             }
+            // Initial static overlay (no subtitle yet)
+            ensureOverlayForTime(0L)
 
             // --- Decoder ---
             decoder = MediaCodec.createDecoderByType(mime).apply {
@@ -180,6 +206,8 @@ class VideoEffectsExporter {
                             surfaceTexture.updateTexImage()
                             surfaceTexture.getTransformMatrix(transform)
 
+                            ensureOverlayForTime(bufferInfo.presentationTimeUs / 1000L)
+
                             // OES → FBO
                             fbo.bind()
                             GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
@@ -198,7 +226,7 @@ class VideoEffectsExporter {
                                 effectFilter.draw(frameTex)
                             }
 
-                            // Watermark / stickers overlay
+                            // Watermark / stickers / subtitle overlay
                             if (overlayTextureId != 0) {
                                 GLES20.glEnable(GLES20.GL_BLEND)
                                 GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA)
@@ -455,9 +483,10 @@ class VideoEffectsExporter {
         width: Int,
         height: Int,
         watermarkText: String,
-        stickers: List<Bitmap>
+        stickers: List<Bitmap>,
+        subtitleText: String = ""
     ): Bitmap? {
-        if (watermarkText.isBlank() && stickers.isEmpty()) return null
+        if (watermarkText.isBlank() && stickers.isEmpty() && subtitleText.isBlank()) return null
         val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
         canvas.drawColor(Color.TRANSPARENT)
@@ -476,6 +505,39 @@ class VideoEffectsExporter {
             canvas.drawText(watermarkText, x, y, paint)
         }
 
+        if (subtitleText.isNotBlank()) {
+            val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                color = Color.WHITE
+                textSize = (height * 0.05f).coerceIn(24f, 64f)
+                typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
+                textAlign = Paint.Align.CENTER
+                setShadowLayer(6f, 0f, 2f, Color.BLACK)
+            }
+            val bg = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                color = Color.argb(140, 0, 0, 0)
+            }
+            val maxW = width * 0.85f
+            val lines = wrapLine(subtitleText, paint, maxW)
+            val lineH = paint.fontSpacing
+            val blockH = lineH * lines.size + 24f
+            val top = height * 0.78f
+            canvas.drawRoundRect(
+                width * 0.05f,
+                top - 12f,
+                width * 0.95f,
+                top + blockH,
+                16f,
+                16f,
+                bg
+            )
+            var y = top - paint.ascent()
+            val cx = width / 2f
+            for (line in lines) {
+                canvas.drawText(line, cx, y, paint)
+                y += lineH
+            }
+        }
+
         stickers.forEachIndexed { index, sticker ->
             if (sticker.isRecycled) return@forEachIndexed
             val size = (width * 0.2f).toInt().coerceAtLeast(48)
@@ -486,6 +548,23 @@ class VideoEffectsExporter {
             if (scaled !== sticker) scaled.recycle()
         }
         return bitmap
+    }
+
+    private fun wrapLine(text: String, paint: Paint, maxWidth: Float): List<String> {
+        val words = text.replace('\n', ' ').split(' ')
+        val lines = mutableListOf<String>()
+        var cur = StringBuilder()
+        for (w in words) {
+            val trial = if (cur.isEmpty()) w else "$cur $w"
+            if (paint.measureText(trial) <= maxWidth) {
+                cur = StringBuilder(trial)
+            } else {
+                if (cur.isNotEmpty()) lines.add(cur.toString())
+                cur = StringBuilder(w)
+            }
+        }
+        if (cur.isNotEmpty()) lines.add(cur.toString())
+        return lines.ifEmpty { listOf(text) }.take(4)
     }
 
     private fun uploadBitmapTexture(bitmap: Bitmap): Int {

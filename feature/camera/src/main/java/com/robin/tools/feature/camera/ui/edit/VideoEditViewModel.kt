@@ -6,6 +6,7 @@ import android.media.MediaMetadataRetriever
 import android.media.MediaPlayer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.robin.tools.feature.camera.editor.SubtitleCue
 import com.robin.tools.feature.camera.editor.VideoClipper
 import com.robin.tools.feature.camera.editor.VideoEffectsExporter
 import com.robin.tools.feature.camera.filter.FilterType
@@ -25,6 +26,7 @@ data class VideoEditUiState(
     val currentFilter: FilterType = FilterType.NONE,
     val watermarkText: String = "",
     val stickers: List<Bitmap> = emptyList(),
+    val subtitles: List<SubtitleCue> = emptyList(),
     val isExporting: Boolean = false,
     val exportDone: Boolean = false,
     val error: String? = null
@@ -69,6 +71,47 @@ class VideoEditViewModel : ViewModel() {
 
     fun addSticker(bitmap: Bitmap) {
         _uiState.update { it.copy(stickers = it.stickers + bitmap) }
+    }
+
+    fun addSubtitle(cue: SubtitleCue) {
+        if (cue.text.isBlank() || cue.endMs <= cue.startMs) return
+        _uiState.update { it.copy(subtitles = (it.subtitles + cue).sortedBy { c -> c.startMs }) }
+    }
+
+    fun clearSubtitles() {
+        _uiState.update { it.copy(subtitles = emptyList()) }
+    }
+
+    fun importSrt(content: String) {
+        val cues = parseSrt(content)
+        if (cues.isEmpty()) {
+            _uiState.update { it.copy(error = "No subtitles found in SRT") }
+            return
+        }
+        _uiState.update { it.copy(subtitles = (it.subtitles + cues).sortedBy { c -> c.startMs }) }
+    }
+
+    private fun parseSrt(content: String): List<SubtitleCue> {
+        val blocks = content.replace("\r\n", "\n").trim().split(Regex("\n\n+"))
+        val out = mutableListOf<SubtitleCue>()
+        val timeRe =
+            Regex("""(\d{2}):(\d{2}):(\d{2})[,.](\d{3})\s*-->\s*(\d{2}):(\d{2}):(\d{2})[,.](\d{3})""")
+        for (block in blocks) {
+            val lines = block.lines().filter { it.isNotBlank() }
+            if (lines.size < 2) continue
+            val timeLine = lines.firstOrNull { timeRe.containsMatchIn(it) } ?: continue
+            val m = timeRe.find(timeLine) ?: continue
+            fun toMs(h: String, min: String, s: String, ms: String): Long =
+                h.toLong() * 3_600_000 + min.toLong() * 60_000 + s.toLong() * 1000 + ms.toLong()
+            val start = toMs(m.groupValues[1], m.groupValues[2], m.groupValues[3], m.groupValues[4])
+            val end = toMs(m.groupValues[5], m.groupValues[6], m.groupValues[7], m.groupValues[8])
+            val textStart = lines.indexOf(timeLine) + 1
+            val text = lines.drop(textStart).joinToString(" ").trim()
+            if (text.isNotBlank() && end > start) {
+                out.add(SubtitleCue(start, end, text))
+            }
+        }
+        return out
     }
 
     fun togglePlayback() {
@@ -122,7 +165,8 @@ class VideoEditViewModel : ViewModel() {
             val needsEffects =
                 s.currentFilter != FilterType.NONE ||
                     s.watermarkText.isNotBlank() ||
-                    s.stickers.isNotEmpty()
+                    s.stickers.isNotEmpty() ||
+                    s.subtitles.isNotEmpty()
 
             val ok = if (needsEffects) {
                 effectsExporter.export(
@@ -131,7 +175,8 @@ class VideoEditViewModel : ViewModel() {
                     outputPath = outputFile.absolutePath,
                     filterType = s.currentFilter,
                     watermarkText = s.watermarkText,
-                    stickers = s.stickers
+                    stickers = s.stickers,
+                    subtitles = s.subtitles
                 )
             } else {
                 // Fast path: remux full range, keep audio

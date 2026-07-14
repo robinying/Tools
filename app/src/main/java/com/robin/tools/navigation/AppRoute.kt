@@ -37,6 +37,9 @@ sealed interface AppRoute {
     data object TextToVideo : AppRoute
 
     @Serializable
+    data object Slideshow : AppRoute
+
+    @Serializable
     data class VideoEdit(val videoPath: String) : AppRoute
 
     @Serializable
