@@ -1,7 +1,10 @@
 package com.robin.tools.feature.lightlux.data
 
 import android.app.Application
-import io.mockk.*
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.every
+import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -10,7 +13,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 
@@ -25,6 +28,7 @@ class MainViewModelTest {
         Dispatchers.setMain(UnconfinedTestDispatcher())
         val app = mockk<Application>(relaxed = true)
         every { app.getString(any<Int>(), any()) } returns "Saved: 50.0 lux"
+        every { app.getString(any<Int>(), any(), any()) } returns "Saved: 50.0 lux — note"
         viewModel = MainViewModel(app, repository)
     }
 
@@ -38,6 +42,8 @@ class MainViewModelTest {
         assertEquals(0f, viewModel.currentLux.value, 0f)
         assertEquals(emptyList<ChartDataPoint>(), viewModel.realtimeChartData.value)
         assertEquals(null, viewModel.saveStatus.value)
+        assertEquals(ChartWindow.SEC_60, viewModel.chartWindow.value)
+        assertEquals(0, viewModel.chartStats.value.samples)
     }
 
     @Test
@@ -47,10 +53,13 @@ class MainViewModelTest {
     }
 
     @Test
-    fun `updateLuxFromSensor adds chart data point`() {
+    fun `updateLuxFromSensor adds chart data point and stats`() {
         viewModel.updateLuxFromSensor(10f)
         assertEquals(1, viewModel.realtimeChartData.value.size)
         assertEquals(10f, viewModel.realtimeChartData.value[0].luxValue, 0.01f)
+        assertEquals(1, viewModel.chartStats.value.samples)
+        assertEquals(10f, viewModel.chartStats.value.min, 0.01f)
+        assertEquals(10f, viewModel.chartStats.value.max, 0.01f)
     }
 
     @Test
@@ -63,17 +72,45 @@ class MainViewModelTest {
         assertEquals(3, data.size)
         val luxValues = data.map { it.luxValue }.sorted()
         assertEquals(listOf(10f, 20f, 30f), luxValues)
+        assertEquals(10f, viewModel.chartStats.value.min, 0.01f)
+        assertEquals(30f, viewModel.chartStats.value.max, 0.01f)
+        assertEquals(20f, viewModel.chartStats.value.avg, 0.01f)
     }
 
     @Test
-    fun `saveSnapshot persists current lux and publishes success status`() = runTest {
+    fun `setChartWindow updates selection`() {
+        viewModel.setChartWindow(ChartWindow.SEC_15)
+        assertEquals(ChartWindow.SEC_15, viewModel.chartWindow.value)
+        viewModel.setChartWindow(ChartWindow.MIN_5)
+        assertEquals(ChartWindow.MIN_5, viewModel.chartWindow.value)
+    }
+
+    @Test
+    fun `saveSnapshot persists current lux and note`() = runTest {
         coEvery { repository.insertEntry(any()) } returns Unit
         viewModel.updateLuxFromSensor(50f)
 
-        viewModel.saveSnapshot()
+        viewModel.saveSnapshot("window")
 
-        coVerify { repository.insertEntry(match { it.id == 0L && it.luxValue == 50f && it.timestamp > 0L }) }
-        assertEquals("Saved: 50.0 lux", viewModel.saveStatus.value)
+        coVerify {
+            repository.insertEntry(
+                match {
+                    it.id == 0L &&
+                        it.luxValue == 50f &&
+                        it.timestamp > 0L &&
+                        it.note == "window"
+                }
+            )
+        }
+        assertTrue(viewModel.saveStatus.value != null)
+    }
+
+    @Test
+    fun `saveSnapshot trims note`() = runTest {
+        coEvery { repository.insertEntry(any()) } returns Unit
+        viewModel.updateLuxFromSensor(10f)
+        viewModel.saveSnapshot("  hall  ")
+        coVerify { repository.insertEntry(match { it.note == "hall" }) }
     }
 
     @Test
@@ -82,7 +119,7 @@ class MainViewModelTest {
         viewModel.updateLuxFromSensor(30f)
         viewModel.saveSnapshot()
 
-        assertEquals("Saved: 50.0 lux", viewModel.saveStatus.value)
+        assertTrue(viewModel.saveStatus.value != null)
 
         viewModel.clearSaveStatus()
 

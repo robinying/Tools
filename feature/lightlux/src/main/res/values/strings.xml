@@ -7,8 +7,25 @@
     <string name="lux_unit">lux</string>
     <string name="save_snapshot">Save Snapshot</string>
     <string name="saved_snapshot">Saved: %1$.1f lux</string>
-    <string name="realtime_chart_title">Real-time Chart (last 60s)</string>
+    <string name="saved_snapshot_with_note">Saved: %1$.1f lux — %2$s</string>
+    <string name="snapshot_note_hint">Note (optional)</string>
+    <string name="realtime_chart_title">Real-time chart</string>
+    <string name="chart_window_label">Window</string>
+    <string name="chart_window_15s">15s</string>
+    <string name="chart_window_60s">60s</string>
+    <string name="chart_window_5m">5m</string>
     <string name="waiting_sensor_data">Waiting for sensor data…</string>
+    <string name="stats_line">Min %1$.1f · Max %2$.1f · Avg %3$.1f · n=%4$d</string>
+    <string name="sensor_missing_title">No light sensor</string>
+    <string name="sensor_missing_desc">This device does not report ambient light (TYPE_LIGHT). Snapshot and chart are unavailable.</string>
+    <string name="scene_very_dark">Very dark / night</string>
+    <string name="scene_dim_indoor">Dim indoor / night light</string>
+    <string name="scene_indoor">Typical indoor</string>
+    <string name="scene_bright_indoor">Bright indoor / office</string>
+    <string name="scene_overcast">Overcast / bright room</string>
+    <string name="scene_daylight">Daylight (shade)</string>
+    <string name="scene_full_daylight">Full daylight</string>
+    <string name="scene_direct_sun">Direct sun</string>
     <string name="snapshots_title">Snapshots</string>
     <string name="delete_all">Delete all</string>
     <string name="delete">Delete</string>

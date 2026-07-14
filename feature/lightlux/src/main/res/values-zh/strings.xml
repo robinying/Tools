@@ -7,8 +7,25 @@
     <string name="lux_unit">lux</string>
     <string name="save_snapshot">保存快照</string>
     <string name="saved_snapshot">已保存: %1$.1f lux</string>
-    <string name="realtime_chart_title">实时图表 (最近60秒)</string>
+    <string name="saved_snapshot_with_note">已保存: %1$.1f lux — %2$s</string>
+    <string name="snapshot_note_hint">备注（可选）</string>
+    <string name="realtime_chart_title">实时图表</string>
+    <string name="chart_window_label">时间窗口</string>
+    <string name="chart_window_15s">15秒</string>
+    <string name="chart_window_60s">60秒</string>
+    <string name="chart_window_5m">5分钟</string>
     <string name="waiting_sensor_data">等待传感器数据…</string>
+    <string name="stats_line">最小 %1$.1f · 最大 %2$.1f · 平均 %3$.1f · n=%4$d</string>
+    <string name="sensor_missing_title">无环境光传感器</string>
+    <string name="sensor_missing_desc">此设备不提供 TYPE_LIGHT 环境光读数，无法使用实时图表与快照。</string>
+    <string name="scene_very_dark">极暗 / 夜晚</string>
+    <string name="scene_dim_indoor">昏暗室内 / 小夜灯</string>
+    <string name="scene_indoor">一般室内</string>
+    <string name="scene_bright_indoor">明亮室内 / 办公</string>
+    <string name="scene_overcast">阴天 / 很亮的室内</string>
+    <string name="scene_daylight">室外散射日光</string>
+    <string name="scene_full_daylight">充足日光</string>
+    <string name="scene_direct_sun">直射阳光</string>
     <string name="snapshots_title">快照列表</string>
     <string name="delete_all">删除全部</string>
     <string name="delete">删除</string>

@@ -76,6 +76,13 @@ fun SnapshotListScreen(
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
+                                if (entry.note.isNotBlank()) {
+                                    Text(
+                                        text = entry.note,
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = MaterialTheme.colorScheme.onSurface
+                                    )
+                                }
                             }
                             IconButton(onClick = { viewModel.deleteEntry(entry) }) {
                                 Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.delete))

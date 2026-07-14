@@ -8,5 +8,7 @@ data class LightEntry(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
     val timestamp: Long,
-    val luxValue: Float
+    val luxValue: Float,
+    /** Optional user note (location / purpose). Empty string when unused. */
+    val note: String = ""
 )

@@ -17,38 +17,71 @@ data class ChartDataPoint(
     val luxValue: Float
 )
 
-class MainViewModel(application: Application, private val repository: LightRepository) : AndroidViewModel(application) {
+class MainViewModel(
+    application: Application,
+    private val repository: LightRepository
+) : AndroidViewModel(application) {
     private val appContext get() = getApplication<Application>()
 
     private val _currentLux = MutableStateFlow(0f)
     val currentLux: StateFlow<Float> = _currentLux.asStateFlow()
 
+    private val _chartWindow = MutableStateFlow(ChartWindow.SEC_60)
+    val chartWindow: StateFlow<ChartWindow> = _chartWindow.asStateFlow()
+
+    /** Full recent samples (capped); UI filters by [chartWindow]. */
+    private val _sampleBuffer = MutableStateFlow<List<ChartDataPoint>>(emptyList())
+
     private val _realtimeChartData = MutableStateFlow<List<ChartDataPoint>>(emptyList())
     val realtimeChartData: StateFlow<List<ChartDataPoint>> = _realtimeChartData.asStateFlow()
+
+    private val _chartStats = MutableStateFlow(ChartStats())
+    val chartStats: StateFlow<ChartStats> = _chartStats.asStateFlow()
 
     private val _saveStatus = MutableStateFlow<String?>(null)
     val saveStatus: StateFlow<String?> = _saveStatus.asStateFlow()
 
     private companion object {
-        const val ONE_MINUTE_MS = 60_000L
+        /** Keep slightly more than the longest window so switching windows still has history. */
+        const val MAX_BUFFER_MS = 300_000L
+        const val MAX_POINTS = 3_000
+    }
+
+    fun setChartWindow(window: ChartWindow) {
+        if (_chartWindow.value == window) return
+        _chartWindow.value = window
+        recomputeVisible()
     }
 
     fun updateLuxFromSensor(lux: Float) {
         val now = System.currentTimeMillis()
         _currentLux.value = lux
-        _realtimeChartData.update { list ->
+        _sampleBuffer.update { list ->
             val newPoint = ChartDataPoint(now, lux)
-            val filtered = list.filter { now - it.timestamp <= ONE_MINUTE_MS }
-            (listOf(newPoint) + filtered).sortedBy { it.timestamp }
+            val filtered = list.filter { now - it.timestamp <= MAX_BUFFER_MS }
+            (filtered + newPoint)
+                .sortedBy { it.timestamp }
+                .takeLast(MAX_POINTS)
         }
+        recomputeVisible(now)
     }
 
-    fun saveSnapshot() {
+    /**
+     * @param note optional free-text note stored with the snapshot
+     */
+    fun saveSnapshot(note: String = "") {
         viewModelScope.launch {
             val lux = _currentLux.value
             val timestamp = System.currentTimeMillis()
-            repository.insertEntry(LightEntry(timestamp = timestamp, luxValue = lux))
-            _saveStatus.value = appContext.getString(R.string.saved_snapshot, lux)
+            val trimmed = note.trim().take(200)
+            repository.insertEntry(
+                LightEntry(timestamp = timestamp, luxValue = lux, note = trimmed)
+            )
+            _saveStatus.value = if (trimmed.isEmpty()) {
+                appContext.getString(R.string.saved_snapshot, lux)
+            } else {
+                appContext.getString(R.string.saved_snapshot_with_note, lux, trimmed)
+            }
         }
     }
 
@@ -56,7 +89,17 @@ class MainViewModel(application: Application, private val repository: LightRepos
         _saveStatus.value = null
     }
 
-    class Factory(private val application: Application, private val repository: LightRepository) : ViewModelProvider.Factory {
+    private fun recomputeVisible(now: Long = System.currentTimeMillis()) {
+        val windowMs = _chartWindow.value.durationMs
+        val visible = _sampleBuffer.value.filter { now - it.timestamp <= windowMs }
+        _realtimeChartData.value = visible
+        _chartStats.value = ChartStats.from(visible)
+    }
+
+    class Factory(
+        private val application: Application,
+        private val repository: LightRepository
+    ) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return MainViewModel(application, repository) as T
