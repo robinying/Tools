@@ -32,6 +32,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.robin.tools.core.ui.Dimension
+import com.robin.tools.core.ui.StudioActionButton
+import com.robin.tools.core.ui.StudioActionStyle
+import com.robin.tools.core.ui.StudioSectionHeader
+import com.robin.tools.core.ui.StudioSurface
+import com.robin.tools.core.ui.StudioSurfaceTone
 import com.robin.tools.core.ui.ToolsTopAppBar
 import com.robin.tools.feature.camera.R
 import com.robin.tools.feature.camera.editor.SlideshowGenerator
@@ -74,105 +79,102 @@ fun SlideshowScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .padding(Dimension.lg),
-            verticalArrangement = Arrangement.spacedBy(Dimension.md)
+                .padding(horizontal = Dimension.pageHorizontal, vertical = Dimension.lg),
+            verticalArrangement = Arrangement.spacedBy(Dimension.lg)
         ) {
-            Button(
+            StudioSectionHeader(
+                eyebrow = stringResource(R.string.camera_section_generate_eyebrow),
+                title = stringResource(R.string.slideshow_workflow_title),
+                description = stringResource(R.string.slideshow_workflow_desc),
+                accent = MaterialTheme.colorScheme.secondary
+            )
+            StudioActionButton(
+                label = if (imageCount == 0) {
+                    stringResource(R.string.slideshow_select_images)
+                } else {
+                    stringResource(R.string.slideshow_images_selected, imageCount)
+                },
                 onClick = { picker.launch("image/*") },
                 enabled = !busy,
-                modifier = Modifier.fillMaxWidth()
-            ) {
+                style = StudioActionStyle.SECONDARY
+            )
+            StudioSurface(tone = StudioSurfaceTone.OUTLINED) {
                 Text(
-                    if (imageCount == 0) stringResource(R.string.slideshow_select_images)
-                    else stringResource(R.string.slideshow_images_selected, imageCount)
+                    stringResource(R.string.slideshow_duration, secondsPerImage.toInt()),
+                    style = MaterialTheme.typography.labelLarge
+                )
+                Slider(
+                    value = secondsPerImage,
+                    onValueChange = { secondsPerImage = it },
+                    valueRange = 1f..5f,
+                    steps = 3,
+                    enabled = !busy
+                )
+                Text(
+                    stringResource(R.string.slideshow_hint),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
 
-            Text(
-                stringResource(R.string.slideshow_duration, secondsPerImage.toInt()),
-                style = MaterialTheme.typography.labelLarge
-            )
-            Slider(
-                value = secondsPerImage,
-                onValueChange = { secondsPerImage = it },
-                valueRange = 1f..5f,
-                steps = 3,
-                enabled = !busy
-            )
-
-            Text(
-                stringResource(R.string.slideshow_hint),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-
             Spacer(Modifier.weight(1f))
 
-            Button(
+            StudioActionButton(
+                label = stringResource(R.string.slideshow_generate),
                 onClick = {
                     if (pendingUris.size < 2) {
                         Toast.makeText(context, R.string.slideshow_need_two, Toast.LENGTH_SHORT).show()
-                        return@Button
-                    }
-                    busy = true
-                    scope.launch {
-                        val out = fileManager.createOutputFile("slideshow")
-                        val ok = withContext(Dispatchers.Default) {
-                            val bitmaps = mutableListOf<Bitmap>()
-                            try {
-                                for (uri in pendingUris) {
-                                    try {
-                                        context.contentResolver.openInputStream(uri)?.use { stream ->
-                                            val bmp = BitmapFactory.decodeStream(stream) ?: return@use
-                                            val max = 1280
-                                            val scale = maxOf(bmp.width, bmp.height).toFloat() / max
-                                            val finalBmp = if (scale > 1f) {
-                                                Bitmap.createScaledBitmap(
-                                                    bmp,
-                                                    (bmp.width / scale).toInt().coerceAtLeast(1),
-                                                    (bmp.height / scale).toInt().coerceAtLeast(1),
-                                                    true
-                                                ).also { if (it !== bmp) bmp.recycle() }
-                                            } else {
-                                                bmp
+                    } else {
+                        busy = true
+                        scope.launch {
+                            val out = fileManager.createOutputFile("slideshow")
+                            val ok = withContext(Dispatchers.Default) {
+                                val bitmaps = mutableListOf<Bitmap>()
+                                try {
+                                    for (uri in pendingUris) {
+                                        try {
+                                            context.contentResolver.openInputStream(uri)?.use { stream ->
+                                                val bmp = BitmapFactory.decodeStream(stream) ?: return@use
+                                                val max = 1280
+                                                val scale = maxOf(bmp.width, bmp.height).toFloat() / max
+                                                val finalBmp = if (scale > 1f) {
+                                                    Bitmap.createScaledBitmap(
+                                                        bmp,
+                                                        (bmp.width / scale).toInt().coerceAtLeast(1),
+                                                        (bmp.height / scale).toInt().coerceAtLeast(1),
+                                                        true
+                                                    ).also { if (it !== bmp) bmp.recycle() }
+                                                } else {
+                                                    bmp
+                                                }
+                                                bitmaps.add(finalBmp)
                                             }
-                                            bitmaps.add(finalBmp)
+                                        } catch (e: Exception) {
+                                            Log.w("Slideshow", "decode failed", e)
                                         }
-                                    } catch (e: Exception) {
-                                        Log.w("Slideshow", "decode failed", e)
                                     }
+                                    SlideshowGenerator().generate(
+                                        bitmaps = bitmaps,
+                                        outputFile = out,
+                                        secondsPerImage = secondsPerImage.toInt()
+                                    )
+                                } finally {
+                                    bitmaps.forEach { if (!it.isRecycled) it.recycle() }
                                 }
-                                SlideshowGenerator().generate(
-                                    bitmaps = bitmaps,
-                                    outputFile = out,
-                                    secondsPerImage = secondsPerImage.toInt()
-                                )
-                            } finally {
-                                bitmaps.forEach { if (!it.isRecycled) it.recycle() }
                             }
-                        }
-                        busy = false
-                        if (ok) {
-                            Toast.makeText(context, R.string.slideshow_done, Toast.LENGTH_SHORT).show()
-                            onGenerated(out.absolutePath)
-                        } else {
-                            Toast.makeText(context, R.string.slideshow_failed, Toast.LENGTH_SHORT).show()
+                            busy = false
+                            if (ok) {
+                                Toast.makeText(context, R.string.slideshow_done, Toast.LENGTH_SHORT).show()
+                                onGenerated(out.absolutePath)
+                            } else {
+                                Toast.makeText(context, R.string.slideshow_failed, Toast.LENGTH_SHORT).show()
+                            }
                         }
                     }
                 },
                 enabled = !busy && imageCount >= 2,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                if (busy) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.height(22.dp),
-                        strokeWidth = 2.dp,
-                        color = MaterialTheme.colorScheme.onPrimary
-                    )
-                } else {
-                    Text(stringResource(R.string.slideshow_generate))
-                }
-            }
+                loading = busy
+            )
         }
     }
 }

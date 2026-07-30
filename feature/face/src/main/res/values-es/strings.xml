@@ -31,4 +31,9 @@
     <string name="face_compare_model_missing">Modelo de reconocimiento facial no encontrado. Coloque mobile_face_net.tflite en assets/.</string>
     <string name="face_compare_feature_failed_left">Falló la extracción de características en la imagen izquierda</string>
     <string name="face_compare_feature_failed_right">Falló la extracción de características en la imagen derecha</string>
+    <string name="face_compare_stage_engine">COMPARAR</string>
+    <string name="face_compare_stage_title">Compara dos fotos</string>
+    <string name="face_compare_stage_desc">Elige un par y realiza la comparación en el dispositivo.</string>
+    <string name="face_compare_engine_deep">Motor: MobileFaceNet (en el dispositivo)</string>
+    <string name="face_compare_engine_fallback">Motor: geometría de puntos faciales (modelo no cargado)</string>
 </resources>

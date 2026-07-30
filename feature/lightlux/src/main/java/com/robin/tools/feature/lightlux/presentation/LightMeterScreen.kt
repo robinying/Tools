@@ -54,7 +54,12 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.robin.tools.core.ui.Dimension
 import com.robin.tools.core.ui.EmptyState
-import com.robin.tools.core.ui.TextOptionChip
+import com.robin.tools.core.ui.StudioActionButton
+import com.robin.tools.core.ui.StudioSectionHeader
+import com.robin.tools.core.ui.StudioSelectionOption
+import com.robin.tools.core.ui.StudioSelectionRow
+import com.robin.tools.core.ui.StudioSurface
+import com.robin.tools.core.ui.StudioSurfaceTone
 import com.robin.tools.core.ui.ToolsTopAppBar
 import com.robin.tools.feature.lightlux.R
 import com.robin.tools.feature.lightlux.data.ChartDataPoint
@@ -147,103 +152,117 @@ fun LightMeterScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(Dimension.lg)
+                .padding(horizontal = Dimension.pageHorizontal, vertical = Dimension.lg)
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            val luxLabel = stringResource(R.string.lux_value, currentLux)
-            Text(
-                String.format("%.1f", currentLux),
-                style = MaterialTheme.typography.displayLarge,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.semantics { contentDescription = luxLabel }
-            )
-            Text(stringResource(R.string.lux_unit), style = MaterialTheme.typography.titleMedium)
-            Spacer(Modifier.height(Dimension.sm))
-            Text(
-                text = stringResource(LuxScene.fromLux(currentLux).labelRes),
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.secondary
-            )
-
-            if (chartStats.samples > 0) {
-                Spacer(Modifier.height(Dimension.md))
+            StudioSurface(tone = StudioSurfaceTone.EMPHASIZED) {
+                val luxLabel = stringResource(R.string.lux_value, currentLux)
                 Text(
-                    text = stringResource(
-                        R.string.stats_line,
-                        chartStats.min,
-                        chartStats.max,
-                        chartStats.avg,
-                        chartStats.samples
-                    ),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    String.format("%.1f", currentLux),
+                    style = MaterialTheme.typography.displayLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.secondary,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .semantics { contentDescription = luxLabel },
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
                 )
-            }
+                Text(
+                    stringResource(R.string.lux_unit),
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                )
+                Spacer(Modifier.height(Dimension.sm))
+                Text(
+                    text = stringResource(LuxScene.fromLux(currentLux).labelRes),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                )
 
-            Spacer(Modifier.height(Dimension.lg))
-            OutlinedTextField(
-                value = note,
-                onValueChange = { note = it.take(200) },
-                modifier = Modifier.fillMaxWidth(),
-                label = { Text(stringResource(R.string.snapshot_note_hint)) },
-                singleLine = true
-            )
-            Spacer(Modifier.height(Dimension.md))
-            Button(
-                onClick = {
-                    viewModel.saveSnapshot(note)
-                    note = ""
-                },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Icon(Icons.Default.Save, contentDescription = null)
-                Spacer(Modifier.width(Dimension.sm))
-                Text(stringResource(R.string.save_snapshot))
-            }
-
-            Spacer(Modifier.height(Dimension.xl))
-            Text(
-                stringResource(R.string.realtime_chart_title),
-                style = MaterialTheme.typography.titleSmall,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.fillMaxWidth()
-            )
-            Spacer(Modifier.height(Dimension.sm))
-            Text(
-                stringResource(R.string.chart_window_label),
-                style = MaterialTheme.typography.labelLarge,
-                modifier = Modifier.fillMaxWidth()
-            )
-            Spacer(Modifier.height(Dimension.sm))
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .horizontalScroll(rememberScrollState()),
-                horizontalArrangement = Arrangement.spacedBy(Dimension.sm)
-            ) {
-                ChartWindow.entries.forEach { window ->
-                    TextOptionChip(
-                        selected = chartWindow == window,
-                        onClick = { viewModel.setChartWindow(window) },
-                        label = stringResource(window.labelRes)
+                if (chartStats.samples > 0) {
+                    Spacer(Modifier.height(Dimension.md))
+                    Text(
+                        text = stringResource(
+                            R.string.stats_line,
+                            chartStats.min,
+                            chartStats.max,
+                            chartStats.avg,
+                            chartStats.samples
+                        ),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.fillMaxWidth(),
+                        textAlign = androidx.compose.ui.text.style.TextAlign.Center
                     )
                 }
             }
-            Spacer(Modifier.height(Dimension.md))
-            if (chartData.isNotEmpty()) {
-                LuxChart(
-                    data = chartData,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(200.dp)
+
+            StudioSurface(tone = StudioSurfaceTone.OUTLINED) {
+                StudioSectionHeader(
+                    eyebrow = stringResource(R.string.light_meter_snapshot_eyebrow),
+                    title = stringResource(R.string.light_meter_snapshot_title),
+                    description = stringResource(R.string.light_meter_snapshot_desc),
+                    accent = MaterialTheme.colorScheme.secondary
                 )
-            } else {
+                Spacer(Modifier.height(Dimension.md))
+                OutlinedTextField(
+                    value = note,
+                    onValueChange = { note = it.take(200) },
+                    modifier = Modifier.fillMaxWidth(),
+                    label = { Text(stringResource(R.string.snapshot_note_hint)) },
+                    singleLine = true
+                )
+                Spacer(Modifier.height(Dimension.md))
+                StudioActionButton(
+                    label = stringResource(R.string.save_snapshot),
+                    onClick = {
+                        viewModel.saveSnapshot(note)
+                        note = ""
+                    },
+                    icon = Icons.Default.Save,
+                    iconContentDescription = stringResource(R.string.save_snapshot)
+                )
+            }
+
+            StudioSurface(tone = StudioSurfaceTone.OUTLINED) {
+                StudioSectionHeader(
+                    eyebrow = stringResource(R.string.light_meter_chart_eyebrow),
+                    title = stringResource(R.string.realtime_chart_title),
+                    description = stringResource(R.string.light_meter_chart_desc),
+                    accent = MaterialTheme.colorScheme.primary
+                )
+                Spacer(Modifier.height(Dimension.md))
                 Text(
-                    stringResource(R.string.waiting_sensor_data),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    stringResource(R.string.chart_window_label),
+                    style = MaterialTheme.typography.labelLarge,
+                    modifier = Modifier.fillMaxWidth()
                 )
+                Spacer(Modifier.height(Dimension.sm))
+                StudioSelectionRow(
+                    options = ChartWindow.entries.map { window ->
+                        StudioSelectionOption(window.name, stringResource(window.labelRes))
+                    },
+                    selectedKey = chartWindow.name,
+                    onOptionSelected = { viewModel.setChartWindow(ChartWindow.valueOf(it)) }
+                )
+                Spacer(Modifier.height(Dimension.md))
+                if (chartData.isNotEmpty()) {
+                    LuxChart(
+                        data = chartData,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp)
+                    )
+                } else {
+                    Text(
+                        stringResource(R.string.waiting_sensor_data),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
             }
         }
     }

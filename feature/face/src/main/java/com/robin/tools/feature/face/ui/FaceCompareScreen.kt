@@ -54,6 +54,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.stringResource
 import coil.compose.AsyncImage
 import com.robin.tools.core.ui.Dimension
+import com.robin.tools.core.ui.StudioActionButton
+import com.robin.tools.core.ui.StudioSectionHeader
+import com.robin.tools.core.ui.StudioSurface
+import com.robin.tools.core.ui.StudioSurfaceTone
 import com.robin.tools.core.ui.ToolsTopAppBar
 import com.robin.tools.feature.face.R
 import com.robin.tools.feature.face.data.CompareResult
@@ -92,9 +96,16 @@ fun FaceCompareScreen(
                 .fillMaxSize()
                 .padding(padding)
                 .verticalScroll(rememberScrollState())
-                .padding(16.dp),
+                .padding(horizontal = Dimension.pageHorizontal, vertical = Dimension.lg),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            StudioSectionHeader(
+                eyebrow = stringResource(R.string.face_compare_stage_engine),
+                title = stringResource(R.string.face_compare_stage_title),
+                description = stringResource(R.string.face_compare_stage_desc),
+                accent = MaterialTheme.colorScheme.primary
+            )
+            Spacer(Modifier.height(Dimension.sm))
             Text(
                 text = stringResource(
                     if (uiState.deepModelReady) R.string.face_compare_engine_deep
@@ -125,28 +136,16 @@ fun FaceCompareScreen(
 
             Spacer(Modifier.height(Dimension.xl))
 
-            Button(
-                onClick = { viewModel.compare() },
-                enabled = !uiState.isProcessing
-                        && uiState.leftImageUri != null
-                        && uiState.rightImageUri != null,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(52.dp),
-                shape = RoundedCornerShape(12.dp)
-            ) {
-                if (uiState.isProcessing) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(22.dp),
-                        strokeWidth = 2.dp,
-                        color = MaterialTheme.colorScheme.onPrimary
-                    )
-                    Spacer(Modifier.width(Dimension.md))
-                    Text(stringResource(R.string.face_compare_analyzing))
+            StudioActionButton(
+                label = if (uiState.isProcessing) {
+                    stringResource(R.string.face_compare_analyzing)
                 } else {
-                    Text(stringResource(R.string.face_compare_action), style = MaterialTheme.typography.titleMedium)
-                }
-            }
+                    stringResource(R.string.face_compare_action)
+                },
+                onClick = { viewModel.compare() },
+                enabled = uiState.leftImageUri != null && uiState.rightImageUri != null,
+                loading = uiState.isProcessing
+            )
 
             Spacer(Modifier.height(Dimension.xl))
 

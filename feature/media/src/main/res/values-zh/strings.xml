@@ -22,6 +22,20 @@
     <string name="video_compress">视频压缩</string>
     <string name="image_compress">图片压缩</string>
     <string name="video_to_gif">视频转 GIF</string>
+    <string name="media_section_convert_eyebrow">转换</string>
+    <string name="media_section_convert_title">压缩与转换</string>
+    <string name="media_section_convert_desc">准备视频和图片文件，以便用于下一步。</string>
+    <string name="media_section_edit_eyebrow">编辑</string>
+    <string name="media_section_edit_title">调整动态与声音</string>
+    <string name="media_section_edit_desc">调整片段、节奏、画幅和音轨。</string>
+    <string name="media_section_style_eyebrow">风格</string>
+    <string name="media_section_style_title">构建图像风格</string>
+    <string name="media_section_style_desc">对静态图片应用针对性的视觉处理。</string>
+    <string name="media_stage_select_eyebrow">选择</string>
+    <string name="media_stage_select_title">选择源文件</string>
+    <string name="media_stage_select_desc">选择要处理的一个或多个文件。</string>
+    <string name="media_stage_configure_eyebrow">配置</string>
+    <string name="media_stage_configure_desc">在处理任务开始前设置结果。</string>
     <string name="extract_audio">提取音频</string>
     <string name="extract_audio_desc">从视频导出 AAC/M4A 音轨</string>
     <string name="strip_audio">去除音轨</string>
@@ -76,6 +90,8 @@
 
     <!-- Image filter -->
     <string name="filter_tool">图像滤镜</string>
+    <string name="filter_select_source_title">选择图片</string>
+    <string name="filter_select_source_desc">选择一张静态图片以预览并应用风格。</string>
     <string name="image_filter">图像滤镜</string>
     <string name="image_filter_desc">灰度、模糊、素描、卡通化等风格化效果</string>
     <string name="select_image">选择图片</string>

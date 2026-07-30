@@ -7,6 +7,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -20,6 +21,7 @@ import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material.icons.filled.TextFields
 import androidx.compose.material.icons.filled.Videocam
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -35,6 +37,7 @@ import androidx.core.content.ContextCompat
 import com.robin.tools.core.ui.Dimension
 import com.robin.tools.core.ui.EmptyState
 import com.robin.tools.core.ui.FeatureCard
+import com.robin.tools.core.ui.StudioSectionHeader
 import com.robin.tools.core.ui.ToolsTopAppBar
 import com.robin.tools.feature.camera.R
 
@@ -72,7 +75,6 @@ fun CameraMainScreen(
         )
     }
 
-    // First entry: system dialog once; if denied, EmptyState offers retry.
     LaunchedEffect(Unit) {
         if (!permissionsGranted) {
             requestPermissions()
@@ -100,7 +102,8 @@ fun CameraMainScreen(
                     title = stringResource(R.string.camera_permission_title),
                     description = stringResource(R.string.camera_permission_desc),
                     actionLabel = stringResource(R.string.grant_permission),
-                    onAction = { requestPermissions() }
+                    onAction = { requestPermissions() },
+                    modifier = Modifier.padding(horizontal = Dimension.pageHorizontal)
                 )
             }
         } else {
@@ -109,45 +112,73 @@ fun CameraMainScreen(
                     .fillMaxSize()
                     .padding(padding)
                     .verticalScroll(rememberScrollState())
-                    .padding(Dimension.lg),
+                    .padding(horizontal = Dimension.pageHorizontal, vertical = Dimension.lg),
                 verticalArrangement = Arrangement.spacedBy(Dimension.md)
             ) {
+                StudioSectionHeader(
+                    eyebrow = stringResource(R.string.camera_section_capture_eyebrow),
+                    title = stringResource(R.string.camera_section_capture_title),
+                    description = stringResource(R.string.camera_section_capture_desc),
+                    accent = MaterialTheme.colorScheme.tertiary
+                )
                 FeatureCard(
                     title = stringResource(R.string.camera_photo_title),
                     description = stringResource(R.string.camera_photo_desc),
                     icon = Icons.Default.PhotoCamera,
-                    onClick = onPhoto
+                    onClick = onPhoto,
+                    accent = MaterialTheme.colorScheme.tertiary
                 )
                 FeatureCard(
                     title = stringResource(R.string.camera_record_title),
                     description = stringResource(R.string.camera_record_desc),
                     icon = Icons.Default.Videocam,
-                    onClick = onRecord
+                    onClick = onRecord,
+                    accent = MaterialTheme.colorScheme.tertiary
+                )
+
+                StudioSectionHeader(
+                    eyebrow = stringResource(R.string.camera_section_edit_eyebrow),
+                    title = stringResource(R.string.camera_section_edit_title),
+                    description = stringResource(R.string.camera_section_edit_desc),
+                    accent = MaterialTheme.colorScheme.primary
                 )
                 FeatureCard(
                     title = stringResource(R.string.camera_edit_title),
                     description = stringResource(R.string.camera_edit_desc),
                     icon = Icons.Default.Edit,
-                    onClick = onEditVideo
+                    onClick = onEditVideo,
+                    accent = MaterialTheme.colorScheme.primary
                 )
                 FeatureCard(
                     title = stringResource(R.string.camera_trim_title),
                     description = stringResource(R.string.camera_trim_desc),
                     icon = Icons.Default.ContentCut,
-                    onClick = onTrimVideo
+                    onClick = onTrimVideo,
+                    accent = MaterialTheme.colorScheme.primary
                 )
                 FeatureCard(
                     title = stringResource(R.string.camera_cover_title),
                     description = stringResource(R.string.camera_cover_desc),
                     icon = Icons.Default.Collections,
-                    onClick = onCoverSelect
+                    onClick = onCoverSelect,
+                    accent = MaterialTheme.colorScheme.primary
                 )
+
+                if (onTextToVideo != null || onSlideshow != null) {
+                    StudioSectionHeader(
+                        eyebrow = stringResource(R.string.camera_section_generate_eyebrow),
+                        title = stringResource(R.string.camera_section_generate_title),
+                        description = stringResource(R.string.camera_section_generate_desc),
+                        accent = MaterialTheme.colorScheme.secondary
+                    )
+                }
                 if (onTextToVideo != null) {
                     FeatureCard(
                         title = stringResource(R.string.camera_text_to_video_title),
                         description = stringResource(R.string.camera_text_to_video_desc),
                         icon = Icons.Default.TextFields,
-                        onClick = onTextToVideo
+                        onClick = onTextToVideo,
+                        accent = MaterialTheme.colorScheme.secondary
                     )
                 }
                 if (onSlideshow != null) {
@@ -155,9 +186,11 @@ fun CameraMainScreen(
                         title = stringResource(R.string.camera_slideshow_title),
                         description = stringResource(R.string.camera_slideshow_desc),
                         icon = Icons.Default.PhotoLibrary,
-                        onClick = onSlideshow
+                        onClick = onSlideshow,
+                        accent = MaterialTheme.colorScheme.secondary
                     )
                 }
+                Spacer(Modifier.padding(bottom = Dimension.lg))
             }
         }
     }

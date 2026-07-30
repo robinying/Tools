@@ -2,6 +2,11 @@
 <resources>
     <string name="app_name">Light Meter</string>
     <string name="light_meter_title">Light Meter</string>
+    <string name="light_meter_snapshot_eyebrow">SNAPSHOT</string>
+    <string name="light_meter_snapshot_title">Record this reading</string>
+    <string name="light_meter_snapshot_desc">Add an optional note to remember the conditions.</string>
+    <string name="light_meter_chart_eyebrow">LIVE DATA</string>
+    <string name="light_meter_chart_desc">Use a time window to inspect how the ambient light changes.</string>
     <string name="back">Back</string>
     <string name="history">History</string>
     <string name="lux_unit">lux</string>

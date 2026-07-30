@@ -432,11 +432,19 @@ class VideoEffectsExporter {
             info.offset = 0
             info.size = size
             info.presentationTimeUs = extractor.sampleTime
-            info.flags = extractor.sampleFlags
+            info.flags = mediaCodecBufferFlags(extractor.sampleFlags)
             muxer.writeSampleData(muxerTrack, buffer, info)
             extractor.advance()
         }
         extractor.unselectTrack(trackIndex)
+    }
+
+    private fun mediaCodecBufferFlags(sampleFlags: Int): Int {
+        return if (sampleFlags and MediaExtractor.SAMPLE_FLAG_SYNC != 0) {
+            MediaCodec.BUFFER_FLAG_KEY_FRAME
+        } else {
+            0
+        }
     }
 
     private fun selectTrack(extractor: MediaExtractor, prefix: String): Int? {

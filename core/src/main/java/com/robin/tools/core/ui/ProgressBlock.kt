@@ -4,8 +4,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -13,11 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 
-/**
- * Unified progress section for long-running media/ebook tasks.
- *
- * @param progress 0f–1f for determinate progress; null for indeterminate.
- */
+/** Unified progress section for long-running media and conversion tasks. */
 @Composable
 fun ProgressBlock(
     progress: Float?,
@@ -26,34 +22,37 @@ fun ProgressBlock(
     onCancel: (() -> Unit)? = null,
     cancelLabel: String = "",
 ) {
-    Column(
-        modifier = modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally
+    StudioSurface(
+        modifier = modifier,
+        tone = StudioSurfaceTone.EMPHASIZED
     ) {
-        if (progress != null) {
-            LinearProgressIndicator(
-                progress = { progress.coerceIn(0f, 1f) },
-                modifier = Modifier.fillMaxWidth(),
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            if (progress != null) {
+                LinearProgressIndicator(
+                    progress = { progress.coerceIn(0f, 1f) },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            } else {
+                LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+            }
+            Spacer(Modifier.height(Dimension.sm))
+            Text(
+                text = message,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
-        } else {
-            LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
-        }
-        Spacer(Modifier.height(Dimension.sm))
-        Text(
-            text = message,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-        if (onCancel != null && cancelLabel.isNotEmpty()) {
-            Spacer(Modifier.height(Dimension.md))
-            Button(
-                onClick = onCancel,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.error
-                ),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(cancelLabel)
+            if (onCancel != null && cancelLabel.isNotEmpty()) {
+                Spacer(Modifier.height(Dimension.md))
+                StudioActionButton(
+                    label = cancelLabel,
+                    onClick = onCancel,
+                    style = StudioActionStyle.DESTRUCTIVE,
+                    icon = Icons.Default.Close,
+                    iconContentDescription = cancelLabel
+                )
             }
         }
     }

@@ -5,6 +5,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.History
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -14,6 +15,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.robin.tools.core.ui.Dimension
+import com.robin.tools.core.ui.EmptyState
+import com.robin.tools.core.ui.StudioSurface
+import com.robin.tools.core.ui.StudioSurfaceTone
 import com.robin.tools.core.ui.ToolsTopAppBar
 import com.robin.tools.feature.lightlux.R
 import com.robin.tools.feature.lightlux.data.SnapshotListViewModel
@@ -51,7 +56,11 @@ fun SnapshotListScreen(
                 modifier = Modifier.fillMaxSize().padding(innerPadding),
                 contentAlignment = Alignment.Center
             ) {
-                Text(stringResource(R.string.no_snapshots_yet), style = MaterialTheme.typography.bodyLarge)
+                EmptyState(
+                    icon = Icons.Default.History,
+                    title = stringResource(R.string.no_snapshots_yet),
+                    modifier = Modifier.padding(horizontal = Dimension.pageHorizontal)
+                )
             }
         } else {
             LazyColumn(
@@ -60,15 +69,15 @@ fun SnapshotListScreen(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(entries, key = { it.id }) { entry ->
-                    Card(modifier = Modifier.fillMaxWidth()) {
+                    StudioSurface(tone = StudioSurfaceTone.OUTLINED) {
                         Row(
-                            modifier = Modifier.fillMaxWidth().padding(16.dp),
+                            modifier = Modifier.fillMaxWidth(),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Column(modifier = Modifier.weight(1f)) {
                                 Text(
                                     text = stringResource(R.string.lux_value, entry.luxValue),
-                                    fontSize = 24.sp,
+                                    style = MaterialTheme.typography.headlineSmall,
                                     fontWeight = FontWeight.Bold
                                 )
                                 Text(
@@ -85,7 +94,11 @@ fun SnapshotListScreen(
                                 }
                             }
                             IconButton(onClick = { viewModel.deleteEntry(entry) }) {
-                                Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.delete))
+                                Icon(
+                                    Icons.Default.Delete,
+                                    contentDescription = stringResource(R.string.delete),
+                                    tint = MaterialTheme.colorScheme.error
+                                )
                             }
                         }
                     }

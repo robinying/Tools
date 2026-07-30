@@ -75,7 +75,7 @@ fun CoverScreen(
                     if (bmp != null) {
                         Image(
                             bitmap = bmp.asImageBitmap(),
-                            contentDescription = "Selected cover",
+                            contentDescription = stringResource(R.string.cover_selected_frame),
                             modifier = Modifier.fillMaxSize()
                         )
                     } else {
@@ -95,7 +95,11 @@ fun CoverScreen(
                 }
 
                 // Thumbnail strip
-                Text("Tap to select:", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(
+                    stringResource(R.string.cover_select_frame),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
                 LazyRow(
                     horizontalArrangement = Arrangement.spacedBy(4.dp),
                     modifier = Modifier.fillMaxWidth()

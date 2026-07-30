@@ -38,7 +38,13 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.robin.tools.core.ui.Dimension
 import com.robin.tools.core.ui.ProgressBlock
-import com.robin.tools.core.ui.TextOptionChip
+import com.robin.tools.core.ui.StudioActionButton
+import com.robin.tools.core.ui.StudioActionStyle
+import com.robin.tools.core.ui.StudioSectionHeader
+import com.robin.tools.core.ui.StudioSelectionOption
+import com.robin.tools.core.ui.StudioSelectionRow
+import com.robin.tools.core.ui.StudioSurface
+import com.robin.tools.core.ui.StudioSurfaceTone
 import com.robin.tools.core.ui.ToolsTopAppBar
 import com.robin.tools.feature.media.R
 import com.robin.tools.feature.media.data.*
@@ -185,13 +191,22 @@ fun CompressionScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(Dimension.lg),
-            horizontalAlignment = Alignment.CenterHorizontally,
+                .padding(horizontal = Dimension.pageHorizontal, vertical = Dimension.lg),
             verticalArrangement = Arrangement.spacedBy(Dimension.lg)
         ) {
             val isProcessing = taskState is CompressionTaskState.Processing
 
-            Button(
+            StudioSectionHeader(
+                eyebrow = context.getString(R.string.media_stage_select_eyebrow),
+                title = context.getString(R.string.media_stage_select_title),
+                description = context.getString(R.string.media_stage_select_desc)
+            )
+            StudioActionButton(
+                label = if (selectedUris.isEmpty()) {
+                    context.getString(R.string.select_file)
+                } else {
+                    context.getString(R.string.reselect_file)
+                },
                 onClick = {
                     when (type) {
                         CompressionType.IMAGE -> multipleImagesLauncher.launch("image/*")
@@ -200,13 +215,8 @@ fun CompressionScreen(
                     }
                 },
                 enabled = !isProcessing,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(
-                    if (selectedUris.isEmpty()) context.getString(R.string.select_file)
-                    else context.getString(R.string.reselect_file)
-                )
-            }
+                style = StudioActionStyle.SECONDARY
+            )
 
             if (selectedUris.isNotEmpty()) {
                 MediaPreviewSection(
@@ -216,19 +226,28 @@ fun CompressionScreen(
                 )
             }
 
-            Text(optionSectionTitle(type, context))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                CompressionLevel.values().forEach { level ->
-                    TextOptionChip(
-                        selected = compressionLevel == level,
-                        onClick = { if (!isProcessing) compressionLevel = level },
-                        label = optionLabel(type, level, context),
-                        enabled = !isProcessing
-                    )
-                }
+            StudioSurface(tone = StudioSurfaceTone.OUTLINED) {
+                StudioSectionHeader(
+                    eyebrow = context.getString(R.string.media_stage_configure_eyebrow),
+                    title = optionSectionTitle(type, context),
+                    description = context.getString(R.string.media_stage_configure_desc)
+                )
+                Spacer(Modifier.height(Dimension.md))
+                StudioSelectionRow(
+                    options = CompressionLevel.entries.map { level ->
+                        StudioSelectionOption(
+                            key = level.name,
+                            label = optionLabel(type, level, context)
+                        )
+                    },
+                    selectedKey = compressionLevel.name,
+                    onOptionSelected = { selectedKey ->
+                        if (!isProcessing) {
+                            compressionLevel = CompressionLevel.valueOf(selectedKey)
+                        }
+                    },
+                    enabled = !isProcessing
+                )
             }
 
             if (isProcessing) {
@@ -240,29 +259,27 @@ fun CompressionScreen(
                     cancelLabel = context.getString(R.string.cancel)
                 )
             } else {
-                Button(
+                StudioActionButton(
+                    label = when (type) {
+                        CompressionType.GIF -> context.getString(R.string.start_conversion)
+                        CompressionType.VIDEO, CompressionType.IMAGE ->
+                            context.getString(R.string.start_compression)
+                        else -> context.getString(R.string.start_process)
+                    },
                     onClick = {
                         if (selectedUris.isNotEmpty()) {
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                                notificationPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+                                notificationPermissionLauncher.launch(
+                                    android.Manifest.permission.POST_NOTIFICATIONS
+                                )
                             } else {
                                 viewModel.startCompression(selectedUris, type, compressionLevel)
                             }
                         }
                     },
                     enabled = selectedUris.isNotEmpty() &&
-                        (type != CompressionType.CONCAT || selectedUris.size >= 2),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(
-                        when (type) {
-                            CompressionType.GIF -> context.getString(R.string.start_conversion)
-                            CompressionType.VIDEO, CompressionType.IMAGE ->
-                                context.getString(R.string.start_compression)
-                            else -> context.getString(R.string.start_process)
-                        }
-                    )
-                }
+                        (type != CompressionType.CONCAT || selectedUris.size >= 2)
+                )
             }
         }
     }

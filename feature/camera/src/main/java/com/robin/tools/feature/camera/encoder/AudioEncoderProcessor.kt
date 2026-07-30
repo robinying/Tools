@@ -20,7 +20,7 @@ class AudioEncoderProcessor(
 ) {
     private val audioMime = "audio/mp4a-latm"
     private var audioEnc: MediaCodec
-    private var audioRecord: AudioRecord
+    private var audioRecord: AudioRecord?
     private val sampleRate = 48000
     private val channelCount = 2
     private val audioRate = 128000
@@ -47,8 +47,7 @@ class AudioEncoderProcessor(
         val channelConfig = AudioFormat.CHANNEL_IN_STEREO
         val pcmFormat = AudioFormat.ENCODING_PCM_16BIT
         bufferSize = AudioRecord.getMinBufferSize(sampleRate, channelConfig, pcmFormat) * 2
-        audioRecord = AudioRecord(MediaRecorder.AudioSource.MIC, sampleRate, channelConfig, pcmFormat, bufferSize)
-        audioRecord.startRecording()
+        audioRecord = createAudioRecord(channelConfig, pcmFormat)
     }
 
     fun start(externalHandler: Handler) {
@@ -87,7 +86,7 @@ class AudioEncoderProcessor(
                 audioEnc.getInputBuffers()[index]
             }
             buffer?.clear()
-            val length = audioRecord.read(buffer!!, bufferSize)
+            val length = audioRecord?.read(buffer!!, bufferSize) ?: 0
             if (length > 0) {
                 val time = if (baseTimeStamp != -1L) {
                     (System.nanoTime() - baseTimeStamp - pauseDelayTime) / 1000
@@ -153,15 +152,37 @@ class AudioEncoderProcessor(
     }
 
     fun release() {
-        audioRecord.apply {
-            stop()
-            release()
+        audioRecord?.let { recorder ->
+            try {
+                recorder.stop()
+            } catch (exception: IllegalStateException) {
+                Log.w(TAG, "Audio recorder was not started", exception)
+            }
+            recorder.release()
         }
+        audioRecord = null
         audioEnc.apply {
             stop()
             release()
         }
         handlerThread.quitSafely()
+    }
+
+    private fun createAudioRecord(channelConfig: Int, pcmFormat: Int): AudioRecord? {
+        return try {
+            AudioRecord(
+                MediaRecorder.AudioSource.MIC,
+                sampleRate,
+                channelConfig,
+                pcmFormat,
+                bufferSize
+            ).also { recorder ->
+                recorder.startRecording()
+            }
+        } catch (exception: SecurityException) {
+            Log.e(TAG, "Microphone permission is not granted", exception)
+            null
+        }
     }
 
     companion object {

@@ -21,7 +21,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import com.robin.tools.core.ui.TextOptionChip
+import com.robin.tools.core.ui.Dimension
+import com.robin.tools.core.ui.StudioActionButton
+import com.robin.tools.core.ui.StudioActionStyle
+import com.robin.tools.core.ui.StudioSectionHeader
+import com.robin.tools.core.ui.StudioSelectionOption
+import com.robin.tools.core.ui.StudioSelectionRow
+import com.robin.tools.core.ui.StudioSurface
+import com.robin.tools.core.ui.StudioSurfaceTone
 import com.robin.tools.core.ui.ToolsTopAppBar
 import com.robin.tools.feature.media.R
 import com.robin.tools.feature.media.data.FilterManager
@@ -133,17 +140,24 @@ fun FilterScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+                .padding(horizontal = Dimension.pageHorizontal, vertical = Dimension.lg),
+            verticalArrangement = Arrangement.spacedBy(Dimension.md)
         ) {
-            Button(
+            StudioSectionHeader(
+                eyebrow = context.getString(R.string.media_stage_select_eyebrow),
+                title = context.getString(R.string.filter_select_source_title),
+                description = context.getString(R.string.filter_select_source_desc)
+            )
+            StudioActionButton(
+                label = if (selectedUri == null) {
+                    context.getString(R.string.select_image)
+                } else {
+                    context.getString(R.string.reselect_file)
+                },
                 onClick = { imagePickerLauncher.launch("image/*") },
                 enabled = !isProcessing,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(if (selectedUri == null) context.getString(R.string.select_image) else context.getString(R.string.reselect_file))
-            }
+                style = StudioActionStyle.SECONDARY
+            )
 
             if (selectedUri != null) {
                 ImagePreviewPanel(
@@ -155,24 +169,21 @@ fun FilterScreen(
                 )
             }
 
-            Text(
-                text = context.getString(R.string.select_filter),
-                style = MaterialTheme.typography.labelLarge
-            )
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .horizontalScroll(rememberScrollState()),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                FilterType.entries.forEach { filter ->
-                    TextOptionChip(
-                        selected = selectedFilter == filter,
-                        onClick = { if (!isProcessing) selectedFilter = filter },
-                        label = stringResource(filter.labelRes),
-                        enabled = !isProcessing
-                    )
-                }
+            StudioSurface(tone = StudioSurfaceTone.OUTLINED) {
+                StudioSectionHeader(
+                    eyebrow = context.getString(R.string.media_stage_configure_eyebrow),
+                    title = context.getString(R.string.select_filter),
+                    description = context.getString(R.string.media_stage_configure_desc)
+                )
+                Spacer(Modifier.height(Dimension.md))
+                StudioSelectionRow(
+                    options = FilterType.entries.map { filter ->
+                        StudioSelectionOption(filter.name, stringResource(filter.labelRes))
+                    },
+                    selectedKey = selectedFilter.name,
+                    onOptionSelected = { selectedFilter = FilterType.valueOf(it) },
+                    enabled = !isProcessing
+                )
             }
 
             if (isProcessing) {
@@ -183,17 +194,16 @@ fun FilterScreen(
                 )
                 Text(state.message)
 
-                Button(
+                StudioActionButton(
+                    label = context.getString(R.string.cancel),
                     onClick = { FilterManager.cancelTask() },
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(context.getString(R.string.cancel))
-                }
+                    style = StudioActionStyle.DESTRUCTIVE
+                )
             } else {
-                Button(
+                StudioActionButton(
+                    label = context.getString(R.string.start_filter),
                     onClick = {
-                        val bitmap = originalBitmap ?: return@Button
+                        val bitmap = originalBitmap ?: return@StudioActionButton
                         scope.launch {
                             FilterManager.startTask()
                             FilterManager.updateState(FilterState.Processing(0f, context.getString(R.string.filter_processing)))
@@ -229,23 +239,27 @@ fun FilterScreen(
                             )
                         }
                     },
-                    enabled = originalBitmap != null,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(context.getString(R.string.start_filter))
-                }
+                    enabled = originalBitmap != null
+                )
 
                 if (previewBitmap != null) {
-                    Button(
+                    StudioActionButton(
+                        label = context.getString(R.string.save_to_gallery),
                         onClick = {
-                            val bitmap = previewBitmap ?: return@Button
+                            val bitmap = previewBitmap ?: return@StudioActionButton
                             scope.launch {
                                 withContext(Dispatchers.IO) {
-                                    val ext = if (selectedFilter == FilterType.EDGE_DETECTION ||
-                                                 selectedFilter == FilterType.SKETCH) "png" else "jpg"
+                                    val ext = if (
+                                        selectedFilter == FilterType.EDGE_DETECTION ||
+                                            selectedFilter == FilterType.SKETCH
+                                    ) {
+                                        "png"
+                                    } else {
+                                        "jpg"
+                                    }
                                     val file = FileUtils.createOutputFile(context, ext)
                                     FileOutputStream(file).use { out ->
-                                        val success = if (ext == "png") {
+                                        if (ext == "png") {
                                             bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
                                         } else {
                                             bitmap.compress(Bitmap.CompressFormat.JPEG, 95, out)
@@ -264,13 +278,10 @@ fun FilterScreen(
                                 }
                             }
                         },
-                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Icon(Icons.Default.Save, null, modifier = Modifier.size(18.dp))
-                        Spacer(Modifier.width(8.dp))
-                        Text(context.getString(R.string.save_to_gallery))
-                    }
+                        style = StudioActionStyle.SECONDARY,
+                        icon = Icons.Default.Save,
+                        iconContentDescription = context.getString(R.string.save_to_gallery)
+                    )
                 }
             }
         }

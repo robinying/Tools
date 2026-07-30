@@ -2,9 +2,15 @@
 <resources>
     <string name="app_name">Outils</string>
     <string name="home_title">Outils</string>
-    <string name="home_subtitle">Compression Média · Conversion Ebook · Luxmètre</string>
-    <string name="home_section_create">Créer et modifier</string>
-    <string name="home_section_utility">Utilitaires</string>
+    <string name="home_eyebrow">ATELIER CRÉATIF</string>
+    <string name="home_subtitle">Choisissez un outil, préparez la matière, puis créez la prochaine version.</string>
+    <string name="home_section_create">CRÉER</string>
+    <string name="home_create_title">Commencez par le travail en cours</string>
+    <string name="home_create_desc">Filmez un nouveau clip ou transformez un média de votre bibliothèque.</string>
+    <string name="home_primary_tool">OUTIL PRINCIPAL</string>
+    <string name="home_section_utility">ATELIER D’OUTILS</string>
+    <string name="home_utility_title">Inspectez, convertissez et comparez</string>
+    <string name="home_utility_desc">Des outils ciblés pour les fichiers, la lumière ambiante et l’analyse de photos.</string>
     <string name="media_editor_title">Éditeur Média</string>
     <string name="media_editor_desc">Compresser vidéo/image, convertir vidéo en GIF</string>
     <string name="ebook_converter_title">Convertisseur Ebook</string>
@@ -13,4 +19,6 @@
     <string name="light_meter_desc">Mesurer la lumière ambiante avec graphique en temps réel</string>
     <string name="face_compare_title">Comparaison Faciale</string>
     <string name="face_compare_desc">Comparer la similarité faciale entre deux photos</string>
+    <string name="camera_title">Caméra</string>
+    <string name="camera_desc">Filmez, éditez et améliorez des vidéos avec des filtres et effets</string>
 </resources>

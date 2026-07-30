@@ -2,6 +2,9 @@
 <resources>
     <string name="app_name">Convertisseur Ebook</string>
     <string name="ebook_title">Ebook vers PDF</string>
+    <string name="ebook_stage_select_eyebrow">SÉLECTIONNER</string>
+    <string name="ebook_stage_select_title">Choisissez un EPUB</string>
+    <string name="ebook_stage_select_desc">Choisissez un livre, puis convertissez-le en PDF facile à partager.</string>
     <string name="back">Retour</string>
     <string name="select_epub">Sélectionner EPUB</string>
     <string name="idle_hint_title">Convert EPUB to PDF</string>

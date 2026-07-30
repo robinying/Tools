@@ -119,7 +119,11 @@ fun RecordScreen(
             modifier = Modifier.align(Alignment.Center)
         ) {
             Text(
-                text = if (uiState.countdownValue > 0) "${uiState.countdownValue}" else "Go!",
+                text = if (uiState.countdownValue > 0) {
+                    uiState.countdownValue.toString()
+                } else {
+                    stringResource(R.string.record_countdown_go)
+                },
                 style = MaterialTheme.typography.displayLarge,
                 color = MaterialTheme.colorScheme.onBackground
             )
@@ -135,7 +139,10 @@ fun RecordScreen(
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     CircularProgressIndicator(color = MaterialTheme.colorScheme.onBackground)
                     Spacer(modifier = Modifier.height(16.dp))
-                    Text("Processing...", color = MaterialTheme.colorScheme.onBackground)
+                    Text(
+                        stringResource(R.string.record_processing),
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
                 }
             }
         }
@@ -153,7 +160,8 @@ fun RecordScreen(
                 enabled = uiState.segmentCount > 0 && !uiState.isRecording
             ) {
                 Icon(
-                    Icons.Default.Undo, "Delete segment",
+                    Icons.Default.Undo,
+                    stringResource(R.string.record_delete_segment),
                     tint = if (uiState.segmentCount > 0) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.onBackground.copy(alpha = 0.3f),
                     modifier = Modifier.size(32.dp)
                 )
@@ -183,7 +191,8 @@ fun RecordScreen(
                 enabled = uiState.segmentCount > 0 && !uiState.isRecording
             ) {
                 Icon(
-                    Icons.Default.Check, "Done",
+                    Icons.Default.Check,
+                    stringResource(R.string.record_done),
                     tint = if (uiState.segmentCount > 0) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.onBackground.copy(alpha = 0.3f),
                     modifier = Modifier.size(32.dp)
                 )

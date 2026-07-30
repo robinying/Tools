@@ -2,6 +2,9 @@
 <resources>
     <string name="app_name">电子书转换</string>
     <string name="ebook_title">电子书转 PDF</string>
+    <string name="ebook_stage_select_eyebrow">选择</string>
+    <string name="ebook_stage_select_title">选择 EPUB 文件</string>
+    <string name="ebook_stage_select_desc">选择一本电子书，然后将它转换为便于分享的 PDF。</string>
     <string name="back">返回</string>
     <string name="select_epub">选择 EPUB</string>
     <string name="idle_hint_title">将 EPUB 转为 PDF</string>

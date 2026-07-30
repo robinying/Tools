@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="face_compare_title">Face Compare</string>
+    <string name="face_compare_stage_engine">COMPARE</string>
+    <string name="face_compare_stage_title">Match two photos</string>
+    <string name="face_compare_stage_desc">Choose a pair, then run the on-device comparison.</string>
     <string name="face_compare_back">Back</string>
     <string name="face_compare_select_photo">Select Photo</string>
     <string name="face_compare_photo_label">Photo %s</string>

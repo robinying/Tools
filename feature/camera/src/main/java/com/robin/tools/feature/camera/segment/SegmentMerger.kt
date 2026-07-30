@@ -48,7 +48,7 @@ object SegmentMerger {
                                     0,
                                     sampleSize,
                                     extractor.sampleTime,
-                                    extractor.sampleFlags
+                                    mediaCodecBufferFlags(extractor.sampleFlags)
                                 )
                                 muxer.writeSampleData(videoTrackIndex, buffer, bufferInfo)
                                 extractor.advance()
@@ -76,6 +76,14 @@ object SegmentMerger {
                 muxer?.release()
             } catch (_: Exception) {
             }
+        }
+    }
+
+    private fun mediaCodecBufferFlags(sampleFlags: Int): Int {
+        return if (sampleFlags and MediaExtractor.SAMPLE_FLAG_SYNC != 0) {
+            android.media.MediaCodec.BUFFER_FLAG_KEY_FRAME
+        } else {
+            0
         }
     }
 }

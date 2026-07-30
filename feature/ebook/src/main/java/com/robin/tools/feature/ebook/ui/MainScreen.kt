@@ -28,6 +28,11 @@ import androidx.core.content.FileProvider
 import com.robin.tools.core.ui.Dimension
 import com.robin.tools.core.ui.EmptyState
 import com.robin.tools.core.ui.ProgressBlock
+import com.robin.tools.core.ui.StudioActionButton
+import com.robin.tools.core.ui.StudioActionStyle
+import com.robin.tools.core.ui.StudioSectionHeader
+import com.robin.tools.core.ui.StudioSurface
+import com.robin.tools.core.ui.StudioSurfaceTone
 import com.robin.tools.core.ui.ToolsTopAppBar
 import com.robin.tools.feature.ebook.R
 
@@ -53,20 +58,29 @@ fun MainScreen(viewModel: ConversionViewModel, onBack: () -> Unit = {}, modifier
             modifier = modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(Dimension.xl),
+                .padding(horizontal = Dimension.pageHorizontal, vertical = Dimension.xl),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
             when (val state = uiState) {
                 is ConversionState.Idle -> {
-                    EmptyState(
-                        icon = Icons.AutoMirrored.Filled.MenuBook,
-                        title = stringResource(R.string.idle_hint_title),
-                        description = stringResource(R.string.idle_hint_desc),
-                        actionLabel = stringResource(R.string.select_epub),
-                        onAction = { launcher.launch(arrayOf("application/epub+zip")) },
-                        modifier = Modifier.fillMaxWidth()
-                    )
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        StudioSectionHeader(
+                            eyebrow = stringResource(R.string.ebook_stage_select_eyebrow),
+                            title = stringResource(R.string.ebook_stage_select_title),
+                            description = stringResource(R.string.ebook_stage_select_desc),
+                            accent = MaterialTheme.colorScheme.primary
+                        )
+                        Spacer(Modifier.height(Dimension.xl))
+                        EmptyState(
+                            icon = Icons.AutoMirrored.Filled.MenuBook,
+                            title = stringResource(R.string.idle_hint_title),
+                            description = stringResource(R.string.idle_hint_desc),
+                            actionLabel = stringResource(R.string.select_epub),
+                            onAction = { launcher.launch(arrayOf("application/epub+zip")) },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
                 }
                 is ConversionState.Converting -> {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -80,26 +94,34 @@ fun MainScreen(viewModel: ConversionViewModel, onBack: () -> Unit = {}, modifier
                     }
                 }
                 is ConversionState.Success -> {
-                    Icon(
-                        Icons.Default.CheckCircle,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.tertiary,
-                        modifier = Modifier.size(80.dp)
-                    )
-                    Spacer(Modifier.height(Dimension.lg))
-                    Text(
-                        stringResource(R.string.conversion_success),
-                        style = MaterialTheme.typography.headlineSmall
-                    )
-                    Spacer(Modifier.height(Dimension.xl))
-                    Button(
-                        onClick = { openPdf(context, state.cacheFile) },
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text(stringResource(R.string.open_pdf))
-                    }
-                    TextButton(onClick = { viewModel.reset() }) {
-                        Text(stringResource(R.string.continue_converting))
+                    StudioSurface(tone = StudioSurfaceTone.EMPHASIZED) {
+                        Column(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Icon(
+                                Icons.Default.CheckCircle,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.secondary,
+                                modifier = Modifier.size(80.dp)
+                            )
+                            Spacer(Modifier.height(Dimension.lg))
+                            Text(
+                                stringResource(R.string.conversion_success),
+                                style = MaterialTheme.typography.headlineSmall
+                            )
+                            Spacer(Modifier.height(Dimension.xl))
+                            StudioActionButton(
+                                label = stringResource(R.string.open_pdf),
+                                onClick = { openPdf(context, state.cacheFile) }
+                            )
+                            Spacer(Modifier.height(Dimension.sm))
+                            StudioActionButton(
+                                label = stringResource(R.string.continue_converting),
+                                onClick = { viewModel.reset() },
+                                style = StudioActionStyle.SECONDARY
+                            )
+                        }
                     }
                 }
                 is ConversionState.Error -> {

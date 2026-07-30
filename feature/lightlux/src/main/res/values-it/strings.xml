@@ -14,4 +14,26 @@
     <string name="delete">Elimina</string>
     <string name="no_snapshots_yet">Nessuna istantanea ancora</string>
     <string name="lux_value">%1$.1f lux</string>
+    <string name="light_meter_snapshot_eyebrow">ISTANTANEA</string>
+    <string name="light_meter_snapshot_title">Registra questa lettura</string>
+    <string name="light_meter_snapshot_desc">Aggiungi una nota facoltativa per ricordare le condizioni.</string>
+    <string name="light_meter_chart_eyebrow">DATI IN TEMPO REALE</string>
+    <string name="light_meter_chart_desc">Usa una finestra temporale per osservare come cambia la luce ambientale.</string>
+    <string name="saved_snapshot_with_note">Salvato: %1$.1f lux — %2$s</string>
+    <string name="snapshot_note_hint">Nota (facoltativa)</string>
+    <string name="chart_window_label">Finestra</string>
+    <string name="chart_window_15s">15 s</string>
+    <string name="chart_window_60s">60 s</string>
+    <string name="chart_window_5m">5 min</string>
+    <string name="stats_line">Min %1$.1f · Max %2$.1f · Media %3$.1f · n=%4$d</string>
+    <string name="sensor_missing_title">Nessun sensore di luce</string>
+    <string name="sensor_missing_desc">Questo dispositivo non rileva la luce ambientale (TYPE_LIGHT). Istantanea e grafico non sono disponibili.</string>
+    <string name="scene_very_dark">Molto buio / notte</string>
+    <string name="scene_dim_indoor">Interno poco illuminato / luce notturna</string>
+    <string name="scene_indoor">Interno tipico</string>
+    <string name="scene_bright_indoor">Interno luminoso / ufficio</string>
+    <string name="scene_overcast">Nuvoloso / stanza luminosa</string>
+    <string name="scene_daylight">Luce diurna (ombra)</string>
+    <string name="scene_full_daylight">Piena luce diurna</string>
+    <string name="scene_direct_sun">Sole diretto</string>
 </resources>

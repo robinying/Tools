@@ -14,4 +14,26 @@
     <string name="delete">Excluir</string>
     <string name="no_snapshots_yet">Nenhum instantâneo ainda</string>
     <string name="lux_value">%1$.1f lux</string>
+    <string name="light_meter_snapshot_eyebrow">INSTANTÂNEO</string>
+    <string name="light_meter_snapshot_title">Registre esta medição</string>
+    <string name="light_meter_snapshot_desc">Adicione uma nota opcional para lembrar as condições.</string>
+    <string name="light_meter_chart_eyebrow">DADOS AO VIVO</string>
+    <string name="light_meter_chart_desc">Use uma janela de tempo para observar como a luz ambiente muda.</string>
+    <string name="saved_snapshot_with_note">Salvo: %1$.1f lux — %2$s</string>
+    <string name="snapshot_note_hint">Nota (opcional)</string>
+    <string name="chart_window_label">Janela</string>
+    <string name="chart_window_15s">15 s</string>
+    <string name="chart_window_60s">60 s</string>
+    <string name="chart_window_5m">5 min</string>
+    <string name="stats_line">Mín. %1$.1f · Máx. %2$.1f · Média %3$.1f · n=%4$d</string>
+    <string name="sensor_missing_title">Sem sensor de luz</string>
+    <string name="sensor_missing_desc">Este dispositivo não informa luz ambiente (TYPE_LIGHT). O instantâneo e o gráfico não estão disponíveis.</string>
+    <string name="scene_very_dark">Muito escuro / noite</string>
+    <string name="scene_dim_indoor">Interior escuro / luz noturna</string>
+    <string name="scene_indoor">Interior típico</string>
+    <string name="scene_bright_indoor">Interior claro / escritório</string>
+    <string name="scene_overcast">Nublado / ambiente claro</string>
+    <string name="scene_daylight">Luz do dia (sombra)</string>
+    <string name="scene_full_daylight">Luz do dia intensa</string>
+    <string name="scene_direct_sun">Sol direto</string>
 </resources>

@@ -14,4 +14,26 @@
     <string name="delete">Supprimer</string>
     <string name="no_snapshots_yet">Aucun instantané pour l\'instant</string>
     <string name="lux_value">%1$.1f lux</string>
+    <string name="light_meter_snapshot_eyebrow">INSTANTANÉ</string>
+    <string name="light_meter_snapshot_title">Enregistrez cette mesure</string>
+    <string name="light_meter_snapshot_desc">Ajoutez une note facultative pour mémoriser les conditions.</string>
+    <string name="light_meter_chart_eyebrow">DONNÉES EN DIRECT</string>
+    <string name="light_meter_chart_desc">Utilisez une fenêtre de temps pour observer l’évolution de la lumière ambiante.</string>
+    <string name="saved_snapshot_with_note">Enregistré : %1$.1f lux — %2$s</string>
+    <string name="snapshot_note_hint">Note (facultative)</string>
+    <string name="chart_window_label">Fenêtre</string>
+    <string name="chart_window_15s">15 s</string>
+    <string name="chart_window_60s">60 s</string>
+    <string name="chart_window_5m">5 min</string>
+    <string name="stats_line">Min. %1$.1f · Max. %2$.1f · Moy. %3$.1f · n=%4$d</string>
+    <string name="sensor_missing_title">Aucun capteur de lumière</string>
+    <string name="sensor_missing_desc">Cet appareil ne fournit pas de mesure de lumière ambiante (TYPE_LIGHT). L’instantané et le graphique ne sont pas disponibles.</string>
+    <string name="scene_very_dark">Très sombre / nuit</string>
+    <string name="scene_dim_indoor">Intérieur sombre / veilleuse</string>
+    <string name="scene_indoor">Intérieur habituel</string>
+    <string name="scene_bright_indoor">Intérieur lumineux / bureau</string>
+    <string name="scene_overcast">Couvert / pièce lumineuse</string>
+    <string name="scene_daylight">Lumière du jour (ombre)</string>
+    <string name="scene_full_daylight">Plein jour</string>
+    <string name="scene_direct_sun">Soleil direct</string>
 </resources>

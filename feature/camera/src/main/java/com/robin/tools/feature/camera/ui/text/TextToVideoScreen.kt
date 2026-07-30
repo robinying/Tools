@@ -32,6 +32,10 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.robin.tools.core.ui.Dimension
+import com.robin.tools.core.ui.StudioActionButton
+import com.robin.tools.core.ui.StudioSectionHeader
+import com.robin.tools.core.ui.StudioSurface
+import com.robin.tools.core.ui.StudioSurfaceTone
 import com.robin.tools.core.ui.ToolsTopAppBar
 import com.robin.tools.feature.camera.R
 import com.robin.tools.feature.camera.editor.TextCardVideoGenerator
@@ -72,70 +76,73 @@ fun TextToVideoScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .padding(Dimension.lg),
-            verticalArrangement = Arrangement.spacedBy(Dimension.md)
+                .padding(horizontal = Dimension.pageHorizontal, vertical = Dimension.lg),
+            verticalArrangement = Arrangement.spacedBy(Dimension.lg)
         ) {
-            OutlinedTextField(
-                value = text,
-                onValueChange = { text = it.take(200) },
-                modifier = Modifier.fillMaxWidth().height(160.dp),
-                label = { Text(stringResource(R.string.ttv_hint)) },
-                enabled = !busy
+            StudioSectionHeader(
+                eyebrow = stringResource(R.string.camera_section_generate_eyebrow),
+                title = stringResource(R.string.ttv_workflow_title),
+                description = stringResource(R.string.ttv_workflow_desc),
+                accent = MaterialTheme.colorScheme.secondary
             )
-            Text(
-                stringResource(R.string.ttv_duration, durationSec.toInt()),
-                style = MaterialTheme.typography.labelLarge
-            )
-            Slider(
-                value = durationSec,
-                onValueChange = { durationSec = it },
-                valueRange = 1f..10f,
-                steps = 8,
-                enabled = !busy
-            )
+            StudioSurface(tone = StudioSurfaceTone.OUTLINED) {
+                OutlinedTextField(
+                    value = text,
+                    onValueChange = { text = it.take(200) },
+                    modifier = Modifier.fillMaxWidth().height(160.dp),
+                    label = { Text(stringResource(R.string.ttv_hint)) },
+                    enabled = !busy
+                )
+                Spacer(Modifier.height(Dimension.lg))
+                Text(
+                    stringResource(R.string.ttv_duration, durationSec.toInt()),
+                    style = MaterialTheme.typography.labelLarge
+                )
+                Slider(
+                    value = durationSec,
+                    onValueChange = { durationSec = it },
+                    valueRange = 1f..10f,
+                    steps = 8,
+                    enabled = !busy
+                )
+            }
             Spacer(Modifier.weight(1f))
-            Button(
+            StudioActionButton(
+                label = stringResource(R.string.ttv_generate),
                 onClick = {
                     if (text.isBlank()) {
                         Toast.makeText(context, R.string.ttv_empty, Toast.LENGTH_SHORT).show()
-                        return@Button
-                    }
-                    hideKeyboard()
-                    busy = true
-                    Log.i("TextCardVideo", "generate clicked textLen=${text.trim().length} duration=${durationSec.toInt()}")
-                    scope.launch {
-                        val out = fileManager.createOutputFile("textcard")
-                        Log.i("TextCardVideo", "output path=${out.absolutePath}")
-                        val ok = withContext(Dispatchers.Default) {
-                            TextCardVideoGenerator().generate(
-                                text = text.trim(),
-                                outputFile = out,
-                                durationSec = durationSec.toInt()
-                            )
-                        }
-                        busy = false
-                        Log.i("TextCardVideo", "generate result ok=$ok size=${out.length()}")
-                        if (ok) {
-                            Toast.makeText(context, R.string.ttv_done, Toast.LENGTH_SHORT).show()
-                            onGenerated(out.absolutePath)
-                        } else {
-                            Toast.makeText(context, R.string.ttv_failed, Toast.LENGTH_SHORT).show()
+                    } else {
+                        hideKeyboard()
+                        busy = true
+                        Log.i(
+                            "TextCardVideo",
+                            "generate clicked textLen=${text.trim().length} duration=${durationSec.toInt()}"
+                        )
+                        scope.launch {
+                            val out = fileManager.createOutputFile("textcard")
+                            Log.i("TextCardVideo", "output path=${out.absolutePath}")
+                            val ok = withContext(Dispatchers.Default) {
+                                TextCardVideoGenerator().generate(
+                                    text = text.trim(),
+                                    outputFile = out,
+                                    durationSec = durationSec.toInt()
+                                )
+                            }
+                            busy = false
+                            Log.i("TextCardVideo", "generate result ok=$ok size=${out.length()}")
+                            if (ok) {
+                                Toast.makeText(context, R.string.ttv_done, Toast.LENGTH_SHORT).show()
+                                onGenerated(out.absolutePath)
+                            } else {
+                                Toast.makeText(context, R.string.ttv_failed, Toast.LENGTH_SHORT).show()
+                            }
                         }
                     }
                 },
                 enabled = !busy,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                if (busy) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.height(22.dp),
-                        strokeWidth = 2.dp,
-                        color = MaterialTheme.colorScheme.onPrimary
-                    )
-                } else {
-                    Text(stringResource(R.string.ttv_generate))
-                }
-            }
+                loading = busy
+            )
             Text(
                 stringResource(R.string.ttv_footer),
                 style = MaterialTheme.typography.bodySmall,

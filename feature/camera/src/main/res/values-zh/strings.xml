@@ -2,6 +2,15 @@
 <resources>
     <string name="camera_feature_title">相机</string>
     <string name="camera_feature_desc">录制和编辑视频，添加滤镜和特效</string>
+    <string name="camera_section_capture_eyebrow">拍摄</string>
+    <string name="camera_section_capture_title">记录原始素材</string>
+    <string name="camera_section_capture_desc">从照片或分段视频开始创作。</string>
+    <string name="camera_section_edit_eyebrow">编辑</string>
+    <string name="camera_section_edit_title">精修画面与节奏</string>
+    <string name="camera_section_edit_desc">调整视频、裁剪时间线，或挑选封面帧。</string>
+    <string name="camera_section_generate_eyebrow">生成</string>
+    <string name="camera_section_generate_title">从想法开始制作</string>
+    <string name="camera_section_generate_desc">用文字卡片或一组照片生成短视频。</string>
 
     <string name="camera_photo_title">拍照</string>
     <string name="camera_photo_desc">实时滤镜抓拍静帧</string>
@@ -10,6 +19,8 @@
     <string name="photo_saved">照片已保存到相册</string>
     <string name="photo_failed">保存照片失败</string>
     <string name="ttv_hint">输入要显示在视频卡片上的文字</string>
+    <string name="ttv_workflow_title">编写文字卡片</string>
+    <string name="ttv_workflow_desc">设置要展示的内容和时长，然后生成视频。</string>
     <string name="ttv_duration">时长：%1$d 秒</string>
     <string name="ttv_generate">生成视频</string>
     <string name="ttv_empty">请先输入文字</string>
@@ -32,6 +43,8 @@
     <string name="slideshow_images_selected">已选 %1$d 张</string>
     <string name="slideshow_duration">每张时长：%1$d 秒</string>
     <string name="slideshow_hint">至少选 2 张照片，导出无声 H.264 MP4。</string>
+    <string name="slideshow_workflow_title">编排照片顺序</string>
+    <string name="slideshow_workflow_desc">选择照片集、设置节奏，然后生成短视频。</string>
     <string name="slideshow_need_two">请至少选择 2 张照片</string>
     <string name="slideshow_generate">生成幻灯片</string>
     <string name="slideshow_done">幻灯片已生成</string>
@@ -54,6 +67,7 @@
     <string name="record_delete_segment">删除上一段</string>
     <string name="record_done">完成</string>
     <string name="record_processing">处理中…</string>
+    <string name="record_countdown_go">开始！</string>
 
     <string name="trim_title">裁剪视频</string>
     <string name="trim_export">导出</string>
@@ -76,6 +90,8 @@
     <string name="cover_title">选择封面</string>
     <string name="cover_save">保存</string>
     <string name="cover_hint">点击缩略图选择封面</string>
+    <string name="cover_select_frame">点击一帧进行选择</string>
+    <string name="cover_selected_frame">已选封面帧</string>
     <string name="cover_frame">%1$s 处的帧</string>
 
     <string name="filter_none">原图</string>

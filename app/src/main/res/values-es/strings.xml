@@ -2,9 +2,15 @@
 <resources>
     <string name="app_name">Herramientas</string>
     <string name="home_title">Herramientas</string>
-    <string name="home_subtitle">Compresión de Medios · Conversión de Ebook · Medidor de Luz</string>
-    <string name="home_section_create">Crear y editar</string>
-    <string name="home_section_utility">Utilidades</string>
+    <string name="home_eyebrow">MESA DE CREACIÓN</string>
+    <string name="home_subtitle">Elige una herramienta, prepara el material y crea la siguiente versión.</string>
+    <string name="home_section_create">CREAR</string>
+    <string name="home_create_title">Empieza con el trabajo actual</string>
+    <string name="home_create_desc">Graba un clip nuevo o transforma contenido de tu biblioteca.</string>
+    <string name="home_primary_tool">HERRAMIENTA PRINCIPAL</string>
+    <string name="home_section_utility">MESA DE UTILIDADES</string>
+    <string name="home_utility_title">Inspecciona, convierte y compara</string>
+    <string name="home_utility_desc">Herramientas específicas para archivos, luz ambiental y análisis de fotos.</string>
     <string name="media_editor_title">Editor de Medios</string>
     <string name="media_editor_desc">Comprimir video/imagen, convertir video a GIF</string>
     <string name="ebook_converter_title">Conversor de Ebook</string>
@@ -13,4 +19,6 @@
     <string name="light_meter_desc">Medir luz ambiental con gráfico en tiempo real</string>
     <string name="face_compare_title">Comparación Facial</string>
     <string name="face_compare_desc">Comparar similitud facial entre dos fotos</string>
+    <string name="camera_title">Cámara</string>
+    <string name="camera_desc">Graba, edita y mejora vídeos con filtros y efectos</string>
 </resources>

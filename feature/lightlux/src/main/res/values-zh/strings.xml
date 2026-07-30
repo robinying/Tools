@@ -2,6 +2,11 @@
 <resources>
     <string name="app_name">光线测量仪</string>
     <string name="light_meter_title">光线测量仪</string>
+    <string name="light_meter_snapshot_eyebrow">快照</string>
+    <string name="light_meter_snapshot_title">记录当前读数</string>
+    <string name="light_meter_snapshot_desc">可添加备注，以便记住当时的环境条件。</string>
+    <string name="light_meter_chart_eyebrow">实时数据</string>
+    <string name="light_meter_chart_desc">选择时间窗口，查看环境光的变化。</string>
     <string name="back">返回</string>
     <string name="history">历史记录</string>
     <string name="lux_unit">lux</string>

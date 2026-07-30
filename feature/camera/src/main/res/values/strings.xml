@@ -3,6 +3,15 @@
     <!-- Camera feature -->
     <string name="camera_feature_title">Camera</string>
     <string name="camera_feature_desc">Record, edit, and enhance videos with filters and effects</string>
+    <string name="camera_section_capture_eyebrow">CAPTURE</string>
+    <string name="camera_section_capture_title">Frame the source</string>
+    <string name="camera_section_capture_desc">Start with a still image or a multi-segment video clip.</string>
+    <string name="camera_section_edit_eyebrow">EDIT</string>
+    <string name="camera_section_edit_title">Refine the cut</string>
+    <string name="camera_section_edit_desc">Adjust the video, trim its timeline, or choose a cover frame.</string>
+    <string name="camera_section_generate_eyebrow">GENERATE</string>
+    <string name="camera_section_generate_title">Create from an idea</string>
+    <string name="camera_section_generate_desc">Build a text card or turn a photo set into a short video.</string>
 
     <!-- Camera main -->
     <string name="camera_photo_title">Take Photo</string>
@@ -12,6 +21,8 @@
     <string name="photo_saved">Photo saved to gallery</string>
     <string name="photo_failed">Failed to save photo</string>
     <string name="ttv_hint">Enter text for the video card</string>
+    <string name="ttv_workflow_title">Write the card</string>
+    <string name="ttv_workflow_desc">Set the message and its duration before generating the video.</string>
     <string name="ttv_duration">Duration: %1$d s</string>
     <string name="ttv_generate">Generate video</string>
     <string name="ttv_empty">Please enter some text</string>
@@ -34,6 +45,8 @@
     <string name="slideshow_images_selected">%1$d photo(s) selected</string>
     <string name="slideshow_duration">Seconds per photo: %1$d</string>
     <string name="slideshow_hint">Pick at least 2 photos. Export is silent H.264 MP4.</string>
+    <string name="slideshow_workflow_title">Sequence the photos</string>
+    <string name="slideshow_workflow_desc">Pick a set, set its rhythm, then generate the clip.</string>
     <string name="slideshow_need_two">Select at least 2 photos</string>
     <string name="slideshow_generate">Generate slideshow</string>
     <string name="slideshow_done">Slideshow created</string>
@@ -57,6 +70,7 @@
     <string name="record_delete_segment">Delete Last Segment</string>
     <string name="record_done">Done</string>
     <string name="record_processing">Processing…</string>
+    <string name="record_countdown_go">Go!</string>
 
     <!-- Trim -->
     <string name="trim_title">Trim Video</string>
@@ -82,6 +96,8 @@
     <string name="cover_title">Select Cover</string>
     <string name="cover_save">Save</string>
     <string name="cover_hint">Tap a thumbnail to select a cover</string>
+    <string name="cover_select_frame">Tap a frame to select it</string>
+    <string name="cover_selected_frame">Selected cover frame</string>
     <string name="cover_frame">Frame at %1$s</string>
 
     <!-- Filter names -->

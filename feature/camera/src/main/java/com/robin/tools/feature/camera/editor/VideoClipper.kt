@@ -64,7 +64,7 @@ class VideoClipper {
                         bufferInfo.offset = 0
                         bufferInfo.size = size
                         bufferInfo.presentationTimeUs = (sampleTime - startUs).coerceAtLeast(0L)
-                        bufferInfo.flags = extractor.sampleFlags
+                        bufferInfo.flags = mediaCodecBufferFlags(extractor.sampleFlags)
                         muxer.writeSampleData(muxerIndex, buffer, bufferInfo)
                     }
                     extractor.advance()
@@ -90,6 +90,14 @@ class VideoClipper {
                 muxer?.release()
             } catch (_: Exception) {
             }
+        }
+    }
+
+    private fun mediaCodecBufferFlags(sampleFlags: Int): Int {
+        return if (sampleFlags and MediaExtractor.SAMPLE_FLAG_SYNC != 0) {
+            MediaCodec.BUFFER_FLAG_KEY_FRAME
+        } else {
+            0
         }
     }
 }
