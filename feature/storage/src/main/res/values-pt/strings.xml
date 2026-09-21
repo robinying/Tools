@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="storage_bench_title">Teste de Velocidade de Armazenamento</string>
+    <string name="storage_bench_subtitle">Meça a taxa de leitura e gravação sequencial deste dispositivo.</string>
+    <string name="back">Voltar</string>
+
+    <string name="storage_target_eyebrow">DESTINO</string>
+    <string name="storage_target_title">Onde gravar</string>
+    <string name="storage_target_desc">Todos os destinos ficam dentro do espaço privado do aplicativo, portanto nenhuma permissão é necessária.</string>
+    <string name="storage_target_internal_files">Armazenamento interno</string>
+    <string name="storage_target_internal_cache">Diretório de cache</string>
+    <string name="storage_target_external_app">Externo do aplicativo</string>
+    <string name="storage_capacity_line">%1$s livres de %2$s</string>
+    <string name="storage_target_unavailable">Indisponível neste dispositivo</string>
+
+    <string name="storage_preset_eyebrow">CARGA</string>
+    <string name="storage_preset_title">Quanto gravar</string>
+    <string name="storage_preset_desc">Cargas maiores produzem números mais estáveis, mas demoram mais.</string>
+    <string name="storage_preset_quick">Rápido</string>
+    <string name="storage_preset_quick_detail">%1$d MB sequenciais — uma primeira olhada</string>
+    <string name="storage_preset_standard">Padrão</string>
+    <string name="storage_preset_standard_detail">%1$d MB sequenciais — o bastante para provocar regravação</string>
+    <string name="storage_preset_thorough">Completo</string>
+    <string name="storage_preset_thorough_detail">%1$d MB sequenciais — o mais próximo do regime estável</string>
+
+    <string name="storage_start">Iniciar teste</string>
+    <string name="storage_cancel">Cancelar</string>
+    <string name="storage_running_message">Testando %1$s — %2$s · %3$s decorridos</string>
+
+    <string name="storage_cold_read_label">Tentar esvaziar o cache antes da leitura</string>
+    <string name="storage_cold_read_hint">O Android não oferece como descartar o cache de páginas. Esta opção grava dados descartáveis para forçar a remoção: é uma tentativa e pode não mudar o resultado.</string>
+
+    <string name="storage_phase_sequential_write">gravação sequencial</string>
+    <string name="storage_phase_cache_flush">esvaziamento do cache</string>
+    <string name="storage_phase_sequential_read">leitura sequencial</string>
+    <string name="storage_phase_random_read">leitura aleatória</string>
+    <string name="storage_phase_random_write">gravação aleatória</string>
+    <string name="storage_phase_small_file">arquivos pequenos</string>
+    <string name="storage_phase_sqlite_insert">inserção no SQLite</string>
+
+    <string name="storage_failure_not_enough_space">Espaço livre insuficiente</string>
+    <string name="storage_failure_target_unavailable">O armazenamento de destino está indisponível</string>
+    <string name="storage_failure_io_error">Erro de armazenamento durante o teste</string>
+    <string name="storage_failure_database_error">Erro de banco de dados durante o teste</string>
+    <string name="storage_failure_unknown">Não foi possível concluir o teste</string>
+    <string name="storage_failure_space_detail">São necessários %1$s livres, mas há apenas %2$s.</string>
+
+    <string name="storage_cancelled_title">Teste cancelado</string>
+    <string name="storage_cancelled_desc">Nada foi mantido. Você pode começar de novo quando quiser.</string>
+
+    <string name="storage_result_eyebrow">RESULTADO</string>
+    <string name="storage_result_title">Taxa medida</string>
+    <string name="storage_result_write_title">Gravação sequencial</string>
+    <string name="storage_result_read_title">Leitura sequencial</string>
+    <string name="storage_result_random_title">E/S aleatória</string>
+    <string name="storage_result_small_file_title">Arquivos pequenos</string>
+    <string name="storage_result_sqlite_title">Inserção no SQLite</string>
+
+    <string name="storage_rating_poor">Ruim</string>
+    <string name="storage_rating_fair">Razoável</string>
+    <string name="storage_rating_good">Bom</string>
+    <string name="storage_rating_excellent">Excelente</string>
+
+    <string name="storage_label_write_average">Média</string>
+    <string name="storage_label_write_buffered">Em buffer (sem descarga)</string>
+    <string name="storage_label_write_steady_state">Regime estável (antes da descarga)</string>
+    <string name="storage_label_read_first_pass">Primeira passagem</string>
+    <string name="storage_label_read_repeat">Segunda passagem</string>
+    <string name="storage_label_random_read">Leitura 4K</string>
+    <string name="storage_label_random_write">Gravação 4K</string>
+    <string name="storage_label_small_file">Criar + fdatasync</string>
+    <string name="storage_label_sqlite_insert">Inserção</string>
+    <string name="storage_caption_latency">p50 %1$s · p95 %2$s · p99 %3$s</string>
+    <string name="storage_chart_description">Taxa de gravação ao longo do tempo: pico %1$s, final %2$s.</string>
+    <string name="storage_random_variance_note">Os números de 4K variam bastante entre execuções no mesmo dispositivo: encare-os como uma faixa, não como um valor exato.</string>
+
+    <string name="storage_read_caveat">O Android não oferece como descartar o cache de páginas, então as leituras podem vir da memória e parecer mais rápidas do que o hardware.</string>
+    <string name="storage_read_caveat_cold">Foi tentado esvaziar o cache antes desta leitura, mas é uma tentativa e pode não ter surtido efeito.</string>
+    <string name="storage_rate_operations">%1$s op/s</string>
+    <string name="storage_rate_files">%1$s arquivos/s</string>
+    <string name="storage_rate_rows">%1$s linhas/s</string>
+    <string name="storage_total_elapsed">Tempo total %1$s</string>
+    <string name="storage_device_line">%1$s · API %2$d · %3$s</string>
+
+    <string name="storage_history_eyebrow">HISTÓRICO</string>
+    <string name="storage_history_title">Testes anteriores</string>
+    <string name="storage_history_desc">Os últimos 50 testes neste dispositivo, do mais recente para o mais antigo.</string>
+    <string name="storage_history_empty_title">Nenhum teste ainda</string>
+    <string name="storage_history_empty_desc">Os testes concluídos ficam guardados aqui para você comparar resultados ao longo do tempo.</string>
+    <string name="storage_history_clear">Limpar histórico</string>
+    <string name="storage_history_clear_confirm_title">Limpar todo o histórico?</string>
+    <string name="storage_history_clear_confirm_message">Todos os testes salvos serão excluídos. Não é possível desfazer.</string>
+    <string name="storage_history_clear_confirm_action">Limpar</string>
+    <string name="storage_history_custom_workload">Personalizada</string>
+    <string name="storage_history_entry_title">%1$s · %2$s · %3$s</string>
+    <string name="storage_history_entry_throughput">Gravação %1$s · Leitura %2$s</string>
+    <string name="storage_history_entry_details">%1$s / %2$s IOPS · %3$s arquivos/s</string>
+    <string name="storage_history_entry_details_with_sqlite">%1$s / %2$s IOPS · %3$s arquivos/s · %4$s linhas/s</string>
+
+    <string name="storage_unit_bytes">%1$s B</string>
+    <string name="storage_unit_kilobytes">%1$s KB</string>
+    <string name="storage_unit_megabytes">%1$s MB</string>
+    <string name="storage_unit_gigabytes">%1$s GB</string>
+    <string name="storage_unit_bytes_per_second">%1$s B/s</string>
+    <string name="storage_unit_kilobytes_per_second">%1$s KB/s</string>
+    <string name="storage_unit_megabytes_per_second">%1$s MB/s</string>
+    <string name="storage_unit_gigabytes_per_second">%1$s GB/s</string>
+    <string name="storage_unit_microseconds">%1$s µs</string>
+    <string name="storage_unit_milliseconds">%1$s ms</string>
+    <string name="storage_unit_seconds">%1$s s</string>
+    <string name="storage_duration_minutes_seconds">%1$d:%2$02d</string>
+    <string name="storage_duration_hours_minutes_seconds">%1$d:%2$02d:%3$02d</string>
+</resources>

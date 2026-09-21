@@ -15,6 +15,7 @@ import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.LightMode
+import androidx.compose.material.icons.filled.Speed
 import androidx.compose.material.icons.filled.Videocam
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -35,7 +36,8 @@ fun HomeScreen(
     onEbookClick: () -> Unit,
     onLightLuxClick: () -> Unit,
     onFaceCompareClick: () -> Unit,
-    onCameraClick: () -> Unit = {}
+    onCameraClick: () -> Unit = {},
+    onStorageBenchClick: () -> Unit = {}
 ) {
     Column(
         modifier = Modifier
@@ -97,6 +99,13 @@ fun HomeScreen(
             icon = Icons.Default.Face,
             onClick = onFaceCompareClick,
             accent = MaterialTheme.colorScheme.tertiary
+        )
+        FeatureCard(
+            title = stringResource(R.string.storage_bench_title),
+            description = stringResource(R.string.storage_bench_desc),
+            icon = Icons.Default.Speed,
+            onClick = onStorageBenchClick,
+            accent = MaterialTheme.colorScheme.secondary
         )
         Spacer(Modifier.height(Dimension.xl))
     }

@@ -21,4 +21,6 @@
     <string name="face_compare_desc">Comparar similaridade facial entre duas fotos</string>
     <string name="camera_title">Câmera</string>
     <string name="camera_desc">Grave, edite e aprimore vídeos com filtros e efeitos</string>
+    <string name="storage_bench_title">Teste de Velocidade de Armazenamento</string>
+    <string name="storage_bench_desc">Medir a velocidade de leitura e gravação do armazenamento</string>
 </resources>

@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="storage_bench_title">Storage Speed Test</string>
+    <string name="storage_bench_subtitle">Measure sequential read and write throughput on this device.</string>
+    <string name="back">Back</string>
+
+    <string name="storage_target_eyebrow">DESTINATION</string>
+    <string name="storage_target_title">Where to write</string>
+    <string name="storage_target_desc">Every target lives inside the app sandbox, so no permission is required.</string>
+    <string name="storage_target_internal_files">Internal storage</string>
+    <string name="storage_target_internal_cache">Cache dir</string>
+    <string name="storage_target_external_app">App external</string>
+    <string name="storage_capacity_line">%1$s free of %2$s</string>
+    <string name="storage_target_unavailable">Unavailable on this device</string>
+
+    <string name="storage_preset_eyebrow">WORKLOAD</string>
+    <string name="storage_preset_title">How much to write</string>
+    <string name="storage_preset_desc">Larger workloads give steadier numbers but take longer.</string>
+    <string name="storage_preset_quick">Quick</string>
+    <string name="storage_preset_quick_detail">%1$d MB sequential — a first look</string>
+    <string name="storage_preset_standard">Standard</string>
+    <string name="storage_preset_standard_detail">%1$d MB sequential — enough to trigger writeback</string>
+    <string name="storage_preset_thorough">Thorough</string>
+    <string name="storage_preset_thorough_detail">%1$d MB sequential — closest to steady state</string>
+
+    <string name="storage_start">Start test</string>
+    <string name="storage_cancel">Cancel</string>
+    <string name="storage_running_message">Testing %1$s — %2$s · %3$s elapsed</string>
+
+    <string name="storage_cold_read_label">Try to evict the cache before reading</string>
+    <string name="storage_cold_read_hint">Android offers no way to drop the page cache. This writes throwaway data to pressure it out — best effort, and it may not change the result.</string>
+
+    <string name="storage_phase_sequential_write">sequential write</string>
+    <string name="storage_phase_cache_flush">cache eviction</string>
+    <string name="storage_phase_sequential_read">sequential read</string>
+    <string name="storage_phase_random_read">random read</string>
+    <string name="storage_phase_random_write">random write</string>
+    <string name="storage_phase_small_file">small files</string>
+    <string name="storage_phase_sqlite_insert">SQLite insert</string>
+
+    <string name="storage_failure_not_enough_space">Not enough free space</string>
+    <string name="storage_failure_target_unavailable">Target storage is unavailable</string>
+    <string name="storage_failure_io_error">Storage error while testing</string>
+    <string name="storage_failure_database_error">Database error while testing</string>
+    <string name="storage_failure_unknown">Test could not complete</string>
+    <string name="storage_failure_space_detail">Needs %1$s free, only %2$s available.</string>
+
+    <string name="storage_cancelled_title">Test cancelled</string>
+    <string name="storage_cancelled_desc">Nothing was kept. You can start again whenever you like.</string>
+
+    <string name="storage_result_eyebrow">RESULT</string>
+    <string name="storage_result_title">Measured throughput</string>
+    <string name="storage_result_write_title">Sequential write</string>
+    <string name="storage_result_read_title">Sequential read</string>
+    <string name="storage_result_random_title">Random IO</string>
+    <string name="storage_result_small_file_title">Small files</string>
+    <string name="storage_result_sqlite_title">SQLite insert</string>
+
+    <string name="storage_rating_poor">Poor</string>
+    <string name="storage_rating_fair">Fair</string>
+    <string name="storage_rating_good">Good</string>
+    <string name="storage_rating_excellent">Excellent</string>
+
+    <string name="storage_label_write_average">Average</string>
+    <string name="storage_label_write_buffered">Buffered (no flush)</string>
+    <string name="storage_label_write_steady_state">Steady state (before flush)</string>
+    <string name="storage_label_read_first_pass">First pass</string>
+    <string name="storage_label_read_repeat">Second pass</string>
+    <string name="storage_label_random_read">4K read</string>
+    <string name="storage_label_random_write">4K write</string>
+    <string name="storage_label_small_file">Create + fsync</string>
+    <string name="storage_label_sqlite_insert">Insert</string>
+    <string name="storage_caption_latency">p50 %1$s · p95 %2$s · p99 %3$s</string>
+    <string name="storage_chart_description">Write throughput over time: peak %1$s, ending at %2$s.</string>
+    <string name="storage_random_variance_note">4K figures vary noticeably between runs on the same device — treat them as a range, not an exact number.</string>
+
+    <string name="storage_read_caveat">Android offers no way to drop the page cache, so reads may be served from memory and look faster than the hardware.</string>
+    <string name="storage_read_caveat_cold">Cache eviction was attempted first, but it is best effort and may not have taken effect.</string>
+    <string name="storage_rate_operations">%1$s ops/s</string>
+    <string name="storage_rate_files">%1$s files/s</string>
+    <string name="storage_rate_rows">%1$s rows/s</string>
+    <string name="storage_total_elapsed">Total elapsed %1$s</string>
+    <string name="storage_device_line">%1$s · API %2$d · %3$s</string>
+
+    <string name="storage_history_eyebrow">HISTORY</string>
+    <string name="storage_history_title">Past runs</string>
+    <string name="storage_history_desc">The last 50 runs on this device, newest first.</string>
+    <string name="storage_history_empty_title">No runs yet</string>
+    <string name="storage_history_empty_desc">Finished tests are kept here so you can compare results over time.</string>
+    <string name="storage_history_clear">Clear history</string>
+    <string name="storage_history_clear_confirm_title">Clear all history?</string>
+    <string name="storage_history_clear_confirm_message">Every saved run will be deleted. This cannot be undone.</string>
+    <string name="storage_history_clear_confirm_action">Clear</string>
+    <string name="storage_history_custom_workload">Custom</string>
+    <string name="storage_history_entry_title">%1$s · %2$s · %3$s</string>
+    <string name="storage_history_entry_throughput">Write %1$s · Read %2$s</string>
+    <string name="storage_history_entry_details">%1$s / %2$s IOPS · %3$s files/s</string>
+    <string name="storage_history_entry_details_with_sqlite">%1$s / %2$s IOPS · %3$s files/s · %4$s rows/s</string>
+
+    <!--
+      计量单位文案。数字由 MetricFormat 按系统区域格式化后传入，单位之所以要进资源，
+      是因为不同语言的写法确实不同（法语用 Mo/Go 而不是 MB/GB）。
+    -->
+    <string name="storage_unit_bytes">%1$s B</string>
+    <string name="storage_unit_kilobytes">%1$s KB</string>
+    <string name="storage_unit_megabytes">%1$s MB</string>
+    <string name="storage_unit_gigabytes">%1$s GB</string>
+    <string name="storage_unit_bytes_per_second">%1$s B/s</string>
+    <string name="storage_unit_kilobytes_per_second">%1$s KB/s</string>
+    <string name="storage_unit_megabytes_per_second">%1$s MB/s</string>
+    <string name="storage_unit_gigabytes_per_second">%1$s GB/s</string>
+    <string name="storage_unit_microseconds">%1$s µs</string>
+    <string name="storage_unit_milliseconds">%1$s ms</string>
+    <string name="storage_unit_seconds">%1$s s</string>
+    <string name="storage_duration_minutes_seconds">%1$d:%2$02d</string>
+    <string name="storage_duration_hours_minutes_seconds">%1$d:%2$02d:%3$02d</string>
+</resources>

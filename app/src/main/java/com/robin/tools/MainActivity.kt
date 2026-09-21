@@ -45,6 +45,8 @@ import com.robin.tools.feature.media.data.CompressionType
 import com.robin.tools.feature.media.ui.screens.CompressionScreen
 import com.robin.tools.feature.media.ui.screens.FilterScreen
 import com.robin.tools.feature.media.ui.screens.MainScreen as MediaMainScreen
+import com.robin.tools.feature.storage.data.StorageBenchViewModel
+import com.robin.tools.feature.storage.presentation.StorageBenchScreen
 import com.robin.tools.navigation.AppRoute
 import com.robin.tools.ui.screens.HomeScreen
 import com.robin.tools.ui.theme.ToolsTheme
@@ -73,7 +75,8 @@ class MainActivity : ComponentActivity() {
                                 onEbookClick = { navController.navigate(AppRoute.Ebook) },
                                 onLightLuxClick = { navController.navigate(AppRoute.LightLux) },
                                 onFaceCompareClick = { navController.navigate(AppRoute.FaceCompare) },
-                                onCameraClick = { navController.navigate(AppRoute.CameraMain) }
+                                onCameraClick = { navController.navigate(AppRoute.CameraMain) },
+                                onStorageBenchClick = { navController.navigate(AppRoute.StorageBench) }
                             )
                         }
 
@@ -96,6 +99,10 @@ class MainActivity : ComponentActivity() {
 
                         composable<AppRoute.FaceCompare> {
                             FaceCompareWrapper(navController)
+                        }
+
+                        composable<AppRoute.StorageBench> {
+                            StorageBenchWrapper(navController)
                         }
 
                         // Camera feature routes
@@ -236,6 +243,20 @@ private fun FaceCompareWrapper(navController: NavHostController) {
         )
         FaceCompareScreen(
             viewModel = faceViewModel,
+            onBack = { navController.popBackStack() }
+        )
+    }
+}
+
+@Composable
+private fun StorageBenchWrapper(navController: NavHostController) {
+    SwipeBackContainer(onBack = { navController.popBackStack() }) {
+        val context = LocalContext.current
+        val storageViewModel: StorageBenchViewModel = viewModel(
+            factory = StorageBenchViewModel.Factory(context.applicationContext as android.app.Application)
+        )
+        StorageBenchScreen(
+            viewModel = storageViewModel,
             onBack = { navController.popBackStack() }
         )
     }

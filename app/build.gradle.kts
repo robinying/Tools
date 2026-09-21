@@ -94,6 +94,7 @@ dependencies {
     implementation(project(":feature:lightlux"))
     implementation(project(":feature:face"))
     implementation(project(":feature:camera"))
+    implementation(project(":feature:storage"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

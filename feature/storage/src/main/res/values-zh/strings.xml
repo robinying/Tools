@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="storage_bench_title">存储速度测试</string>
+    <string name="storage_bench_subtitle">测量本机存储的顺序读写吞吐能力。</string>
+    <string name="back">返回</string>
+
+    <string name="storage_target_eyebrow">写入位置</string>
+    <string name="storage_target_title">测试哪个目录</string>
+    <string name="storage_target_desc">三个目标都位于应用沙箱内，因此不需要任何权限。</string>
+    <string name="storage_target_internal_files">内部存储</string>
+    <string name="storage_target_internal_cache">缓存目录</string>
+    <string name="storage_target_external_app">应用外部目录</string>
+    <string name="storage_capacity_line">可用 %1$s / 共 %2$s</string>
+    <string name="storage_target_unavailable">本机不可用</string>
+
+    <string name="storage_preset_eyebrow">测试档位</string>
+    <string name="storage_preset_title">写入多少数据</string>
+    <string name="storage_preset_desc">载荷越大数值越稳定，但耗时越长。</string>
+    <string name="storage_preset_quick">快速</string>
+    <string name="storage_preset_quick_detail">顺序写入 %1$d MB —— 先看一眼</string>
+    <string name="storage_preset_standard">标准</string>
+    <string name="storage_preset_standard_detail">顺序写入 %1$d MB —— 足以触发回写</string>
+    <string name="storage_preset_thorough">深度</string>
+    <string name="storage_preset_thorough_detail">顺序写入 %1$d MB —— 最接近稳态</string>
+
+    <string name="storage_start">开始测试</string>
+    <string name="storage_cancel">取消</string>
+    <string name="storage_running_message">正在测试%1$s — %2$s · 已用 %3$s</string>
+
+    <string name="storage_cold_read_label">读取前尝试驱逐缓存</string>
+    <string name="storage_cold_read_hint">Android 没有丢弃页缓存的接口。这里通过写入丢弃数据来施加回写压力，属于尽力而为，可能不会改变结果。</string>
+
+    <string name="storage_phase_sequential_write">顺序写入</string>
+    <string name="storage_phase_cache_flush">缓存驱逐</string>
+    <string name="storage_phase_sequential_read">顺序读取</string>
+    <string name="storage_phase_random_read">随机读取</string>
+    <string name="storage_phase_random_write">随机写入</string>
+    <string name="storage_phase_small_file">小文件</string>
+    <string name="storage_phase_sqlite_insert">SQLite 写入</string>
+
+    <string name="storage_failure_not_enough_space">可用空间不足</string>
+    <string name="storage_failure_target_unavailable">目标存储不可用</string>
+    <string name="storage_failure_io_error">测试过程中发生存储错误</string>
+    <string name="storage_failure_database_error">测试过程中发生数据库错误</string>
+    <string name="storage_failure_unknown">测试未能完成</string>
+    <string name="storage_failure_space_detail">需要可用 %1$s，当前只有 %2$s。</string>
+
+    <string name="storage_cancelled_title">测试已取消</string>
+    <string name="storage_cancelled_desc">没有保留任何数据，随时可以重新开始。</string>
+
+    <string name="storage_result_eyebrow">测试结果</string>
+    <string name="storage_result_title">实测吞吐</string>
+    <string name="storage_result_write_title">顺序写入</string>
+    <string name="storage_result_read_title">顺序读取</string>
+    <string name="storage_result_random_title">随机 IO</string>
+    <string name="storage_result_small_file_title">小文件</string>
+    <string name="storage_result_sqlite_title">SQLite 写入</string>
+
+    <string name="storage_rating_poor">较差</string>
+    <string name="storage_rating_fair">一般</string>
+    <string name="storage_rating_good">良好</string>
+    <string name="storage_rating_excellent">优秀</string>
+
+    <string name="storage_label_write_average">平均</string>
+    <string name="storage_label_write_buffered">缓冲写入（不含落盘）</string>
+    <string name="storage_label_write_steady_state">稳态（落盘前）</string>
+    <string name="storage_label_read_first_pass">第 1 轮</string>
+    <string name="storage_label_read_repeat">第 2 轮</string>
+    <string name="storage_label_random_read">4K 读</string>
+    <string name="storage_label_random_write">4K 写</string>
+    <string name="storage_label_small_file">创建 + fdatasync</string>
+    <string name="storage_label_sqlite_insert">插入</string>
+    <string name="storage_caption_latency">p50 %1$s · p95 %2$s · p99 %3$s</string>
+    <string name="storage_chart_description">写入吞吐随时间变化：峰值 %1$s，末尾 %2$s。</string>
+    <string name="storage_random_variance_note">4K 数值在同一台设备上每次都会有明显波动，请当作一个区间看，而不是精确值。</string>
+
+    <string name="storage_read_caveat">Android 没有丢弃页缓存的接口，读取可能直接命中内存，数值会比介质实际能力好看。</string>
+    <string name="storage_read_caveat_cold">本次读取前已尝试驱逐缓存，但该手段是尽力而为，可能并未生效。</string>
+    <string name="storage_rate_operations">%1$s 次/秒</string>
+    <string name="storage_rate_files">%1$s 个/秒</string>
+    <string name="storage_rate_rows">%1$s 行/秒</string>
+    <string name="storage_total_elapsed">总耗时 %1$s</string>
+    <string name="storage_device_line">%1$s · API %2$d · %3$s</string>
+
+    <string name="storage_history_eyebrow">历史记录</string>
+    <string name="storage_history_title">过去的测试</string>
+    <string name="storage_history_desc">本机最近 50 次测试，最新的在最前。</string>
+    <string name="storage_history_empty_title">还没有测试记录</string>
+    <string name="storage_history_empty_desc">完成的测试会保存在这里，方便随时间对比。</string>
+    <string name="storage_history_clear">清空历史</string>
+    <string name="storage_history_clear_confirm_title">清空全部历史记录？</string>
+    <string name="storage_history_clear_confirm_message">所有已保存的记录都会被删除，且无法恢复。</string>
+    <string name="storage_history_clear_confirm_action">清空</string>
+    <string name="storage_history_custom_workload">自定义</string>
+    <string name="storage_history_entry_title">%1$s · %2$s · %3$s</string>
+    <string name="storage_history_entry_throughput">写 %1$s · 读 %2$s</string>
+    <string name="storage_history_entry_details">%1$s / %2$s IOPS · %3$s 个/秒</string>
+    <string name="storage_history_entry_details_with_sqlite">%1$s / %2$s IOPS · %3$s 个/秒 · %4$s 行/秒</string>
+
+    <!-- 计量单位文案，理由见 values/strings.xml。 -->
+    <string name="storage_unit_bytes">%1$s B</string>
+    <string name="storage_unit_kilobytes">%1$s KB</string>
+    <string name="storage_unit_megabytes">%1$s MB</string>
+    <string name="storage_unit_gigabytes">%1$s GB</string>
+    <string name="storage_unit_bytes_per_second">%1$s B/s</string>
+    <string name="storage_unit_kilobytes_per_second">%1$s KB/s</string>
+    <string name="storage_unit_megabytes_per_second">%1$s MB/s</string>
+    <string name="storage_unit_gigabytes_per_second">%1$s GB/s</string>
+    <string name="storage_unit_microseconds">%1$s µs</string>
+    <string name="storage_unit_milliseconds">%1$s ms</string>
+    <string name="storage_unit_seconds">%1$s 秒</string>
+    <string name="storage_duration_minutes_seconds">%1$d:%2$02d</string>
+    <string name="storage_duration_hours_minutes_seconds">%1$d:%2$02d:%3$02d</string>
+</resources>

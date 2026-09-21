@@ -21,4 +21,6 @@
     <string name="face_compare_desc">对比两张照片的人脸相似度</string>
     <string name="camera_title">相机</string>
     <string name="camera_desc">录制和编辑视频，添加滤镜和特效</string>
+    <string name="storage_bench_title">存储速度测试</string>
+    <string name="storage_bench_desc">测量手机存储的读写速度</string>
 </resources>

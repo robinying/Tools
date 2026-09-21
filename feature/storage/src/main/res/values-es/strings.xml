@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="storage_bench_title">Test de Velocidad de Almacenamiento</string>
+    <string name="storage_bench_subtitle">Mide el rendimiento de lectura y escritura secuencial de este dispositivo.</string>
+    <string name="back">Atrás</string>
+
+    <string name="storage_target_eyebrow">DESTINO</string>
+    <string name="storage_target_title">Dónde escribir</string>
+    <string name="storage_target_desc">Todos los destinos están dentro del espacio privado de la aplicación, así que no hace falta ningún permiso.</string>
+    <string name="storage_target_internal_files">Almacenamiento interno</string>
+    <string name="storage_target_internal_cache">Directorio de caché</string>
+    <string name="storage_target_external_app">Externo de la aplicación</string>
+    <string name="storage_capacity_line">%1$s libres de %2$s</string>
+    <string name="storage_target_unavailable">No disponible en este dispositivo</string>
+
+    <string name="storage_preset_eyebrow">CARGA</string>
+    <string name="storage_preset_title">Cuánto escribir</string>
+    <string name="storage_preset_desc">Las cargas mayores dan cifras más estables, pero tardan más.</string>
+    <string name="storage_preset_quick">Rápida</string>
+    <string name="storage_preset_quick_detail">%1$d MB secuenciales: un primer vistazo</string>
+    <string name="storage_preset_standard">Estándar</string>
+    <string name="storage_preset_standard_detail">%1$d MB secuenciales: basta para provocar escritura diferida</string>
+    <string name="storage_preset_thorough">Exhaustiva</string>
+    <string name="storage_preset_thorough_detail">%1$d MB secuenciales: lo más cercano al régimen estable</string>
+
+    <string name="storage_start">Iniciar prueba</string>
+    <string name="storage_cancel">Cancelar</string>
+    <string name="storage_running_message">Probando %1$s — %2$s · %3$s transcurridos</string>
+
+    <string name="storage_cold_read_label">Intentar vaciar la caché antes de leer</string>
+    <string name="storage_cold_read_hint">Android no ofrece forma de descartar la caché de páginas. Esto escribe datos desechables para forzar su expulsión: es un intento y puede que no cambie el resultado.</string>
+
+    <string name="storage_phase_sequential_write">escritura secuencial</string>
+    <string name="storage_phase_cache_flush">vaciado de caché</string>
+    <string name="storage_phase_sequential_read">lectura secuencial</string>
+    <string name="storage_phase_random_read">lectura aleatoria</string>
+    <string name="storage_phase_random_write">escritura aleatoria</string>
+    <string name="storage_phase_small_file">archivos pequeños</string>
+    <string name="storage_phase_sqlite_insert">inserción en SQLite</string>
+
+    <string name="storage_failure_not_enough_space">Espacio libre insuficiente</string>
+    <string name="storage_failure_target_unavailable">El almacenamiento de destino no está disponible</string>
+    <string name="storage_failure_io_error">Error de almacenamiento durante la prueba</string>
+    <string name="storage_failure_database_error">Error de base de datos durante la prueba</string>
+    <string name="storage_failure_unknown">La prueba no pudo completarse</string>
+    <string name="storage_failure_space_detail">Se necesitan %1$s libres y solo hay %2$s.</string>
+
+    <string name="storage_cancelled_title">Prueba cancelada</string>
+    <string name="storage_cancelled_desc">No se conservó nada. Puedes volver a empezar cuando quieras.</string>
+
+    <string name="storage_result_eyebrow">RESULTADO</string>
+    <string name="storage_result_title">Rendimiento medido</string>
+    <string name="storage_result_write_title">Escritura secuencial</string>
+    <string name="storage_result_read_title">Lectura secuencial</string>
+    <string name="storage_result_random_title">E/S aleatoria</string>
+    <string name="storage_result_small_file_title">Archivos pequeños</string>
+    <string name="storage_result_sqlite_title">Inserción en SQLite</string>
+
+    <string name="storage_rating_poor">Bajo</string>
+    <string name="storage_rating_fair">Aceptable</string>
+    <string name="storage_rating_good">Bueno</string>
+    <string name="storage_rating_excellent">Excelente</string>
+
+    <string name="storage_label_write_average">Media</string>
+    <string name="storage_label_write_buffered">Con búfer (sin volcado)</string>
+    <string name="storage_label_write_steady_state">Régimen estable (antes del volcado)</string>
+    <string name="storage_label_read_first_pass">Primera pasada</string>
+    <string name="storage_label_read_repeat">Segunda pasada</string>
+    <string name="storage_label_random_read">Lectura 4K</string>
+    <string name="storage_label_random_write">Escritura 4K</string>
+    <string name="storage_label_small_file">Crear + fdatasync</string>
+    <string name="storage_label_sqlite_insert">Inserción</string>
+    <string name="storage_caption_latency">p50 %1$s · p95 %2$s · p99 %3$s</string>
+    <string name="storage_chart_description">Rendimiento de escritura a lo largo del tiempo: máximo %1$s, final %2$s.</string>
+    <string name="storage_random_variance_note">Las cifras de 4K varían bastante entre ejecuciones en el mismo dispositivo: trátalas como un rango, no como un valor exacto.</string>
+
+    <string name="storage_read_caveat">Android no ofrece forma de descartar la caché de páginas, así que las lecturas pueden servirse desde memoria y parecer más rápidas de lo que es el hardware.</string>
+    <string name="storage_read_caveat_cold">Se intentó vaciar la caché antes de esta lectura, pero es un intento y puede que no haya surtido efecto.</string>
+    <string name="storage_rate_operations">%1$s ops/s</string>
+    <string name="storage_rate_files">%1$s archivos/s</string>
+    <string name="storage_rate_rows">%1$s filas/s</string>
+    <string name="storage_total_elapsed">Tiempo total %1$s</string>
+    <string name="storage_device_line">%1$s · API %2$d · %3$s</string>
+
+    <string name="storage_history_eyebrow">HISTORIAL</string>
+    <string name="storage_history_title">Pruebas anteriores</string>
+    <string name="storage_history_desc">Las últimas 50 pruebas de este dispositivo, la más reciente primero.</string>
+    <string name="storage_history_empty_title">Aún no hay pruebas</string>
+    <string name="storage_history_empty_desc">Las pruebas terminadas se guardan aquí para que compares resultados con el tiempo.</string>
+    <string name="storage_history_clear">Borrar historial</string>
+    <string name="storage_history_clear_confirm_title">¿Borrar todo el historial?</string>
+    <string name="storage_history_clear_confirm_message">Se eliminarán todas las pruebas guardadas. Esta acción no se puede deshacer.</string>
+    <string name="storage_history_clear_confirm_action">Borrar</string>
+    <string name="storage_history_custom_workload">Personalizada</string>
+    <string name="storage_history_entry_title">%1$s · %2$s · %3$s</string>
+    <string name="storage_history_entry_throughput">Escritura %1$s · Lectura %2$s</string>
+    <string name="storage_history_entry_details">%1$s / %2$s IOPS · %3$s archivos/s</string>
+    <string name="storage_history_entry_details_with_sqlite">%1$s / %2$s IOPS · %3$s archivos/s · %4$s filas/s</string>
+
+    <string name="storage_unit_bytes">%1$s B</string>
+    <string name="storage_unit_kilobytes">%1$s KB</string>
+    <string name="storage_unit_megabytes">%1$s MB</string>
+    <string name="storage_unit_gigabytes">%1$s GB</string>
+    <string name="storage_unit_bytes_per_second">%1$s B/s</string>
+    <string name="storage_unit_kilobytes_per_second">%1$s KB/s</string>
+    <string name="storage_unit_megabytes_per_second">%1$s MB/s</string>
+    <string name="storage_unit_gigabytes_per_second">%1$s GB/s</string>
+    <string name="storage_unit_microseconds">%1$s µs</string>
+    <string name="storage_unit_milliseconds">%1$s ms</string>
+    <string name="storage_unit_seconds">%1$s s</string>
+    <string name="storage_duration_minutes_seconds">%1$d:%2$02d</string>
+    <string name="storage_duration_hours_minutes_seconds">%1$d:%2$02d:%3$02d</string>
+</resources>

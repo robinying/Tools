@@ -23,6 +23,9 @@ sealed interface AppRoute {
     @Serializable
     data object FaceCompare : AppRoute
 
+    @Serializable
+    data object StorageBench : AppRoute
+
     // Camera feature routes
     @Serializable
     data object CameraMain : AppRoute
