@@ -227,17 +227,22 @@ private fun DuplicateCard(group: DuplicateGroup) {
         )
         group.files.forEach { file ->
             Spacer(Modifier.height(Dimension.xs))
-            Row(modifier = Modifier.fillMaxWidth()) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+            ) {
                 Text(
                     text = file.displayName,
                     style = MaterialTheme.typography.bodyMedium,
+                    maxLines = 1,
+                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
                     modifier = Modifier.weight(1f)
                 )
-                StudioActionButton(
-                    label = stringResource(R.string.cleanup_open),
-                    onClick = { openFile(context, file) },
-                    style = StudioActionStyle.SECONDARY
-                )
+                androidx.compose.material3.TextButton(
+                    onClick = { openFile(context, file) }
+                ) {
+                    Text(stringResource(R.string.cleanup_open))
+                }
             }
         }
     }

@@ -763,6 +763,12 @@ private fun ShareEntryWrapper(
             },
             onAudioTrim = { initialUri ->
                 navController.navigate(AppRoute.AudioTrim(initialUri))
+            },
+            onFaceBlur = { initialUri ->
+                navController.navigate(AppRoute.FaceBlur(initialUri))
+            },
+            onVideoCustomCompress = { initialUri ->
+                navController.navigate(AppRoute.VideoCustomCompress(initialUri))
             }
         )
     }

@@ -46,7 +46,9 @@ fun ShareEntryScreen(
     onImageTool: (toolKey: String, initialUri: String?) -> Unit,
     onQr: (initialText: String?, initialUri: String?) -> Unit,
     onOcr: (initialUri: String?) -> Unit,
-    onAudioTrim: (initialUri: String?) -> Unit
+    onAudioTrim: (initialUri: String?) -> Unit,
+    onFaceBlur: (initialUri: String?) -> Unit,
+    onVideoCustomCompress: (initialUri: String?) -> Unit
 ) {
     val kind = when {
         mimeType?.startsWith("image/") == true -> SharedKind.IMAGE
@@ -102,6 +104,10 @@ fun ShareEntryScreen(
                                     onOcr(uri)
                                 is AppRoute.AudioTrim ->
                                     onAudioTrim(uri)
+                                is AppRoute.FaceBlur ->
+                                    onFaceBlur(uri)
+                                is AppRoute.VideoCustomCompress ->
+                                    onVideoCustomCompress(uri)
                                 else -> Unit
                             }
                         }

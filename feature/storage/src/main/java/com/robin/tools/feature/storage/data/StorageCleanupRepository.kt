@@ -46,12 +46,15 @@ class StorageCleanupRepository(private val context: Context) {
         onProgress: (String) -> Unit = {}
     ): CleanupReport = withContext(Dispatchers.IO) {
         onProgress("large")
-        val allMedia = queryMedia(largeFileThresholdBytes)
-        val largeFiles = allMedia.sortedByDescending { it.sizeBytes }
+        // Query once with the smallest useful size so duplicate candidates below
+        // the "large file" threshold are still considered.
+        val allMedia = queryMedia(MIN_HASH_SIZE_BYTES)
+        val largeFiles = allMedia
+            .filter { it.sizeBytes >= largeFileThresholdBytes }
+            .sortedByDescending { it.sizeBytes }
 
         onProgress("duplicates")
         val candidates = allMedia
-            .filter { it.sizeBytes >= MIN_HASH_SIZE_BYTES }
             .groupBy { it.sizeBytes }
             .filterValues { it.size > 1 }
             .values
