@@ -48,7 +48,14 @@ fun ShareEntryScreen(
     onOcr: (initialUri: String?) -> Unit,
     onAudioTrim: (initialUri: String?) -> Unit,
     onFaceBlur: (initialUri: String?) -> Unit,
-    onVideoCustomCompress: (initialUri: String?) -> Unit
+    onFaceIdPhoto: (initialUri: String?) -> Unit,
+    onDocumentScanner: (initialUri: String?) -> Unit,
+    onVideoCustomCompress: (initialUri: String?) -> Unit,
+    onAudioConcat: (initialUri: String?) -> Unit,
+    onVideoBgm: (initialVideoUri: String?) -> Unit,
+    onVideoPip: (initialMainUri: String?) -> Unit,
+    onVideoSpeedCustom: (initialUri: String?) -> Unit,
+    onFrameExtract: (initialUri: String?) -> Unit
 ) {
     val kind = when {
         mimeType?.startsWith("image/") == true -> SharedKind.IMAGE
@@ -106,8 +113,22 @@ fun ShareEntryScreen(
                                     onAudioTrim(uri)
                                 is AppRoute.FaceBlur ->
                                     onFaceBlur(uri)
+                                is AppRoute.FaceIdPhoto ->
+                                    onFaceIdPhoto(uri)
+                                is AppRoute.DocumentScanner ->
+                                    onDocumentScanner(uri)
                                 is AppRoute.VideoCustomCompress ->
                                     onVideoCustomCompress(uri)
+                                is AppRoute.AudioConcat ->
+                                    onAudioConcat(uri)
+                                is AppRoute.VideoBgm ->
+                                    onVideoBgm(uri)
+                                is AppRoute.VideoPip ->
+                                    onVideoPip(uri)
+                                is AppRoute.VideoSpeedCustom ->
+                                    onVideoSpeedCustom(uri)
+                                is AppRoute.FrameExtract ->
+                                    onFrameExtract(uri)
                                 else -> Unit
                             }
                         }
@@ -131,13 +152,14 @@ private fun toolsFor(kind: SharedKind): List<ToolEntry> {
     val ids = when (kind) {
         SharedKind.IMAGE -> listOf(
             "image_convert", "image_resize", "image_rotate", "image_exif",
-            "image_pdf", "image_compress", "face_blur", "qr", "ocr"
+            "image_pdf", "image_compress", "face_blur", "face_id_photo", "document_scanner", "qr", "ocr"
         )
         SharedKind.VIDEO -> listOf(
-            "video_compress", "video_custom", "gif", "transcode", "speed", "reverse",
+            "video_compress", "video_custom", "video_bgm", "video_pip", "video_speed_custom",
+            "frame_extract", "gif", "transcode", "speed", "reverse",
             "crop", "volume", "strip_audio", "extract_audio"
         )
-        SharedKind.AUDIO -> listOf("audio_trim")
+        SharedKind.AUDIO -> listOf("audio_trim", "audio_concat")
         SharedKind.TEXT -> listOf("qr")
         SharedKind.OTHER -> emptyList()
     }

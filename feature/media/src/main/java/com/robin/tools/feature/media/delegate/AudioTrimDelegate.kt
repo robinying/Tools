@@ -19,7 +19,8 @@ import kotlin.coroutines.resume
  */
 class AudioTrimDelegate(
     private val startMs: Long = 0L,
-    private val endMs: Long = Long.MAX_VALUE
+    private val endMs: Long = Long.MAX_VALUE,
+    private val asRingtone: Boolean = false
 ) : CompressionDelegate {
 
     override suspend fun process(
@@ -67,7 +68,7 @@ class AudioTrimDelegate(
             val returnCode = session.returnCode
             try {
                 if (ReturnCode.isSuccess(returnCode)) {
-                    val galleryUri = FileUtils.saveAudioToGallery(context, outputFile)
+                    val galleryUri = FileUtils.saveAudioToGallery(context, outputFile, asRingtone)
                     if (galleryUri != null) {
                         continuation.resume(Result.success(galleryUri.toString()))
                         outputFile.delete()

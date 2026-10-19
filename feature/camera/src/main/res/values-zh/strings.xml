@@ -112,4 +112,14 @@
     <string name="camera_timer_off">关闭</string>
     <string name="camera_timer_3">3 秒</string>
     <string name="camera_timer_10">10 秒</string>
+
+    <string name="camera_burst_off">单张</string>
+    <string name="camera_burst_3">3 连拍</string>
+    <string name="camera_burst_5">5 连拍</string>
+    <string name="camera_burst_saved">已保存 %1$d/%2$d 张</string>
+
+    <string name="edit_subtitle_style_classic">经典</string>
+    <string name="edit_subtitle_style_yellow">黄色</string>
+    <string name="edit_subtitle_style_minimal">极简</string>
+    <string name="edit_subtitle_style_top">顶部</string>
 </resources>

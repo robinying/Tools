@@ -9,7 +9,7 @@ class CompressionStateTest {
     @Test
     fun `CompressionType has all expected values`() {
         val types = CompressionType.values()
-        assertEquals(13, types.size)
+        assertEquals(17, types.size)
         assertEquals(CompressionType.VIDEO, types[0])
         assertEquals(CompressionType.IMAGE, types[1])
         assertEquals(CompressionType.GIF, types[2])
@@ -18,6 +18,10 @@ class CompressionStateTest {
         assertTrue(types.contains(CompressionType.VOLUME_FADE))
         assertTrue(types.contains(CompressionType.AUDIO_TRIM))
         assertTrue(types.contains(CompressionType.VIDEO_CUSTOM))
+        assertTrue(types.contains(CompressionType.AUDIO_CONCAT))
+        assertTrue(types.contains(CompressionType.VIDEO_BGM))
+        assertTrue(types.contains(CompressionType.VIDEO_PIP))
+        assertTrue(types.contains(CompressionType.VIDEO_SPEED_CUSTOM))
     }
 
     @Test

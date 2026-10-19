@@ -49,4 +49,30 @@
     <string name="face_blur_empty_title">Choose a photo</string>
     <string name="face_blur_empty_desc">Every detected face will be obscured.</string>
     <string name="face_blur_share">Share</string>
+
+    <string name="id_photo_title">ID Photo</string>
+    <string name="id_photo_desc">Crop to a standard ID size and replace the background with a solid color.</string>
+    <string name="id_photo_size">SIZE</string>
+    <string name="id_photo_one_inch">1 inch</string>
+    <string name="id_photo_two_inch">2 inch</string>
+    <string name="id_photo_background">BACKGROUND</string>
+    <string name="id_photo_white">White</string>
+    <string name="id_photo_blue">Blue</string>
+    <string name="id_photo_red">Red</string>
+    <string name="id_photo_action">Create ID photo</string>
+    <string name="id_photo_saved">Saved: %1$s</string>
+    <string name="id_photo_failed">Failed: %1$s</string>
+    <string name="id_photo_empty_title">Choose a portrait</string>
+    <string name="id_photo_empty_desc">A single face works best for ID photos.</string>
+    <string name="id_photo_share">Share</string>
+
+    <string name="face_group_title">Group Similar Faces</string>
+    <string name="face_group_desc">Pick several photos and group them by the largest detected face.</string>
+    <string name="face_group_select">Select photos</string>
+    <string name="face_group_progress">Processed %1$d photos…</string>
+    <string name="face_group_result">%1$d groups · %2$d photos skipped</string>
+    <string name="face_group_group">GROUP</string>
+    <string name="face_group_group_title">Group %1$d · %2$d photos</string>
+    <string name="face_group_empty_title">No groups yet</string>
+    <string name="face_group_empty_desc">Choose photos that contain faces to start grouping.</string>
 </resources>

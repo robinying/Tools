@@ -129,4 +129,22 @@
     <string name="tool_video_custom_title">Compressão de vídeo personalizada</string>
     <string name="tool_video_custom_desc">Escolha resolução e bitrate manualmente</string>
     <string name="app_back">Voltar</string>
+    <string name="tool_audio_concat_title">Unir áudio</string>
+    <string name="tool_audio_concat_desc">Junte vários arquivos de áudio em ordem</string>
+    <string name="tool_audio_recorder_title">Gravador de áudio</string>
+    <string name="tool_audio_recorder_desc">Grave áudio com forma de onda ao vivo</string>
+    <string name="tool_video_bgm_title">Música de fundo</string>
+    <string name="tool_video_bgm_desc">Substitua ou misture a trilha do vídeo</string>
+    <string name="tool_video_pip_title">Picture-in-picture</string>
+    <string name="tool_video_pip_desc">Sobreponha um segundo vídeo em um canto</string>
+    <string name="tool_video_speed_custom_title">Velocidade personalizada</string>
+    <string name="tool_video_speed_custom_desc">Multiplicadores de câmera lenta e time-lapse</string>
+    <string name="tool_frame_extract_title">Extrair quadros</string>
+    <string name="tool_frame_extract_desc">Salve quadros estáticos igualmente espaçados</string>
+    <string name="tool_document_scanner_title">Digitalizador de documentos</string>
+    <string name="tool_document_scanner_desc">Digitalize papel com detecção de bordas e correção de perspectiva</string>
+    <string name="tool_face_id_photo_title">Foto 3x4</string>
+    <string name="tool_face_id_photo_desc">Tamanhos padrão com substituição de fundo</string>
+    <string name="tool_face_group_title">Agrupar rostos semelhantes</string>
+    <string name="tool_face_group_desc">Agrupe fotos pelo maior rosto detectado</string>
 </resources>

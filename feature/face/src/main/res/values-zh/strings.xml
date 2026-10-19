@@ -49,4 +49,30 @@
     <string name="face_blur_empty_title">选择一张照片</string>
     <string name="face_blur_empty_desc">检测到的每张人脸都会被遮挡。</string>
     <string name="face_blur_share">分享</string>
+
+    <string name="id_photo_title">证件照</string>
+    <string name="id_photo_desc">裁剪为标准证件照尺寸，并替换为纯色背景。</string>
+    <string name="id_photo_size">尺寸</string>
+    <string name="id_photo_one_inch">1 寸</string>
+    <string name="id_photo_two_inch">2 寸</string>
+    <string name="id_photo_background">背景</string>
+    <string name="id_photo_white">白底</string>
+    <string name="id_photo_blue">蓝底</string>
+    <string name="id_photo_red">红底</string>
+    <string name="id_photo_action">生成证件照</string>
+    <string name="id_photo_saved">已保存：%1$s</string>
+    <string name="id_photo_failed">失败：%1$s</string>
+    <string name="id_photo_empty_title">选择一张人像照片</string>
+    <string name="id_photo_empty_desc">证件照建议使用单人正面照片。</string>
+    <string name="id_photo_share">分享</string>
+
+    <string name="face_group_title">相似人脸分组</string>
+    <string name="face_group_desc">选择多张照片，按检测到的最大人脸进行分组。</string>
+    <string name="face_group_select">选择照片</string>
+    <string name="face_group_progress">已处理 %1$d 张照片…</string>
+    <string name="face_group_result">%1$d 组 · 跳过 %2$d 张照片</string>
+    <string name="face_group_group">分组</string>
+    <string name="face_group_group_title">第 %1$d 组 · %2$d 张照片</string>
+    <string name="face_group_empty_title">暂无分组</string>
+    <string name="face_group_empty_desc">选择包含人脸的照片开始分组。</string>
 </resources>

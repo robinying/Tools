@@ -130,4 +130,9 @@
     <string name="storage_export_failed">导出失败</string>
 
     <string name="cleanup_permission_needed">扫描图片和视频需要媒体读取权限。</string>
+
+    <string name="cleanup_delete">删除</string>
+    <string name="cleanup_delete_extras">删除多余副本</string>
+    <string name="cleanup_deleted">已删除</string>
+    <string name="cleanup_delete_failed">无法删除所选文件</string>
 </resources>

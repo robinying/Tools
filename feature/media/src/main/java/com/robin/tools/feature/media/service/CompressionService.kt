@@ -16,7 +16,12 @@ import androidx.core.app.NotificationCompat
 import com.robin.tools.feature.media.R
 import com.robin.tools.feature.media.data.*
 import com.robin.tools.feature.media.delegate.CompressionDelegateFactory
+import com.robin.tools.feature.media.delegate.AudioConcatDelegate
 import com.robin.tools.feature.media.delegate.AudioTrimDelegate
+import com.robin.tools.feature.media.delegate.CustomSpeedDelegate
+import com.robin.tools.feature.media.delegate.PipPosition
+import com.robin.tools.feature.media.delegate.VideoBgmDelegate
+import com.robin.tools.feature.media.delegate.VideoPipDelegate
 import com.robin.tools.feature.media.delegate.ConcatDelegate
 import com.robin.tools.feature.media.delegate.VideoCompressionDelegate
 import kotlinx.coroutines.*
@@ -37,6 +42,10 @@ class CompressionService : Service() {
         const val EXTRA_TRIM_END_MS = "extra_trim_end_ms"
         const val EXTRA_VIDEO_MIN_DIMENSION = "extra_video_min_dimension"
         const val EXTRA_VIDEO_BITRATE_KBPS = "extra_video_bitrate_kbps"
+        const val EXTRA_BGM_MIX = "extra_bgm_mix"
+        const val EXTRA_PIP_POSITION = "extra_pip_position"
+        const val EXTRA_SPEED_FACTOR = "extra_speed_factor"
+        const val EXTRA_AUDIO_RINGTONE = "extra_audio_ringtone"
 
         /**
          * Start processing without going through the system multi-select UI.
@@ -52,6 +61,55 @@ class CompressionService : Service() {
                 putStringArrayListExtra(EXTRA_FILE_PATHS, ArrayList(absolutePaths))
                 putExtra(EXTRA_TYPE, type.name)
                 putExtra(EXTRA_LEVEL, level.name)
+            }
+            androidx.core.content.ContextCompat.startForegroundService(context, intent)
+        }
+
+        fun startAudioConcat(context: Context, uris: List<Uri>) {
+            val intent = Intent(context, CompressionService::class.java).apply {
+                putParcelableArrayListExtra(EXTRA_URIS, ArrayList(uris))
+                putExtra(EXTRA_TYPE, CompressionType.AUDIO_CONCAT.name)
+                putExtra(EXTRA_LEVEL, CompressionLevel.MEDIUM.name)
+            }
+            androidx.core.content.ContextCompat.startForegroundService(context, intent)
+        }
+
+        fun startVideoBgm(
+            context: Context,
+            videoUri: Uri,
+            audioUri: Uri,
+            mixWithOriginal: Boolean
+        ) {
+            val intent = Intent(context, CompressionService::class.java).apply {
+                putParcelableArrayListExtra(EXTRA_URIS, arrayListOf(videoUri, audioUri))
+                putExtra(EXTRA_TYPE, CompressionType.VIDEO_BGM.name)
+                putExtra(EXTRA_LEVEL, CompressionLevel.MEDIUM.name)
+                putExtra(EXTRA_BGM_MIX, mixWithOriginal)
+            }
+            androidx.core.content.ContextCompat.startForegroundService(context, intent)
+        }
+
+        fun startVideoPip(
+            context: Context,
+            videoUri: Uri,
+            overlayUri: Uri,
+            position: String
+        ) {
+            val intent = Intent(context, CompressionService::class.java).apply {
+                putParcelableArrayListExtra(EXTRA_URIS, arrayListOf(videoUri, overlayUri))
+                putExtra(EXTRA_TYPE, CompressionType.VIDEO_PIP.name)
+                putExtra(EXTRA_LEVEL, CompressionLevel.MEDIUM.name)
+                putExtra(EXTRA_PIP_POSITION, position)
+            }
+            androidx.core.content.ContextCompat.startForegroundService(context, intent)
+        }
+
+        fun startCustomSpeed(context: Context, uri: Uri, speedFactor: Double) {
+            val intent = Intent(context, CompressionService::class.java).apply {
+                putParcelableArrayListExtra(EXTRA_URIS, arrayListOf(uri))
+                putExtra(EXTRA_TYPE, CompressionType.VIDEO_SPEED_CUSTOM.name)
+                putExtra(EXTRA_LEVEL, CompressionLevel.MEDIUM.name)
+                putExtra(EXTRA_SPEED_FACTOR, speedFactor)
             }
             androidx.core.content.ContextCompat.startForegroundService(context, intent)
         }
@@ -78,7 +136,8 @@ class CompressionService : Service() {
             context: Context,
             uri: Uri,
             startMs: Long,
-            endMs: Long
+            endMs: Long,
+            asRingtone: Boolean = false
         ) {
             val intent = Intent(context, CompressionService::class.java).apply {
                 putParcelableArrayListExtra(EXTRA_URIS, arrayListOf(uri))
@@ -86,6 +145,7 @@ class CompressionService : Service() {
                 putExtra(EXTRA_LEVEL, CompressionLevel.MEDIUM.name)
                 putExtra(EXTRA_TRIM_START_MS, startMs)
                 putExtra(EXTRA_TRIM_END_MS, endMs)
+                putExtra(EXTRA_AUDIO_RINGTONE, asRingtone)
             }
             androidx.core.content.ContextCompat.startForegroundService(context, intent)
         }
@@ -149,6 +209,12 @@ class CompressionService : Service() {
         val trimEndMs = intent.getLongExtra(EXTRA_TRIM_END_MS, Long.MAX_VALUE)
         val videoMinDimension = intent.getIntExtra(EXTRA_VIDEO_MIN_DIMENSION, 0)
         val videoBitrateKbps = intent.getIntExtra(EXTRA_VIDEO_BITRATE_KBPS, 0)
+        val bgmMix = intent.getBooleanExtra(EXTRA_BGM_MIX, true)
+        val pipPosition = intent.getStringExtra(EXTRA_PIP_POSITION)
+            ?.let { name -> PipPosition.entries.firstOrNull { it.name == name } }
+            ?: PipPosition.TOP_RIGHT
+        val speedFactor = intent.getDoubleExtra(EXTRA_SPEED_FACTOR, 1.0)
+        val audioRingtone = intent.getBooleanExtra(EXTRA_AUDIO_RINGTONE, false)
 
         startCompression(
             uris = uris,
@@ -157,7 +223,11 @@ class CompressionService : Service() {
             trimStartMs = trimStartMs,
             trimEndMs = trimEndMs,
             videoMinDimension = videoMinDimension,
-            videoBitrateKbps = videoBitrateKbps
+            videoBitrateKbps = videoBitrateKbps,
+            bgmMix = bgmMix,
+            pipPosition = pipPosition,
+            speedFactor = speedFactor,
+            audioRingtone = audioRingtone
         )
 
         return START_NOT_STICKY
@@ -228,7 +298,11 @@ class CompressionService : Service() {
         trimStartMs: Long,
         trimEndMs: Long,
         videoMinDimension: Int,
-        videoBitrateKbps: Int
+        videoBitrateKbps: Int,
+        bgmMix: Boolean,
+        pipPosition: PipPosition,
+        speedFactor: Double,
+        audioRingtone: Boolean
     ) {
         isRunning = true
         CompressionManager.startTask(type)
@@ -236,12 +310,15 @@ class CompressionService : Service() {
         serviceScope.launch {
             var successCount = 0
             var failCount = 0
-            val total = if (type == CompressionType.CONCAT) 1 else uris.size
+            val isSingleJob = type == CompressionType.CONCAT ||
+                type == CompressionType.AUDIO_CONCAT ||
+                type == CompressionType.VIDEO_BGM ||
+                type == CompressionType.VIDEO_PIP
+            val total = if (isSingleJob) 1 else uris.size
             var lastOutputUri = ""
             var lastErrorMsg = ""
 
-            // Multi-input concat is a single job over all URIs.
-            if (type == CompressionType.CONCAT) {
+            if (isSingleJob) {
                 val onProgress: (Float, String) -> Unit = { p, msg ->
                     val statusMsg = getString(R.string.processing, 1, 1, msg)
                     updateNotification((p * 100).toInt(), 100, statusMsg)
@@ -250,9 +327,31 @@ class CompressionService : Service() {
                     )
                 }
                 val result = try {
-                    ConcatDelegate().processAll(this@CompressionService, uris, level, onProgress)
+                    when (type) {
+                        CompressionType.CONCAT ->
+                            ConcatDelegate().processAll(this@CompressionService, uris, level, onProgress)
+                        CompressionType.AUDIO_CONCAT ->
+                            AudioConcatDelegate().processAll(this@CompressionService, uris, level, onProgress)
+                        CompressionType.VIDEO_BGM ->
+                            if (uris.size >= 2) {
+                                VideoBgmDelegate(bgmMix).processPair(
+                                    this@CompressionService, uris[0], uris[1], onProgress
+                                )
+                            } else {
+                                Result.failure(Exception("Select a video and an audio file"))
+                            }
+                        CompressionType.VIDEO_PIP ->
+                            if (uris.size >= 2) {
+                                VideoPipDelegate(pipPosition).processPair(
+                                    this@CompressionService, uris[0], uris[1], onProgress
+                                )
+                            } else {
+                                Result.failure(Exception("Select a video and an overlay video"))
+                            }
+                        else -> Result.failure(Exception("Unsupported job"))
+                    }
                 } catch (e: Exception) {
-                    Log.e(TAG, "Concat failed", e)
+                    Log.e(TAG, "Multi-input job failed", e)
                     Result.failure(e)
                 }
                 if (result.isSuccess) {
@@ -286,9 +385,11 @@ class CompressionService : Service() {
 
                     val delegate = when {
                         type == CompressionType.AUDIO_TRIM ->
-                            AudioTrimDelegate(trimStartMs, trimEndMs)
+                            AudioTrimDelegate(trimStartMs, trimEndMs, audioRingtone)
                         type == CompressionType.VIDEO_CUSTOM && videoMinDimension > 0 ->
                             VideoCompressionDelegate(videoMinDimension, videoBitrateKbps)
+                        type == CompressionType.VIDEO_SPEED_CUSTOM ->
+                            CustomSpeedDelegate(speedFactor)
                         else -> CompressionDelegateFactory.create(type)
                     }
                     val result = try {

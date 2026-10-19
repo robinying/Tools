@@ -40,6 +40,7 @@ import com.robin.tools.core.ui.TextOptionChip
 import com.robin.tools.core.ui.ToolsTopAppBar
 import com.robin.tools.feature.camera.R
 import com.robin.tools.feature.camera.editor.SubtitleCue
+import com.robin.tools.feature.camera.editor.SubtitleStyle
 import com.robin.tools.feature.camera.filter.FilterType
 import com.robin.tools.feature.camera.filter.stringRes
 import com.robin.tools.feature.camera.storage.CameraFileManager
@@ -338,6 +339,27 @@ fun VideoEditScreen(
                         style = MaterialTheme.typography.labelMedium,
                         modifier = Modifier.padding(horizontal = 16.dp)
                     )
+                    androidx.compose.foundation.layout.Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        SubtitleStyle.entries.forEach { style ->
+                            com.robin.tools.core.ui.TextOptionChip(
+                                selected = uiState.subtitleStyle == style,
+                                onClick = { viewModel.setSubtitleStyle(style) },
+                                label = stringResource(
+                                    when (style) {
+                                        SubtitleStyle.CLASSIC -> R.string.edit_subtitle_style_classic
+                                        SubtitleStyle.YELLOW -> R.string.edit_subtitle_style_yellow
+                                        SubtitleStyle.MINIMAL -> R.string.edit_subtitle_style_minimal
+                                        SubtitleStyle.TOP -> R.string.edit_subtitle_style_top
+                                    }
+                                )
+                            )
+                        }
+                    }
                 }
 
                 Spacer(Modifier.height(16.dp))

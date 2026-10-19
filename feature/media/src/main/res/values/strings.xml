@@ -138,4 +138,77 @@
     <string name="video_custom_action">Compress with custom settings</string>
     <string name="video_custom_saved">Video compressed and saved</string>
     <string name="video_custom_failed">Compression failed: %1$s</string>
+
+    <string name="audio_concat">Audio Merge</string>
+    <string name="audio_concat_desc">Join two or more audio files in the selected order.</string>
+    <string name="audio_concat_select">Select audio files</string>
+    <string name="audio_concat_no_files">Choose at least two audio files</string>
+    <string name="audio_concat_selected">%1$d audio files selected</string>
+    <string name="audio_concat_action">Merge audio</string>
+    <string name="audio_concat_saved">Audio merged and saved</string>
+    <string name="audio_concat_failed">Merge failed: %1$s</string>
+
+    <string name="video_bgm">Background Music</string>
+    <string name="video_bgm_desc">Replace the video audio with a music file, or mix both tracks.</string>
+    <string name="video_bgm_select_video">Select video</string>
+    <string name="video_bgm_select_audio">Select music</string>
+    <string name="video_bgm_mode">MODE</string>
+    <string name="video_bgm_mix">Mix with original</string>
+    <string name="video_bgm_replace">Replace audio</string>
+    <string name="video_bgm_action">Apply music</string>
+    <string name="video_bgm_saved">Video audio updated</string>
+    <string name="video_bgm_failed">Failed: %1$s</string>
+
+    <string name="video_pip">Picture in Picture</string>
+    <string name="video_pip_desc">Overlay a second video in a corner of the primary video.</string>
+    <string name="video_pip_select_main">Select main video</string>
+    <string name="video_pip_select_overlay">Select overlay video</string>
+    <string name="video_pip_position">POSITION</string>
+    <string name="video_pip_tl">Top left</string>
+    <string name="video_pip_tr">Top right</string>
+    <string name="video_pip_bl">Bottom left</string>
+    <string name="video_pip_br">Bottom right</string>
+    <string name="video_pip_action">Composite videos</string>
+    <string name="video_pip_saved">Picture-in-picture video saved</string>
+    <string name="video_pip_failed">Failed: %1$s</string>
+
+    <string name="video_speed_custom">Custom Speed</string>
+    <string name="video_speed_custom_desc">Slow motion and time-lapse with a custom multiplier.</string>
+    <string name="video_speed_custom_speed">SPEED</string>
+    <string name="video_speed_custom_action">Apply speed</string>
+    <string name="video_speed_custom_saved">Speed-changed video saved</string>
+    <string name="video_speed_custom_failed">Failed: %1$s</string>
+
+    <string name="frame_extract">Extract Frames</string>
+    <string name="frame_extract_desc">Save evenly spaced still frames from a video.</string>
+    <string name="frame_extract_count">NUMBER OF FRAMES</string>
+    <string name="frame_extract_action">Extract frames</string>
+    <string name="frame_extract_saved">%1$d frames saved</string>
+    <string name="frame_extract_failed">Extraction failed: %1$s</string>
+
+    <string name="audio_recorder">Audio Recorder</string>
+    <string name="audio_recorder_desc">Record audio with a live waveform, then save it to Music/Tools.</string>
+    <string name="audio_recorder_start">Start recording</string>
+    <string name="audio_recorder_stop">Stop and save</string>
+    <string name="audio_recorder_saved">Recording saved</string>
+    <string name="audio_recorder_failed">Recording failed: %1$s</string>
+    <string name="audio_recorder_permission">Microphone permission is required to record.</string>
+    <string name="audio_recorder_hint">Tap start, speak, then stop to save.</string>
+    <string name="audio_recorder_elapsed">%1$s</string>
+
+    <string name="audio_trim_destination">DESTINATION</string>
+    <string name="audio_trim_music">Music</string>
+    <string name="audio_trim_ringtone">Ringtone</string>
+
+    <string name="doc_scan_title">Document Scanner</string>
+    <string name="doc_scan_desc">Detect the page edges and flatten the perspective. Works offline with OpenCV.</string>
+    <string name="doc_scan_select">Select image</string>
+    <string name="doc_scan_action">Detect and flatten page</string>
+    <string name="doc_scan_result">RESULT</string>
+    <string name="doc_scan_detected">Page detected</string>
+    <string name="doc_scan_full_image">No page contour found — using the full image</string>
+    <string name="doc_scan_saved">Saved: %1$s</string>
+    <string name="doc_scan_failed">Scan failed: %1$s</string>
+    <string name="doc_scan_save">Save scan</string>
+    <string name="toolkit_share_saved">Share</string>
 </resources>

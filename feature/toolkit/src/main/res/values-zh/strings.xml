@@ -71,4 +71,5 @@
     <string name="ocr_recognize">识别文字</string>
     <string name="ocr_no_text">未识别到文字</string>
     <string name="ocr_result_title">识别结果</string>
+
 </resources>

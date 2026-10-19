@@ -41,6 +41,14 @@ data class SubtitleCue(
     val text: String
 )
 
+/** Built-in subtitle looks burned into the exported video. */
+enum class SubtitleStyle {
+    CLASSIC,
+    YELLOW,
+    MINIMAL,
+    TOP
+}
+
 /**
  * Re-encodes a video while applying a GPU filter and optional watermark/sticker overlays.
  * Audio is remuxed from the source without re-encoding.
@@ -54,7 +62,8 @@ class VideoEffectsExporter {
         filterType: FilterType,
         watermarkText: String = "",
         stickers: List<Bitmap> = emptyList(),
-        subtitles: List<SubtitleCue> = emptyList()
+        subtitles: List<SubtitleCue> = emptyList(),
+        subtitleStyle: SubtitleStyle = SubtitleStyle.CLASSIC
     ): Boolean {
         val meta = readMeta(inputPath) ?: return false
         val width = alignEven(meta.width.coerceAtLeast(16))
@@ -143,7 +152,7 @@ class VideoEffectsExporter {
                     overlayTextureId = 0
                 }
                 val overlayBitmap = buildOverlayBitmap(
-                    width, height, watermarkText, stickers, activeSub
+                    width, height, watermarkText, stickers, activeSub, subtitleStyle
                 )
                 if (overlayBitmap != null) {
                     overlayTextureId = uploadBitmapTexture(overlayBitmap)
@@ -492,7 +501,8 @@ class VideoEffectsExporter {
         height: Int,
         watermarkText: String,
         stickers: List<Bitmap>,
-        subtitleText: String = ""
+        subtitleText: String = "",
+        subtitleStyle: SubtitleStyle = SubtitleStyle.CLASSIC
     ): Bitmap? {
         if (watermarkText.isBlank() && stickers.isEmpty() && subtitleText.isBlank()) return null
         val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
@@ -514,30 +524,40 @@ class VideoEffectsExporter {
         }
 
         if (subtitleText.isNotBlank()) {
+            val textColor = when (subtitleStyle) {
+                SubtitleStyle.YELLOW -> Color.rgb(255, 214, 64)
+                else -> Color.WHITE
+            }
+            val sizeFactor = if (subtitleStyle == SubtitleStyle.YELLOW) 0.058f else 0.05f
             val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-                color = Color.WHITE
-                textSize = (height * 0.05f).coerceIn(24f, 64f)
+                color = textColor
+                textSize = (height * sizeFactor).coerceIn(24f, 72f)
                 typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
                 textAlign = Paint.Align.CENTER
                 setShadowLayer(6f, 0f, 2f, Color.BLACK)
-            }
-            val bg = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-                color = Color.argb(140, 0, 0, 0)
             }
             val maxW = width * 0.85f
             val lines = wrapLine(subtitleText, paint, maxW)
             val lineH = paint.fontSpacing
             val blockH = lineH * lines.size + 24f
-            val top = height * 0.78f
-            canvas.drawRoundRect(
-                width * 0.05f,
-                top - 12f,
-                width * 0.95f,
-                top + blockH,
-                16f,
-                16f,
-                bg
-            )
+            val top = when (subtitleStyle) {
+                SubtitleStyle.TOP -> height * 0.12f
+                else -> height * 0.78f
+            }
+            if (subtitleStyle != SubtitleStyle.MINIMAL) {
+                val bg = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                    color = Color.argb(150, 0, 0, 0)
+                }
+                canvas.drawRoundRect(
+                    width * 0.05f,
+                    top - 12f,
+                    width * 0.95f,
+                    top + blockH,
+                    16f,
+                    16f,
+                    bg
+                )
+            }
             var y = top - paint.ascent()
             val cx = width / 2f
             for (line in lines) {

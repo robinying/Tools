@@ -129,4 +129,22 @@
     <string name="tool_video_custom_title">Compression vidéo personnalisée</string>
     <string name="tool_video_custom_desc">Choisir manuellement la résolution et le débit</string>
     <string name="app_back">Retour</string>
+    <string name="tool_audio_concat_title">Fusion audio</string>
+    <string name="tool_audio_concat_desc">Joindre plusieurs fichiers audio dans l\'ordre</string>
+    <string name="tool_audio_recorder_title">Enregistreur audio</string>
+    <string name="tool_audio_recorder_desc">Enregistrer de l\'audio avec une forme d\'onde</string>
+    <string name="tool_video_bgm_title">Musique de fond</string>
+    <string name="tool_video_bgm_desc">Remplacer ou mixer la bande-son de la vidéo</string>
+    <string name="tool_video_pip_title">Incrustation vidéo</string>
+    <string name="tool_video_pip_desc">Superposer une seconde vidéo dans un coin</string>
+    <string name="tool_video_speed_custom_title">Vitesse personnalisée</string>
+    <string name="tool_video_speed_custom_desc">Multiplicateurs ralenti et accéléré</string>
+    <string name="tool_frame_extract_title">Extraire des images</string>
+    <string name="tool_frame_extract_desc">Enregistrer des images fixes espacées régulièrement</string>
+    <string name="tool_document_scanner_title">Scanner de documents</string>
+    <string name="tool_document_scanner_desc">Scanner du papier avec détection des bords et correction de perspective</string>
+    <string name="tool_face_id_photo_title">Photo d\'identité</string>
+    <string name="tool_face_id_photo_desc">Formats standard avec remplacement du fond</string>
+    <string name="tool_face_group_title">Regrouper les visages similaires</string>
+    <string name="tool_face_group_desc">Regrouper les photos par le plus grand visage</string>
 </resources>

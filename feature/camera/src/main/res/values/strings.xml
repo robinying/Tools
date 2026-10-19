@@ -119,4 +119,14 @@
     <string name="camera_timer_off">Off</string>
     <string name="camera_timer_3">3s</string>
     <string name="camera_timer_10">10s</string>
+
+    <string name="camera_burst_off">Single</string>
+    <string name="camera_burst_3">3 shots</string>
+    <string name="camera_burst_5">5 shots</string>
+    <string name="camera_burst_saved">%1$d/%2$d photos saved</string>
+
+    <string name="edit_subtitle_style_classic">Classic</string>
+    <string name="edit_subtitle_style_yellow">Yellow</string>
+    <string name="edit_subtitle_style_minimal">Minimal</string>
+    <string name="edit_subtitle_style_top">Top</string>
 </resources>

@@ -129,4 +129,22 @@
     <string name="tool_video_custom_title">Compressione video personalizzata</string>
     <string name="tool_video_custom_desc">Scegli manualmente risoluzione e bitrate</string>
     <string name="app_back">Indietro</string>
+    <string name="tool_audio_concat_title">Unisci audio</string>
+    <string name="tool_audio_concat_desc">Unisci più file audio in ordine</string>
+    <string name="tool_audio_recorder_title">Registratore audio</string>
+    <string name="tool_audio_recorder_desc">Registra audio con forma d\'onda dal vivo</string>
+    <string name="tool_video_bgm_title">Musica di sottofondo</string>
+    <string name="tool_video_bgm_desc">Sostituisci o mixa la traccia audio del video</string>
+    <string name="tool_video_pip_title">Picture in picture</string>
+    <string name="tool_video_pip_desc">Sovrapponi un secondo video in un angolo</string>
+    <string name="tool_video_speed_custom_title">Velocità personalizzata</string>
+    <string name="tool_video_speed_custom_desc">Moltiplicatori slow motion e time-lapse</string>
+    <string name="tool_frame_extract_title">Estrai fotogrammi</string>
+    <string name="tool_frame_extract_desc">Salva fotogrammi fissi distribuiti uniformemente</string>
+    <string name="tool_document_scanner_title">Scanner documenti</string>
+    <string name="tool_document_scanner_desc">Scansiona carta con rilevamento bordi e correzione prospettica</string>
+    <string name="tool_face_id_photo_title">Foto tessera</string>
+    <string name="tool_face_id_photo_desc">Dimensioni standard con sostituzione sfondo</string>
+    <string name="tool_face_group_title">Raggruppa volti simili</string>
+    <string name="tool_face_group_desc">Raggruppa le foto per il volto rilevato più grande</string>
 </resources>

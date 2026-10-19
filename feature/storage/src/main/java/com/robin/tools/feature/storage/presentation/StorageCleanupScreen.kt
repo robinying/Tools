@@ -1,11 +1,15 @@
 package com.robin.tools.feature.storage.presentation
 
 import android.Manifest
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.IntentSender
 import android.os.Build
+import android.provider.MediaStore
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -26,11 +30,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.core.content.ContextCompat
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.robin.tools.core.ui.Dimension
@@ -64,6 +72,49 @@ fun StorageCleanupScreen(
     val context = LocalContext.current
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val report = state.report
+    val scope = rememberCoroutineScope()
+
+    val deleteLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.StartIntentSenderForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            android.widget.Toast.makeText(
+                context,
+                context.getString(R.string.cleanup_deleted),
+                android.widget.Toast.LENGTH_SHORT
+            ).show()
+            viewModel.scan()
+        }
+    }
+
+    fun deleteUris(uris: List<android.net.Uri>) {
+        if (uris.isEmpty()) return
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            val request = MediaStore.createDeleteRequest(context.contentResolver, uris)
+            deleteLauncher.launch(
+                IntentSenderRequest.Builder(request.intentSender).build()
+            )
+        } else {
+            scope.launch {
+                val deleted = withContext(Dispatchers.IO) {
+                    uris.count { uri ->
+                        runCatching { context.contentResolver.delete(uri, null, null) }
+                            .getOrDefault(0) > 0
+                    }
+                }
+                android.widget.Toast.makeText(
+                    context,
+                    if (deleted > 0) {
+                        context.getString(R.string.cleanup_deleted)
+                    } else {
+                        context.getString(R.string.cleanup_delete_failed)
+                    },
+                    android.widget.Toast.LENGTH_SHORT
+                ).show()
+                if (deleted > 0) viewModel.scan()
+            }
+        }
+    }
 
     val requiredPermissions = remember {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -152,7 +203,12 @@ fun StorageCleanupScreen(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 } else {
-                    report.largeFiles.forEach { file -> FileCard(file) }
+                    report.largeFiles.forEach { file ->
+                        FileCard(
+                            file = file,
+                            onDelete = { deleteUris(listOf(file.uri)) }
+                        )
+                    }
                 }
 
                 StudioSectionHeader(title = stringResource(R.string.cleanup_duplicate_title))
@@ -163,7 +219,14 @@ fun StorageCleanupScreen(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 } else {
-                    report.duplicateGroups.forEach { group -> DuplicateCard(group) }
+                    report.duplicateGroups.forEach { group ->
+                        DuplicateCard(
+                            group = group,
+                            onDeleteExtras = {
+                                deleteUris(group.files.drop(1).map { it.uri })
+                            }
+                        )
+                    }
                 }
             }
             Spacer(Modifier.height(Dimension.lg))
@@ -188,7 +251,7 @@ private fun Summary(largeCount: Int, groupCount: Int, duplicateBytes: Long) {
 }
 
 @Composable
-private fun FileCard(file: LargeMediaFile) {
+private fun FileCard(file: LargeMediaFile, onDelete: () -> Unit) {
     val context = LocalContext.current
     StudioSurface(tone = StudioSurfaceTone.STANDARD) {
         Row(modifier = Modifier.fillMaxWidth()) {
@@ -209,11 +272,17 @@ private fun FileCard(file: LargeMediaFile) {
             onClick = { openFile(context, file) },
             style = StudioActionStyle.SECONDARY
         )
+        Spacer(Modifier.height(Dimension.sm))
+        StudioActionButton(
+            label = stringResource(R.string.cleanup_delete),
+            onClick = onDelete,
+            style = StudioActionStyle.DESTRUCTIVE
+        )
     }
 }
 
 @Composable
-private fun DuplicateCard(group: DuplicateGroup) {
+private fun DuplicateCard(group: DuplicateGroup, onDeleteExtras: () -> Unit) {
     val context = LocalContext.current
     StudioSurface(tone = StudioSurfaceTone.STANDARD) {
         Text(
@@ -245,6 +314,12 @@ private fun DuplicateCard(group: DuplicateGroup) {
                 }
             }
         }
+        Spacer(Modifier.height(Dimension.sm))
+        StudioActionButton(
+            label = stringResource(R.string.cleanup_delete_extras),
+            onClick = onDeleteExtras,
+            style = StudioActionStyle.DESTRUCTIVE
+        )
     }
 }
 

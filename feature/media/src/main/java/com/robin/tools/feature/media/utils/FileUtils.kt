@@ -127,17 +127,26 @@ object FileUtils {
         return saveToGallery(context, file, values, collection)
     }
 
-    fun saveAudioToGallery(context: Context, file: File): Uri? {
+    fun saveAudioToGallery(
+        context: Context,
+        file: File,
+        asRingtone: Boolean = false
+    ): Uri? {
         val mime = when (file.extension.lowercase()) {
             "m4a", "aac" -> "audio/mp4"
             "mp3" -> "audio/mpeg"
             else -> "audio/*"
         }
+        val relativePath = if (asRingtone) {
+            Environment.DIRECTORY_RINGTONES
+        } else {
+            Environment.DIRECTORY_MUSIC + "/Tools"
+        }
         val values = ContentValues().apply {
             put(MediaStore.Audio.Media.DISPLAY_NAME, file.name)
             put(MediaStore.Audio.Media.MIME_TYPE, mime)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                put(MediaStore.Audio.Media.RELATIVE_PATH, Environment.DIRECTORY_MUSIC + "/Tools")
+                put(MediaStore.Audio.Media.RELATIVE_PATH, relativePath)
                 put(MediaStore.Audio.Media.IS_PENDING, 1)
             }
         }

@@ -22,7 +22,13 @@ Compression, conversion, and FFmpeg-powered video utilities. Long work runs in a
 | **Merge Videos** | Join multiple clips in order (concat; re-encode fallback) |
 | **Crop Aspect** | Center crop to **1:1**, **9:16**, or **16:9** |
 | **Volume and Fade** | Volume 50% / 100% / 150% plus fade in/out |
-| **Audio Trim** | Cut an audio file to a precise start/end range |
+| **Audio Trim** | Cut an audio file to a precise range; save to Music or Ringtones |
+| **Audio Merge** | Join multiple audio files in order |
+| **Audio Recorder** | Record with a live waveform and save to Music/Tools |
+| **Background Music** | Replace or mix the video soundtrack with a music file |
+| **Picture in Picture** | Overlay a second video in a corner |
+| **Custom Speed** | 0.25x / 0.5x / 2x / 4x / 8x slow motion and time-lapse |
+| **Extract Frames** | Save evenly spaced still frames from a video |
 | **Image Filter** | Grayscale, Blur, Edge Detection, Cartoon, Sharpen, Sketch (OpenCV) |
 
 ### 📸 Camera
@@ -33,7 +39,8 @@ Camera2 + OpenGL preview pipeline, multi-segment recording, and offline editors.
 |------|-------------|
 | **Take Photo** | Still capture with live GPU filters, grid/level guides, and 3s/10s timer; save to gallery |
 | **Record Video** | Multi-segment recording, countdown, beauty/color filters, flip camera, rule-of-thirds grid and horizon level |
-| **Edit Video** | Filters, text watermark, **stickers**, timed **subtitles** / **SRT import**, export with effects burn-in |
+| **Burst Photo** | Single, 3-shot, or 5-shot capture with grid, level, and timer |
+| **Edit Video** | Filters, text watermark, **stickers**, timed **subtitles** with style templates (classic/yellow/minimal/top) and **SRT import**, export with effects burn-in |
 | **Trim Video** | Trim range, rotate / orientation helpers |
 | **Select Cover** | Pick a cover frame from the video |
 | **Text to Video** | Solid-color text card → short H.264 MP4 (no audio) |
@@ -46,6 +53,7 @@ Camera2 + OpenGL preview pipeline, multi-segment recording, and offline editors.
 - Export a photo as a single-page PDF
 - QR code generation and decoding from images
 - On-device text recognition (Chinese + Latin)
+- Offline document scanner: page contour detection + perspective flattening (OpenCV)
 
 ### 🎵 Audio Trim
 
@@ -70,6 +78,7 @@ Camera2 + OpenGL preview pipeline, multi-segment recording, and offline editors.
 
 - Find media files above a configurable size threshold
 - Group suspected duplicates by size + sampled content hash
+- Delete a large file or the extra copies of a duplicate group via the system confirmation dialog
 - Export benchmark history as CSV
 - Read-only review; deletion stays with the system file manager
 
@@ -84,6 +93,8 @@ Camera2 + OpenGL preview pipeline, multi-segment recording, and offline editors.
 
 - **Face Compare** — select two photos, detect faces with ML Kit, and score cosine similarity (MobileFaceNet when the model is present)
 - **Face Blur** — detect every face and apply mosaic or soft blur for privacy
+- **ID Photo** — 1-inch / 2-inch crops with white, blue, or red background replacement (ML Kit selfie segmentation)
+- **Group Similar Faces** — cluster selected photos by the largest detected face
 
 ### 🔎 Home, History, and Sharing
 

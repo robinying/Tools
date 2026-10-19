@@ -71,4 +71,5 @@
     <string name="ocr_recognize">Recognize text</string>
     <string name="ocr_no_text">No text found</string>
     <string name="ocr_result_title">Recognized text</string>
+
 </resources>

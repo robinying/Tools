@@ -137,4 +137,25 @@
     <string name="tool_video_custom_title">自定义视频压缩</string>
     <string name="tool_video_custom_desc">手动选择分辨率与码率</string>
     <string name="app_back">返回</string>
+
+    <string name="tool_audio_concat_title">音频拼接</string>
+    <string name="tool_audio_concat_desc">按顺序拼接多个音频文件</string>
+    <string name="tool_audio_recorder_title">录音机</string>
+    <string name="tool_audio_recorder_desc">录制音频并显示实时波形</string>
+    <string name="tool_video_bgm_title">背景音乐</string>
+    <string name="tool_video_bgm_desc">替换或混合视频音轨</string>
+    <string name="tool_video_pip_title">画中画</string>
+    <string name="tool_video_pip_desc">将第二个视频叠加到角落</string>
+    <string name="tool_video_speed_custom_title">自定义变速</string>
+    <string name="tool_video_speed_custom_desc">慢动作与延时倍率</string>
+    <string name="tool_frame_extract_title">提取帧</string>
+    <string name="tool_frame_extract_desc">保存均匀间隔的静帧</string>
+
+    <string name="tool_document_scanner_title">文档扫描</string>
+    <string name="tool_document_scanner_desc">自动边缘检测与透视校正的纸质文档扫描</string>
+
+    <string name="tool_face_id_photo_title">证件照</string>
+    <string name="tool_face_id_photo_desc">标准证件照尺寸并替换背景</string>
+    <string name="tool_face_group_title">相似人脸分组</string>
+    <string name="tool_face_group_desc">按最大人脸对照片进行分组</string>
 </resources>

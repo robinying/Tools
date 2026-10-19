@@ -43,6 +43,7 @@ dependencies {
 
     // ML Kit Face Detection (bundled, arm64-v8a only via app-level ndk abiFilters)
     implementation("com.google.mlkit:face-detection:16.1.7")
+    implementation(libs.mlkit.segmentation.selfie)
 
     // TensorFlow Lite (MobileFaceNet inference)
     implementation("org.tensorflow:tensorflow-lite:2.14.0")

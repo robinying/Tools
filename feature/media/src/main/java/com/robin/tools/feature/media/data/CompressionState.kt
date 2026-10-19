@@ -29,7 +29,15 @@ enum class CompressionType {
     /** Trim an audio file to a time range */
     AUDIO_TRIM,
     /** Video compression with a user-chosen resolution and bitrate */
-    VIDEO_CUSTOM
+    VIDEO_CUSTOM,
+    /** Concatenate multiple audio files */
+    AUDIO_CONCAT,
+    /** Replace or mix the video's audio with a music file */
+    VIDEO_BGM,
+    /** Overlay a second video on the primary video */
+    VIDEO_PIP,
+    /** Speed change with a custom multiplier (slow motion / time-lapse) */
+    VIDEO_SPEED_CUSTOM
 }
 
 enum class CompressionLevel(@StringRes val labelRes: Int) {

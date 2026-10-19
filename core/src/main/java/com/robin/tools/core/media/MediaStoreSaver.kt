@@ -61,6 +61,67 @@ object MediaStoreSaver {
             }
         }
 
+    /**
+     * Copies an audio file into the shared Music collection, or into Ringtones
+     * when [asRingtone] is true.
+     */
+    fun saveAudio(
+        context: Context,
+        source: java.io.File,
+        mimeType: String,
+        fileName: String,
+        asRingtone: Boolean = false
+    ): Result<SavedMedia> = runCatching {
+        val relativePath = if (asRingtone) {
+            Environment.DIRECTORY_RINGTONES
+        } else {
+            "${Environment.DIRECTORY_MUSIC}/Tools"
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            val values = ContentValues().apply {
+                put(MediaStore.MediaColumns.DISPLAY_NAME, fileName)
+                put(MediaStore.MediaColumns.MIME_TYPE, mimeType)
+                put(MediaStore.MediaColumns.RELATIVE_PATH, relativePath)
+                put(MediaStore.MediaColumns.IS_PENDING, 1)
+            }
+            val collection = MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
+            val resolver = context.contentResolver
+            val uri = resolver.insert(collection, values)
+                ?: error("MediaStore refused to create $fileName")
+            try {
+                resolver.openOutputStream(uri)?.use { out ->
+                    source.inputStream().use { it.copyTo(out) }
+                } ?: error("Cannot open output stream")
+                values.clear()
+                values.put(MediaStore.MediaColumns.IS_PENDING, 0)
+                resolver.update(uri, values, null, null)
+            } catch (e: Exception) {
+                resolver.delete(uri, null, null)
+                throw e
+            }
+            SavedMedia(uri, fileName, mimeType)
+        } else {
+            val dir = if (asRingtone) {
+                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_RINGTONES)
+            } else {
+                java.io.File(
+                    Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC),
+                    "Tools"
+                )
+            }
+            if (!dir.exists() && !dir.mkdirs()) error("Cannot create ${dir.absolutePath}")
+            val destination = java.io.File(dir, fileName)
+            source.copyTo(destination, overwrite = true)
+            android.media.MediaScannerConnection.scanFile(
+                context,
+                arrayOf(destination.absolutePath),
+                arrayOf(mimeType),
+                null
+            )
+            SavedMedia(Uri.fromFile(destination), fileName, mimeType)
+        }
+    }
+
     /** Saves arbitrary bytes (CSV, text, JSON) under Downloads/Tools. */
     fun saveDocument(
         context: Context,

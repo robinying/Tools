@@ -129,4 +129,22 @@
     <string name="tool_video_custom_title">Compresión de vídeo personalizada</string>
     <string name="tool_video_custom_desc">Elige resolución y bitrate manualmente</string>
     <string name="app_back">Volver</string>
+    <string name="tool_audio_concat_title">Unir audio</string>
+    <string name="tool_audio_concat_desc">Une varios archivos de audio en orden</string>
+    <string name="tool_audio_recorder_title">Grabadora de audio</string>
+    <string name="tool_audio_recorder_desc">Graba audio con forma de onda en vivo</string>
+    <string name="tool_video_bgm_title">Música de fondo</string>
+    <string name="tool_video_bgm_desc">Sustituye o mezcla la banda sonora del vídeo</string>
+    <string name="tool_video_pip_title">Imagen en imagen</string>
+    <string name="tool_video_pip_desc">Superpone un segundo vídeo en una esquina</string>
+    <string name="tool_video_speed_custom_title">Velocidad personalizada</string>
+    <string name="tool_video_speed_custom_desc">Multiplicadores de cámara lenta y time-lapse</string>
+    <string name="tool_frame_extract_title">Extraer fotogramas</string>
+    <string name="tool_frame_extract_desc">Guarda fotogramas fijos uniformemente espaciados</string>
+    <string name="tool_document_scanner_title">Escáner de documentos</string>
+    <string name="tool_document_scanner_desc">Escanea papel con detección de bordes y corrección de perspectiva</string>
+    <string name="tool_face_id_photo_title">Foto de carné</string>
+    <string name="tool_face_id_photo_desc">Tamaños estándar con sustitución de fondo</string>
+    <string name="tool_face_group_title">Agrupar caras similares</string>
+    <string name="tool_face_group_desc">Agrupa fotos por la cara detectada más grande</string>
 </resources>

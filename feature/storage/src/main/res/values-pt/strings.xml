@@ -126,4 +126,8 @@
     <string name="storage_export_csv">Exportar CSV</string>
     <string name="storage_export_done">Salvo: %1$s</string>
     <string name="storage_export_failed">Falha na exportação</string>
+    <string name="cleanup_delete">Excluir</string>
+    <string name="cleanup_delete_extras">Excluir cópias extras</string>
+    <string name="cleanup_deleted">Excluído</string>
+    <string name="cleanup_delete_failed">Não foi possível excluir os arquivos selecionados</string>
 </resources>

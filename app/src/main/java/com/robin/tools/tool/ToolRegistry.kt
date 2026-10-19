@@ -7,6 +7,7 @@ import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.automirrored.filled.VolumeOff
 import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.filled.AspectRatio
+import androidx.compose.material.icons.filled.Badge
 import androidx.compose.material.icons.filled.AudioFile
 import androidx.compose.material.icons.filled.Collections
 import androidx.compose.material.icons.filled.ContentCut
@@ -15,10 +16,14 @@ import androidx.compose.material.icons.filled.DocumentScanner
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.FilterAlt
+import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.LightMode
+import androidx.compose.material.icons.filled.Mic
+import androidx.compose.material.icons.filled.MusicNote
+import androidx.compose.material.icons.filled.PictureInPictureAlt
 import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material.icons.filled.PictureAsPdf
 import androidx.compose.material.icons.filled.QrCode
@@ -146,6 +151,12 @@ object ToolRegistry {
             listOf("qr", "barcode", "二维码", "扫码", "生成")
         ),
         ToolEntry(
+            "document_scanner", R.string.tool_document_scanner_title,
+            R.string.tool_document_scanner_desc,
+            Icons.Default.DocumentScanner, ToolCategory.IMAGE, AppRoute.DocumentScanner(),
+            listOf("scan", "document", "pdf", "扫描", "文档", "透视校正")
+        ),
+        ToolEntry(
             "ocr", R.string.tool_ocr_title, R.string.tool_ocr_desc,
             Icons.Default.DocumentScanner, ToolCategory.IMAGE, AppRoute.OcrTool(),
             listOf("ocr", "text", "识别", "文字", "提取")
@@ -215,6 +226,37 @@ object ToolRegistry {
             listOf("compress", "bitrate", "resolution", "压缩", "码率", "分辨率")
         ),
         ToolEntry(
+            "audio_concat", R.string.tool_audio_concat_title, R.string.tool_audio_concat_desc,
+            Icons.Default.AudioFile, ToolCategory.MEDIA, AppRoute.AudioConcat(),
+            listOf("audio", "merge", "join", "音频", "拼接", "合并")
+        ),
+        ToolEntry(
+            "audio_recorder", R.string.tool_audio_recorder_title, R.string.tool_audio_recorder_desc,
+            Icons.Default.Mic, ToolCategory.MEDIA, AppRoute.AudioRecorder,
+            listOf("record", "microphone", "录音", "波形")
+        ),
+        ToolEntry(
+            "video_bgm", R.string.tool_video_bgm_title, R.string.tool_video_bgm_desc,
+            Icons.Default.MusicNote, ToolCategory.MEDIA, AppRoute.VideoBgm(),
+            listOf("music", "audio", "mix", "背景音乐", "混音")
+        ),
+        ToolEntry(
+            "video_pip", R.string.tool_video_pip_title, R.string.tool_video_pip_desc,
+            Icons.Default.PictureInPictureAlt, ToolCategory.MEDIA, AppRoute.VideoPip(),
+            listOf("pip", "overlay", "画中画", "叠加")
+        ),
+        ToolEntry(
+            "video_speed_custom", R.string.tool_video_speed_custom_title,
+            R.string.tool_video_speed_custom_desc,
+            Icons.Default.Speed, ToolCategory.MEDIA, AppRoute.VideoSpeedCustom(),
+            listOf("slow motion", "timelapse", "慢动作", "延时", "变速")
+        ),
+        ToolEntry(
+            "frame_extract", R.string.tool_frame_extract_title, R.string.tool_frame_extract_desc,
+            Icons.Default.Collections, ToolCategory.MEDIA, AppRoute.FrameExtract(),
+            listOf("frames", "cover", "抽帧", "封面", "静帧")
+        ),
+        ToolEntry(
             "audio_trim", R.string.tool_audio_trim_title, R.string.tool_audio_trim_desc,
             Icons.Default.AudioFile, ToolCategory.MEDIA, AppRoute.AudioTrim(),
             listOf("audio", "trim", "ringtone", "音频", "裁剪", "铃声")
@@ -248,6 +290,16 @@ object ToolRegistry {
             "storage", R.string.tool_storage_title, R.string.tool_storage_desc,
             Icons.Default.Storage, ToolCategory.UTILITY, AppRoute.StorageBench,
             listOf("storage", "benchmark", "speed", "存储", "测速")
+        ),
+        ToolEntry(
+            "face_id_photo", R.string.tool_face_id_photo_title, R.string.tool_face_id_photo_desc,
+            Icons.Default.Badge, ToolCategory.UTILITY, AppRoute.FaceIdPhoto(),
+            listOf("id photo", "passport", "证件照", "换底色")
+        ),
+        ToolEntry(
+            "face_group", R.string.tool_face_group_title, R.string.tool_face_group_desc,
+            Icons.Default.Groups, ToolCategory.UTILITY, AppRoute.FaceGroup,
+            listOf("group", "similar", "分组", "相似", "人脸")
         ),
         ToolEntry(
             "storage_cleanup", R.string.tool_storage_cleanup_title, R.string.tool_storage_cleanup_desc,

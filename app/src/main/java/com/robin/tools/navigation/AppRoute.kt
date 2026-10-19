@@ -30,6 +30,12 @@ sealed interface AppRoute {
     data class FaceBlur(val initialUri: String? = null) : AppRoute
 
     @Serializable
+    data class FaceIdPhoto(val initialUri: String? = null) : AppRoute
+
+    @Serializable
+    data object FaceGroup : AppRoute
+
+    @Serializable
     data object StorageBench : AppRoute
 
     @Serializable
@@ -70,6 +76,24 @@ sealed interface AppRoute {
     @Serializable
     data class VideoCustomCompress(val initialUri: String? = null) : AppRoute
 
+    @Serializable
+    data class AudioConcat(val initialUri: String? = null) : AppRoute
+
+    @Serializable
+    data class VideoBgm(val initialVideoUri: String? = null) : AppRoute
+
+    @Serializable
+    data class VideoPip(val initialMainUri: String? = null) : AppRoute
+
+    @Serializable
+    data class VideoSpeedCustom(val initialUri: String? = null) : AppRoute
+
+    @Serializable
+    data class FrameExtract(val initialUri: String? = null) : AppRoute
+
+    @Serializable
+    data object AudioRecorder : AppRoute
+
     // Toolkit routes
     @Serializable
     data class ImageTool(
@@ -85,6 +109,9 @@ sealed interface AppRoute {
 
     @Serializable
     data class OcrTool(val initialUri: String? = null) : AppRoute
+
+    @Serializable
+    data class DocumentScanner(val initialUri: String? = null) : AppRoute
 
     // App-level routes
     @Serializable

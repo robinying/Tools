@@ -138,4 +138,77 @@
     <string name="video_custom_action">按自定义参数压缩</string>
     <string name="video_custom_saved">视频已压缩并保存</string>
     <string name="video_custom_failed">压缩失败：%1$s</string>
+
+    <string name="audio_concat">音频拼接</string>
+    <string name="audio_concat_desc">按选择顺序拼接两个或多个音频文件。</string>
+    <string name="audio_concat_select">选择音频文件</string>
+    <string name="audio_concat_no_files">请至少选择两个音频文件</string>
+    <string name="audio_concat_selected">已选择 %1$d 个音频</string>
+    <string name="audio_concat_action">拼接音频</string>
+    <string name="audio_concat_saved">音频已拼接并保存</string>
+    <string name="audio_concat_failed">拼接失败：%1$s</string>
+
+    <string name="video_bgm">背景音乐</string>
+    <string name="video_bgm_desc">用音乐替换视频原声，或与原声混合。</string>
+    <string name="video_bgm_select_video">选择视频</string>
+    <string name="video_bgm_select_audio">选择音乐</string>
+    <string name="video_bgm_mode">模式</string>
+    <string name="video_bgm_mix">与原声混合</string>
+    <string name="video_bgm_replace">替换原声</string>
+    <string name="video_bgm_action">应用音乐</string>
+    <string name="video_bgm_saved">视频音频已更新</string>
+    <string name="video_bgm_failed">失败：%1$s</string>
+
+    <string name="video_pip">画中画</string>
+    <string name="video_pip_desc">将第二个视频叠加到主视频的角落。</string>
+    <string name="video_pip_select_main">选择主视频</string>
+    <string name="video_pip_select_overlay">选择叠加视频</string>
+    <string name="video_pip_position">位置</string>
+    <string name="video_pip_tl">左上</string>
+    <string name="video_pip_tr">右上</string>
+    <string name="video_pip_bl">左下</string>
+    <string name="video_pip_br">右下</string>
+    <string name="video_pip_action">合成视频</string>
+    <string name="video_pip_saved">画中画视频已保存</string>
+    <string name="video_pip_failed">失败：%1$s</string>
+
+    <string name="video_speed_custom">自定义变速</string>
+    <string name="video_speed_custom_desc">使用自定义倍率制作慢动作或延时效果。</string>
+    <string name="video_speed_custom_speed">速度</string>
+    <string name="video_speed_custom_action">应用变速</string>
+    <string name="video_speed_custom_saved">变速视频已保存</string>
+    <string name="video_speed_custom_failed">失败：%1$s</string>
+
+    <string name="frame_extract">提取帧</string>
+    <string name="frame_extract_desc">从视频中按均匀间隔保存静帧。</string>
+    <string name="frame_extract_count">帧数</string>
+    <string name="frame_extract_action">提取帧</string>
+    <string name="frame_extract_saved">已保存 %1$d 帧</string>
+    <string name="frame_extract_failed">提取失败：%1$s</string>
+
+    <string name="audio_recorder">录音机</string>
+    <string name="audio_recorder_desc">录制音频并显示实时波形，保存到 Music/Tools。</string>
+    <string name="audio_recorder_start">开始录音</string>
+    <string name="audio_recorder_stop">停止并保存</string>
+    <string name="audio_recorder_saved">录音已保存</string>
+    <string name="audio_recorder_failed">录音失败：%1$s</string>
+    <string name="audio_recorder_permission">录音需要麦克风权限。</string>
+    <string name="audio_recorder_hint">点击开始，说话后点击停止保存。</string>
+    <string name="audio_recorder_elapsed">%1$s</string>
+
+    <string name="audio_trim_destination">保存位置</string>
+    <string name="audio_trim_music">音乐</string>
+    <string name="audio_trim_ringtone">铃声</string>
+
+    <string name="doc_scan_title">文档扫描</string>
+    <string name="doc_scan_desc">检测纸张边缘并校正透视。使用 OpenCV，完全离线。</string>
+    <string name="doc_scan_select">选择图片</string>
+    <string name="doc_scan_action">检测并校正</string>
+    <string name="doc_scan_result">结果</string>
+    <string name="doc_scan_detected">已检测到纸张</string>
+    <string name="doc_scan_full_image">未检测到纸张轮廓，使用整张图片</string>
+    <string name="doc_scan_saved">已保存：%1$s</string>
+    <string name="doc_scan_failed">扫描失败：%1$s</string>
+    <string name="doc_scan_save">保存扫描</string>
+    <string name="toolkit_share_saved">分享</string>
 </resources>

@@ -42,6 +42,10 @@ import com.robin.tools.feature.ebook.ui.ConversionState
 import com.robin.tools.feature.ebook.ui.ConversionViewModel
 import com.robin.tools.feature.ebook.ui.MainScreen as EbookScreen
 import com.robin.tools.feature.face.ui.FaceBlurScreen
+import com.robin.tools.feature.face.ui.FaceGroupScreen
+import com.robin.tools.feature.face.ui.FaceGroupViewModel
+import com.robin.tools.feature.face.ui.IdPhotoScreen
+import com.robin.tools.feature.face.ui.IdPhotoViewModel
 import com.robin.tools.feature.face.ui.FaceBlurViewModel
 import com.robin.tools.feature.face.ui.FaceCompareScreen
 import com.robin.tools.feature.face.ui.FaceCompareViewModel
@@ -53,12 +57,22 @@ import com.robin.tools.feature.lightlux.presentation.LightLuxScreen
 import com.robin.tools.feature.media.data.CompressionManager
 import com.robin.tools.feature.media.data.CompressionTaskState
 import com.robin.tools.feature.media.data.CompressionType
+import com.robin.tools.feature.media.ui.screens.AudioConcatScreen
+import com.robin.tools.feature.media.ui.screens.AudioRecorderScreen
 import com.robin.tools.feature.media.ui.screens.AudioTrimScreen
+import com.robin.tools.feature.media.ui.screens.FrameExtractScreen
+import com.robin.tools.feature.media.ui.screens.VideoBgmScreen
+import com.robin.tools.feature.media.ui.screens.VideoPipScreen
+import com.robin.tools.feature.media.ui.screens.VideoSpeedCustomScreen
 import com.robin.tools.feature.media.ui.screens.VideoCustomCompressScreen
 import com.robin.tools.feature.media.ui.screens.CompressionScreen
+import com.robin.tools.feature.media.ui.screens.DocumentScanScreen
 import com.robin.tools.feature.media.ui.screens.FilterScreen
 import com.robin.tools.feature.media.ui.screens.MainScreen as MediaMainScreen
+import com.robin.tools.feature.media.ui.viewmodel.AudioRecorderViewModel
 import com.robin.tools.feature.media.ui.viewmodel.CompressionViewModel
+import com.robin.tools.feature.media.ui.viewmodel.DocumentScanViewModel
+import com.robin.tools.feature.media.ui.viewmodel.FrameExtractViewModel
 import com.robin.tools.feature.storage.data.StorageBenchViewModel
 import com.robin.tools.feature.storage.data.StorageCleanupViewModel
 import com.robin.tools.feature.storage.presentation.StorageBenchScreen
@@ -206,6 +220,26 @@ private fun MainNavHost(sharedContent: MutableStateFlow<SharedPayload?>) {
                 FaceBlurWrapper(navController, route.initialUri, recorder)
             }
 
+            composable<AppRoute.FaceIdPhoto> { backStackEntry ->
+                val route = backStackEntry.toRoute<AppRoute.FaceIdPhoto>()
+                FaceIdPhotoWrapper(navController, route.initialUri, recorder)
+            }
+
+            composable<AppRoute.FaceGroup> {
+                SwipeBackContainer(onBack = { navController.popBackStack() }) {
+                    val context = LocalContext.current
+                    val groupViewModel: FaceGroupViewModel = viewModel(
+                        factory = FaceGroupViewModel.Factory(
+                            context.applicationContext as Application
+                        )
+                    )
+                    FaceGroupScreen(
+                        viewModel = groupViewModel,
+                        onBack = { navController.popBackStack() }
+                    )
+                }
+            }
+
             composable<AppRoute.StorageBench> {
                 StorageBenchWrapper(navController)
             }
@@ -263,6 +297,80 @@ private fun MainNavHost(sharedContent: MutableStateFlow<SharedPayload?>) {
                 VideoCustomCompressWrapper(navController, route.initialUri)
             }
 
+            composable<AppRoute.AudioConcat> {
+                SwipeBackContainer(onBack = { navController.popBackStack() }) {
+                    AudioConcatScreen(
+                        viewModel = viewModel(),
+                        onBack = { navController.popBackStack() }
+                    )
+                }
+            }
+
+            composable<AppRoute.VideoBgm> { backStackEntry ->
+                val route = backStackEntry.toRoute<AppRoute.VideoBgm>()
+                SwipeBackContainer(onBack = { navController.popBackStack() }) {
+                    VideoBgmScreen(
+                        viewModel = viewModel(),
+                        onBack = { navController.popBackStack() },
+                        initialVideoUri = route.initialVideoUri
+                    )
+                }
+            }
+
+            composable<AppRoute.VideoPip> { backStackEntry ->
+                val route = backStackEntry.toRoute<AppRoute.VideoPip>()
+                SwipeBackContainer(onBack = { navController.popBackStack() }) {
+                    VideoPipScreen(
+                        viewModel = viewModel(),
+                        onBack = { navController.popBackStack() },
+                        initialMainUri = route.initialMainUri
+                    )
+                }
+            }
+
+            composable<AppRoute.VideoSpeedCustom> { backStackEntry ->
+                val route = backStackEntry.toRoute<AppRoute.VideoSpeedCustom>()
+                SwipeBackContainer(onBack = { navController.popBackStack() }) {
+                    VideoSpeedCustomScreen(
+                        viewModel = viewModel(),
+                        onBack = { navController.popBackStack() },
+                        initialUri = route.initialUri
+                    )
+                }
+            }
+
+            composable<AppRoute.FrameExtract> { backStackEntry ->
+                val route = backStackEntry.toRoute<AppRoute.FrameExtract>()
+                SwipeBackContainer(onBack = { navController.popBackStack() }) {
+                    val context = LocalContext.current
+                    val frameViewModel: FrameExtractViewModel = viewModel(
+                        factory = FrameExtractViewModel.Factory(
+                            context.applicationContext as Application
+                        )
+                    )
+                    FrameExtractScreen(
+                        viewModel = frameViewModel,
+                        onBack = { navController.popBackStack() },
+                        initialUri = route.initialUri
+                    )
+                }
+            }
+
+            composable<AppRoute.AudioRecorder> {
+                SwipeBackContainer(onBack = { navController.popBackStack() }) {
+                    val context = LocalContext.current
+                    val recorderViewModel: AudioRecorderViewModel = viewModel(
+                        factory = AudioRecorderViewModel.Factory(
+                            context.applicationContext as Application
+                        )
+                    )
+                    AudioRecorderScreen(
+                        viewModel = recorderViewModel,
+                        onBack = { navController.popBackStack() }
+                    )
+                }
+            }
+
             composable<AppRoute.ImageTool> { backStackEntry ->
                 val route = backStackEntry.toRoute<AppRoute.ImageTool>()
                 ImageToolWrapper(navController, route.toolKey, route.initialUri, recorder)
@@ -276,6 +384,11 @@ private fun MainNavHost(sharedContent: MutableStateFlow<SharedPayload?>) {
             composable<AppRoute.OcrTool> { backStackEntry ->
                 val route = backStackEntry.toRoute<AppRoute.OcrTool>()
                 OcrToolWrapper(navController, route.initialUri)
+            }
+
+            composable<AppRoute.DocumentScanner> { backStackEntry ->
+                val route = backStackEntry.toRoute<AppRoute.DocumentScanner>()
+                DocumentScannerWrapper(navController, route.initialUri, recorder)
             }
 
             composable<AppRoute.TaskHistory> {
@@ -436,6 +549,35 @@ private fun FaceBlurWrapper(
                     toolId = "face_blur",
                     title = title,
                     detail = "${saved.displayName} · ${viewModel.uiState.value.faceCount} faces",
+                    outputUri = saved.uri.toString(),
+                    isSuccess = true
+                )
+            }
+        )
+    }
+}
+
+@Composable
+private fun FaceIdPhotoWrapper(
+    navController: NavHostController,
+    initialUri: String?,
+    recorder: TaskHistoryRecorder
+) {
+    val context = LocalContext.current
+    val title = context.getString(R.string.tool_face_id_photo_title)
+    val viewModel: IdPhotoViewModel = viewModel(
+        factory = IdPhotoViewModel.Factory(context.applicationContext as Application)
+    )
+    SwipeBackContainer(onBack = { navController.popBackStack() }) {
+        IdPhotoScreen(
+            viewModel = viewModel,
+            onBack = { navController.popBackStack() },
+            initialUri = initialUri,
+            onSaved = { saved ->
+                recorder.record(
+                    toolId = "face_id_photo",
+                    title = title,
+                    detail = saved.displayName,
                     outputUri = saved.uri.toString(),
                     isSuccess = true
                 )
@@ -722,6 +864,35 @@ private fun QrToolWrapper(
 }
 
 @Composable
+private fun DocumentScannerWrapper(
+    navController: NavHostController,
+    initialUri: String?,
+    recorder: TaskHistoryRecorder
+) {
+    val context = LocalContext.current
+    val title = context.getString(R.string.tool_document_scanner_title)
+    val viewModel: DocumentScanViewModel = viewModel(
+        factory = DocumentScanViewModel.Factory(context.applicationContext as Application)
+    )
+    SwipeBackContainer(onBack = { navController.popBackStack() }) {
+        DocumentScanScreen(
+            viewModel = viewModel,
+            onBack = { navController.popBackStack() },
+            initialUri = initialUri,
+            onSaved = { saved ->
+                recorder.record(
+                    toolId = "document_scanner",
+                    title = title,
+                    detail = saved.displayName,
+                    outputUri = saved.uri.toString(),
+                    isSuccess = true
+                )
+            }
+        )
+    }
+}
+
+@Composable
 private fun OcrToolWrapper(navController: NavHostController, initialUri: String?) {
     val context = LocalContext.current
     val ocrToolViewModel: OcrToolViewModel = viewModel(
@@ -767,8 +938,29 @@ private fun ShareEntryWrapper(
             onFaceBlur = { initialUri ->
                 navController.navigate(AppRoute.FaceBlur(initialUri))
             },
+            onFaceIdPhoto = { initialUri ->
+                navController.navigate(AppRoute.FaceIdPhoto(initialUri))
+            },
+            onDocumentScanner = { initialUri ->
+                navController.navigate(AppRoute.DocumentScanner(initialUri))
+            },
             onVideoCustomCompress = { initialUri ->
                 navController.navigate(AppRoute.VideoCustomCompress(initialUri))
+            },
+            onAudioConcat = {
+                navController.navigate(AppRoute.AudioConcat())
+            },
+            onVideoBgm = { initialVideoUri ->
+                navController.navigate(AppRoute.VideoBgm(initialVideoUri))
+            },
+            onVideoPip = { initialMainUri ->
+                navController.navigate(AppRoute.VideoPip(initialMainUri))
+            },
+            onVideoSpeedCustom = { initialUri ->
+                navController.navigate(AppRoute.VideoSpeedCustom(initialUri))
+            },
+            onFrameExtract = { initialUri ->
+                navController.navigate(AppRoute.FrameExtract(initialUri))
             }
         )
     }

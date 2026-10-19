@@ -133,4 +133,9 @@
     <string name="storage_export_failed">Export failed</string>
 
     <string name="cleanup_permission_needed">Media read access is required to scan images and videos.</string>
+
+    <string name="cleanup_delete">Delete</string>
+    <string name="cleanup_delete_extras">Delete extra copies</string>
+    <string name="cleanup_deleted">Deleted</string>
+    <string name="cleanup_delete_failed">Could not delete the selected files</string>
 </resources>

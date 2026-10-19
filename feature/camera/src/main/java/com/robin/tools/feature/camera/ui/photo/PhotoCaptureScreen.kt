@@ -65,6 +65,7 @@ fun PhotoCaptureScreen(
     var countingDown by remember { mutableStateOf(false) }
     var countdownValue by remember { mutableStateOf(0) }
     var timerSeconds by remember { mutableStateOf(0) }
+    var burstCount by remember { mutableStateOf(1) }
     var showGrid by remember { mutableStateOf(true) }
     var showLevel by remember { mutableStateOf(true) }
     val rollDegrees = rememberDeviceRollDegrees()
@@ -154,6 +155,29 @@ fun PhotoCaptureScreen(
         Row(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
+                .padding(bottom = 270.dp),
+            horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(8.dp)
+        ) {
+            TextOptionChip(
+                selected = burstCount == 1,
+                onClick = { burstCount = 1 },
+                label = stringResource(R.string.camera_burst_off)
+            )
+            TextOptionChip(
+                selected = burstCount == 3,
+                onClick = { burstCount = 3 },
+                label = stringResource(R.string.camera_burst_3)
+            )
+            TextOptionChip(
+                selected = burstCount == 5,
+                onClick = { burstCount = 5 },
+                label = stringResource(R.string.camera_burst_5)
+            )
+        }
+
+        Row(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
                 .padding(bottom = 210.dp),
             horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(8.dp)
         ) {
@@ -174,18 +198,35 @@ fun PhotoCaptureScreen(
             )
         }
 
-        val capture: () -> Unit = {
-            capturing = true
+        suspend fun captureOne(): Boolean {
+            val deferred = kotlinx.coroutines.CompletableDeferred<Boolean>()
             viewModel.captureStill { bmp ->
-                scope.launch {
-                    val ok = if (bmp != null) {
-                        withContext(Dispatchers.IO) { savePhoto(context, bmp) }
-                    } else {
-                        false
-                    }
-                    capturing = false
-                    ToastMsg(context, ok)
+                scope.launch(Dispatchers.IO) {
+                    val ok = if (bmp != null) savePhoto(context, bmp) else false
+                    deferred.complete(ok)
                 }
+            }
+            return deferred.await()
+        }
+
+        val capture: () -> Unit = {
+            scope.launch {
+                capturing = true
+                var saved = 0
+                repeat(burstCount) { index ->
+                    if (captureOne()) saved++
+                    if (index < burstCount - 1) delay(350)
+                }
+                capturing = false
+                Toast.makeText(
+                    context,
+                    if (burstCount == 1) {
+                        context.getString(if (saved == 1) R.string.photo_saved else R.string.photo_failed)
+                    } else {
+                        context.getString(R.string.camera_burst_saved, saved, burstCount)
+                    },
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
 

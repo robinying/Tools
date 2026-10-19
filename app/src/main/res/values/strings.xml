@@ -137,4 +137,25 @@
     <string name="tool_video_custom_title">Custom Video Compress</string>
     <string name="tool_video_custom_desc">Choose resolution and bitrate manually</string>
     <string name="app_back">Back</string>
+
+    <string name="tool_audio_concat_title">Audio Merge</string>
+    <string name="tool_audio_concat_desc">Join multiple audio files in order</string>
+    <string name="tool_audio_recorder_title">Audio Recorder</string>
+    <string name="tool_audio_recorder_desc">Record audio with a live waveform</string>
+    <string name="tool_video_bgm_title">Background Music</string>
+    <string name="tool_video_bgm_desc">Replace or mix the video soundtrack</string>
+    <string name="tool_video_pip_title">Picture in Picture</string>
+    <string name="tool_video_pip_desc">Overlay a second video in a corner</string>
+    <string name="tool_video_speed_custom_title">Custom Speed</string>
+    <string name="tool_video_speed_custom_desc">Slow motion and time-lapse multipliers</string>
+    <string name="tool_frame_extract_title">Extract Frames</string>
+    <string name="tool_frame_extract_desc">Save evenly spaced still frames</string>
+
+    <string name="tool_document_scanner_title">Document Scanner</string>
+    <string name="tool_document_scanner_desc">Scan paper with edge detection and perspective correction</string>
+
+    <string name="tool_face_id_photo_title">ID Photo</string>
+    <string name="tool_face_id_photo_desc">Standard ID sizes with background replacement</string>
+    <string name="tool_face_group_title">Group Similar Faces</string>
+    <string name="tool_face_group_desc">Cluster photos by the largest detected face</string>
 </resources>

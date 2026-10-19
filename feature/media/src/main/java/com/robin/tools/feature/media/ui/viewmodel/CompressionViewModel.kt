@@ -27,6 +27,39 @@ class CompressionViewModel(application: Application) : AndroidViewModel(applicat
         ContextCompat.startForegroundService(context, intent)
     }
 
+    fun startAudioConcat(uris: List<Uri>) {
+        CompressionService.startAudioConcat(
+            getApplication<Application>().applicationContext,
+            uris
+        )
+    }
+
+    fun startVideoBgm(videoUri: Uri, audioUri: Uri, mixWithOriginal: Boolean) {
+        CompressionService.startVideoBgm(
+            getApplication<Application>().applicationContext,
+            videoUri,
+            audioUri,
+            mixWithOriginal
+        )
+    }
+
+    fun startVideoPip(videoUri: Uri, overlayUri: Uri, position: String) {
+        CompressionService.startVideoPip(
+            getApplication<Application>().applicationContext,
+            videoUri,
+            overlayUri,
+            position
+        )
+    }
+
+    fun startCustomSpeed(uri: Uri, speedFactor: Double) {
+        CompressionService.startCustomSpeed(
+            getApplication<Application>().applicationContext,
+            uri,
+            speedFactor
+        )
+    }
+
     fun startCustomVideoCompression(uri: Uri, minDimension: Int, bitrateKbps: Int) {
         CompressionService.startCustomVideoCompression(
             getApplication<Application>().applicationContext,
@@ -36,12 +69,13 @@ class CompressionViewModel(application: Application) : AndroidViewModel(applicat
         )
     }
 
-    fun startAudioTrim(uri: Uri, startMs: Long, endMs: Long) {
+    fun startAudioTrim(uri: Uri, startMs: Long, endMs: Long, asRingtone: Boolean = false) {
         CompressionService.startAudioTrim(
             getApplication<Application>().applicationContext,
             uri,
             startMs,
-            endMs
+            endMs,
+            asRingtone
         )
     }
 

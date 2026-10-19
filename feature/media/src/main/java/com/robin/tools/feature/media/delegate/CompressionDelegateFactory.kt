@@ -18,6 +18,10 @@ object CompressionDelegateFactory {
             CompressionType.VOLUME_FADE -> VolumeFadeDelegate()
             CompressionType.AUDIO_TRIM -> AudioTrimDelegate()
             CompressionType.VIDEO_CUSTOM -> VideoCompressionDelegate()
+            CompressionType.AUDIO_CONCAT -> AudioConcatDelegate()
+            CompressionType.VIDEO_BGM -> VideoBgmDelegate(mixWithOriginal = true)
+            CompressionType.VIDEO_PIP -> VideoPipDelegate(PipPosition.TOP_RIGHT)
+            CompressionType.VIDEO_SPEED_CUSTOM -> CustomSpeedDelegate(speed = 0.5)
         }
     }
 }

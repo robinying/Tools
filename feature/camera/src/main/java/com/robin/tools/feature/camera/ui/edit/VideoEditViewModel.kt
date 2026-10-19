@@ -7,6 +7,7 @@ import android.media.MediaPlayer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.robin.tools.feature.camera.editor.SubtitleCue
+import com.robin.tools.feature.camera.editor.SubtitleStyle
 import com.robin.tools.feature.camera.editor.VideoClipper
 import com.robin.tools.feature.camera.editor.VideoEffectsExporter
 import com.robin.tools.feature.camera.filter.FilterType
@@ -27,6 +28,7 @@ data class VideoEditUiState(
     val watermarkText: String = "",
     val stickers: List<Bitmap> = emptyList(),
     val subtitles: List<SubtitleCue> = emptyList(),
+    val subtitleStyle: SubtitleStyle = SubtitleStyle.CLASSIC,
     val isExporting: Boolean = false,
     val exportDone: Boolean = false,
     val error: String? = null
@@ -80,6 +82,10 @@ class VideoEditViewModel : ViewModel() {
 
     fun clearSubtitles() {
         _uiState.update { it.copy(subtitles = emptyList()) }
+    }
+
+    fun setSubtitleStyle(style: SubtitleStyle) {
+        _uiState.update { it.copy(subtitleStyle = style) }
     }
 
     fun importSrt(content: String) {
@@ -176,7 +182,8 @@ class VideoEditViewModel : ViewModel() {
                     filterType = s.currentFilter,
                     watermarkText = s.watermarkText,
                     stickers = s.stickers,
-                    subtitles = s.subtitles
+                    subtitles = s.subtitles,
+                    subtitleStyle = s.subtitleStyle
                 )
             } else {
                 // Fast path: remux full range, keep audio

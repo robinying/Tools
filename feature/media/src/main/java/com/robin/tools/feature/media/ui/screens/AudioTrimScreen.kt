@@ -42,6 +42,8 @@ import com.robin.tools.core.ui.EmptyState
 import com.robin.tools.core.ui.StudioActionButton
 import com.robin.tools.core.ui.StudioActionStyle
 import com.robin.tools.core.ui.StudioSectionHeader
+import com.robin.tools.core.ui.StudioSelectionOption
+import com.robin.tools.core.ui.StudioSelectionRow
 import com.robin.tools.core.ui.StudioSurface
 import com.robin.tools.core.ui.StudioSurfaceTone
 import com.robin.tools.core.ui.ToolsTopAppBar
@@ -72,6 +74,7 @@ fun AudioTrimScreen(
     var endMs by remember { mutableFloatStateOf(0f) }
     var loadingDuration by remember { mutableStateOf(false) }
     var started by remember { mutableStateOf(false) }
+    var asRingtone by remember { mutableStateOf(false) }
 
     val picker = rememberLauncherForActivityResult(
         ActivityResultContracts.GetContent()
@@ -205,6 +208,19 @@ fun AudioTrimScreen(
                         )
                     }
 
+                    StudioSectionHeader(
+                        eyebrow = stringResource(R.string.audio_trim_destination),
+                        title = stringResource(R.string.audio_trim_destination)
+                    )
+                    StudioSelectionRow(
+                        options = listOf(
+                            StudioSelectionOption("music", stringResource(R.string.audio_trim_music)),
+                            StudioSelectionOption("ringtone", stringResource(R.string.audio_trim_ringtone))
+                        ),
+                        selectedKey = if (asRingtone) "ringtone" else "music",
+                        onOptionSelected = { asRingtone = it == "ringtone" },
+                        enabled = taskState !is CompressionTaskState.Processing
+                    )
                     StudioActionButton(
                         label = stringResource(R.string.audio_trim_action),
                         onClick = {
@@ -212,7 +228,8 @@ fun AudioTrimScreen(
                             viewModel.startAudioTrim(
                                 selectedUri!!,
                                 startMs.toLong(),
-                                endMs.toLong()
+                                endMs.toLong(),
+                                asRingtone
                             )
                         },
                         loading = taskState is CompressionTaskState.Processing,
