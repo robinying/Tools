@@ -42,11 +42,31 @@ import com.robin.tools.R
 import com.robin.tools.feature.media.data.CompressionType
 import com.robin.tools.navigation.AppRoute
 
-enum class ToolCategory(@StringRes val labelRes: Int) {
-    CREATE(R.string.tool_category_create),
-    IMAGE(R.string.tool_category_image),
-    MEDIA(R.string.tool_category_media),
-    UTILITY(R.string.tool_category_utility)
+enum class ToolCategory(
+    @StringRes val labelRes: Int,
+    @StringRes val descriptionRes: Int,
+    val icon: ImageVector
+) {
+    CREATE(
+        R.string.tool_category_create,
+        R.string.tool_category_create_desc,
+        Icons.Default.Videocam
+    ),
+    IMAGE(
+        R.string.tool_category_image,
+        R.string.tool_category_image_desc,
+        Icons.Default.Image
+    ),
+    MEDIA(
+        R.string.tool_category_media,
+        R.string.tool_category_media_desc,
+        Icons.Default.VideoLibrary
+    ),
+    UTILITY(
+        R.string.tool_category_utility,
+        R.string.tool_category_utility_desc,
+        Icons.Default.Storage
+    )
 }
 
 /** One entry in the searchable home workbench. */

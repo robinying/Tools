@@ -147,4 +147,12 @@
     <string name="tool_face_id_photo_desc">Tamanhos padrão com substituição de fundo</string>
     <string name="tool_face_group_title">Agrupar rostos semelhantes</string>
     <string name="tool_face_group_desc">Agrupe fotos pelo maior rosto detectado</string>
+    <string name="tool_category_create_desc">Capture, grave e gere vídeos</string>
+    <string name="tool_category_image_desc">Edição de imagens, digitalização, QR e reconhecimento de texto</string>
+    <string name="tool_category_media_desc">Conversão, edição e exportação de áudio e vídeo</string>
+    <string name="tool_category_utility_desc">Ferramentas de ebook, luz, rosto, armazenamento e histórico</string>
+    <string name="home_browse_eyebrow">EXPLORAR</string>
+    <string name="home_browse_title">Categorias</string>
+    <string name="home_browse_desc">Escolha uma categoria para ver as ferramentas.</string>
+    <string name="home_category_tool_count">%1$d ferramentas</string>
 </resources>

@@ -147,4 +147,12 @@
     <string name="tool_face_id_photo_desc">Tamaños estándar con sustitución de fondo</string>
     <string name="tool_face_group_title">Agrupar caras similares</string>
     <string name="tool_face_group_desc">Agrupa fotos por la cara detectada más grande</string>
+    <string name="tool_category_create_desc">Captura, graba y genera vídeo</string>
+    <string name="tool_category_image_desc">Edición de imágenes, escaneo, QR y reconocimiento de texto</string>
+    <string name="tool_category_media_desc">Conversión, edición y exportación de audio y vídeo</string>
+    <string name="tool_category_utility_desc">Herramientas de ebook, luz, rostro, almacenamiento e historial</string>
+    <string name="home_browse_eyebrow">EXPLORAR</string>
+    <string name="home_browse_title">Categorías</string>
+    <string name="home_browse_desc">Elige una categoría para ver sus herramientas.</string>
+    <string name="home_category_tool_count">%1$d herramientas</string>
 </resources>

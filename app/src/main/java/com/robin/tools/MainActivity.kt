@@ -89,10 +89,12 @@ import com.robin.tools.history.TaskHistoryRecorder
 import com.robin.tools.history.TaskHistoryRepository
 import com.robin.tools.history.TaskHistoryViewModel
 import com.robin.tools.navigation.AppRoute
+import com.robin.tools.tool.ToolCategory
 import com.robin.tools.tool.ToolPreferences
 import com.robin.tools.ui.screens.HomeScreen
 import com.robin.tools.ui.screens.ShareEntryScreen
 import com.robin.tools.ui.screens.TaskHistoryScreen
+import com.robin.tools.ui.screens.ToolCategoryScreen
 import com.robin.tools.ui.theme.ToolsTheme
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.drop
@@ -186,6 +188,9 @@ private fun MainNavHost(sharedContent: MutableStateFlow<SharedPayload?>) {
                 HomeScreen(
                     favorites = favorites,
                     recents = recents,
+                    onCategoryClick = { category ->
+                        navController.navigate(AppRoute.ToolCategoryRoute(category.name))
+                    },
                     onToolClick = { tool ->
                         toolPreferences.recordRecent(tool.id)
                         navController.navigate(tool.route)
@@ -196,6 +201,25 @@ private fun MainNavHost(sharedContent: MutableStateFlow<SharedPayload?>) {
 
             composable<AppRoute.MediaMain> {
                 MediaMainWrapper(navController)
+            }
+
+            composable<AppRoute.ToolCategoryRoute> { backStackEntry ->
+                val route = backStackEntry.toRoute<AppRoute.ToolCategoryRoute>()
+                val category = ToolCategory.entries
+                    .firstOrNull { it.name == route.category }
+                    ?: ToolCategory.CREATE
+                SwipeBackContainer(onBack = { navController.popBackStack() }) {
+                    ToolCategoryScreen(
+                        category = category,
+                        favorites = favorites,
+                        onToolClick = { tool ->
+                            toolPreferences.recordRecent(tool.id)
+                            navController.navigate(tool.route)
+                        },
+                        onToggleFavorite = { toolPreferences.toggleFavorite(it.id) },
+                        onBack = { navController.popBackStack() }
+                    )
+                }
             }
 
             composable<AppRoute.Compression> { backStackEntry ->

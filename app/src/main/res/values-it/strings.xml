@@ -147,4 +147,12 @@
     <string name="tool_face_id_photo_desc">Dimensioni standard con sostituzione sfondo</string>
     <string name="tool_face_group_title">Raggruppa volti simili</string>
     <string name="tool_face_group_desc">Raggruppa le foto per il volto rilevato più grande</string>
+    <string name="tool_category_create_desc">Acquisisci, registra e genera video</string>
+    <string name="tool_category_image_desc">Modifica immagini, scansione, QR e riconoscimento testo</string>
+    <string name="tool_category_media_desc">Conversione, modifica ed esportazione audio/video</string>
+    <string name="tool_category_utility_desc">Strumenti ebook, luce, volto, archiviazione e cronologia</string>
+    <string name="home_browse_eyebrow">ESPLORA</string>
+    <string name="home_browse_title">Categorie</string>
+    <string name="home_browse_desc">Scegli una categoria per vedere i suoi strumenti.</string>
+    <string name="home_category_tool_count">%1$d strumenti</string>
 </resources>

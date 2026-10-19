@@ -1,7 +1,9 @@
 package com.robin.tools.ui.screens
 
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,8 +15,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.filled.StarBorder
+import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -29,10 +30,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import com.robin.tools.R
 import com.robin.tools.core.ui.Dimension
 import com.robin.tools.core.ui.FeatureCard
-import com.robin.tools.core.ui.FeatureCardEmphasis
 import com.robin.tools.core.ui.StudioSectionHeader
 import com.robin.tools.core.ui.StudioSurface
 import com.robin.tools.core.ui.StudioSurfaceTone
@@ -41,15 +42,16 @@ import com.robin.tools.tool.ToolEntry
 import com.robin.tools.tool.ToolRegistry
 
 /**
- * Searchable home workbench.
+ * Category-first home workbench.
  *
- * Tools come from [ToolRegistry]; favorites and recents are persisted by
- * `ToolPreferences` in the activity and passed in as state.
+ * The home page keeps search, favorites, recents, and four category cards;
+ * individual tools live in [ToolCategoryScreen] so the first screen stays short.
  */
 @Composable
 fun HomeScreen(
     favorites: Set<String>,
     recents: List<String>,
+    onCategoryClick: (ToolCategory) -> Unit,
     onToolClick: (ToolEntry) -> Unit,
     onToggleFavorite: (ToolEntry) -> Unit
 ) {
@@ -59,7 +61,7 @@ fun HomeScreen(
     val allTools = ToolRegistry.tools
     val filtered = remember(query, allTools) {
         if (query.isBlank()) {
-            allTools
+            emptyList()
         } else {
             allTools.filter { tool ->
                 val haystack = buildString {
@@ -112,7 +114,6 @@ fun HomeScreen(
 
         if (query.isNotBlank()) {
             StudioSectionHeader(
-                eyebrow = stringResource(R.string.home_search_results),
                 title = stringResource(R.string.home_search_results)
             )
             if (filtered.isEmpty()) {
@@ -125,43 +126,49 @@ fun HomeScreen(
                 }
             } else {
                 filtered.forEach { tool ->
-                    ToolCard(tool, isFavorite = tool.id in favorites, onToolClick, onToggleFavorite)
+                    ToolCard(
+                        tool = tool,
+                        isFavorite = tool.id in favorites,
+                        onToolClick = onToolClick,
+                        onToggleFavorite = onToggleFavorite
+                    )
                 }
             }
         } else {
             if (favoriteTools.isNotEmpty()) {
                 StudioSectionHeader(
-                    eyebrow = stringResource(R.string.home_section_favorites),
                     title = stringResource(R.string.home_section_favorites)
                 )
-                favoriteTools.forEach { tool ->
-                    ToolCard(tool, isFavorite = true, onToolClick, onToggleFavorite)
-                }
+                QuickToolRow(
+                    tools = favoriteTools,
+                    onToolClick = onToolClick
+                )
             }
 
             if (recentTools.isNotEmpty()) {
                 StudioSectionHeader(
-                    eyebrow = stringResource(R.string.home_section_recent),
                     title = stringResource(R.string.home_section_recent)
                 )
-                recentTools.forEach { tool ->
-                    ToolCard(tool, isFavorite = tool.id in favorites, onToolClick, onToggleFavorite)
-                }
+                QuickToolRow(
+                    tools = recentTools,
+                    onToolClick = onToolClick
+                )
             }
 
+            StudioSectionHeader(
+                eyebrow = stringResource(R.string.home_browse_eyebrow),
+                title = stringResource(R.string.home_browse_title),
+                description = stringResource(R.string.home_browse_desc)
+            )
             ToolCategory.entries.forEach { category ->
-                val categoryTools = allTools.filter { it.category == category }
-                if (categoryTools.isNotEmpty()) {
-                    StudioSectionHeader(title = stringResource(category.labelRes))
-                    categoryTools.forEach { tool ->
-                        ToolCard(
-                            tool = tool,
-                            isFavorite = tool.id in favorites,
-                            onToolClick = onToolClick,
-                            onToggleFavorite = onToggleFavorite
-                        )
-                    }
-                }
+                val count = allTools.count { it.category == category }
+                FeatureCard(
+                    title = stringResource(category.labelRes),
+                    description = stringResource(category.descriptionRes),
+                    icon = category.icon,
+                    eyebrow = stringResource(R.string.home_category_tool_count, count),
+                    onClick = { onCategoryClick(category) }
+                )
             }
         }
 
@@ -169,36 +176,32 @@ fun HomeScreen(
     }
 }
 
+/** Compact favorites/recent strip that keeps the home page short. */
 @Composable
-private fun ToolCard(
-    tool: ToolEntry,
-    isFavorite: Boolean,
-    onToolClick: (ToolEntry) -> Unit,
-    onToggleFavorite: (ToolEntry) -> Unit
+private fun QuickToolRow(
+    tools: List<ToolEntry>,
+    onToolClick: (ToolEntry) -> Unit
 ) {
-    FeatureCard(
-        title = stringResource(tool.titleRes),
-        description = stringResource(tool.descriptionRes),
-        icon = tool.icon,
-        onClick = { onToolClick(tool) },
-        emphasis = if (tool.id == "camera") FeatureCardEmphasis.PRIMARY else FeatureCardEmphasis.STANDARD,
-        eyebrow = if (tool.id == "camera") stringResource(R.string.home_primary_tool) else null,
-        trailing = {
-            IconButton(onClick = { onToggleFavorite(tool) }) {
-                Icon(
-                    imageVector = if (isFavorite) Icons.Default.Star else Icons.Default.StarBorder,
-                    contentDescription = stringResource(
-                        if (isFavorite) R.string.home_favorite_remove else R.string.home_favorite_add
-                    ),
-                    tint = if (isFavorite) {
-                        MaterialTheme.colorScheme.tertiary
-                    } else {
-                        MaterialTheme.colorScheme.onSurfaceVariant
-                    }
-                )
-            }
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .horizontalScroll(rememberScrollState()),
+        horizontalArrangement = Arrangement.spacedBy(Dimension.sm)
+    ) {
+        tools.forEach { tool ->
+            AssistChip(
+                onClick = { onToolClick(tool) },
+                label = { Text(stringResource(tool.titleRes)) },
+                leadingIcon = {
+                    Icon(
+                        imageVector = tool.icon,
+                        contentDescription = null,
+                        modifier = Modifier.padding(Dimension.xxs)
+                    )
+                }
+            )
         }
-    )
+    }
 }
 
 @Composable

@@ -158,4 +158,13 @@
     <string name="tool_face_id_photo_desc">标准证件照尺寸并替换背景</string>
     <string name="tool_face_group_title">相似人脸分组</string>
     <string name="tool_face_group_desc">按最大人脸对照片进行分组</string>
+
+    <string name="tool_category_create_desc">拍摄、录制与生成视频</string>
+    <string name="tool_category_image_desc">图片编辑、文档扫描、二维码与文字识别</string>
+    <string name="tool_category_media_desc">音视频转换、编辑与导出</string>
+    <string name="tool_category_utility_desc">电子书、光照、人脸、存储与历史工具</string>
+    <string name="home_browse_eyebrow">浏览</string>
+    <string name="home_browse_title">功能分类</string>
+    <string name="home_browse_desc">选择分类查看对应工具。</string>
+    <string name="home_category_tool_count">%1$d 个工具</string>
 </resources>

@@ -158,4 +158,13 @@
     <string name="tool_face_id_photo_desc">Standard ID sizes with background replacement</string>
     <string name="tool_face_group_title">Group Similar Faces</string>
     <string name="tool_face_group_desc">Cluster photos by the largest detected face</string>
+
+    <string name="tool_category_create_desc">Capture, record, and generate video</string>
+    <string name="tool_category_image_desc">Image editing, scanning, QR, and text recognition</string>
+    <string name="tool_category_media_desc">Audio and video conversion, editing, and export</string>
+    <string name="tool_category_utility_desc">Ebook, light, face, storage, and history tools</string>
+    <string name="home_browse_eyebrow">BROWSE</string>
+    <string name="home_browse_title">Categories</string>
+    <string name="home_browse_desc">Pick a category to see its tools.</string>
+    <string name="home_category_tool_count">%1$d tools</string>
 </resources>
