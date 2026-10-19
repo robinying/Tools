@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.updateAndGet
 import kotlinx.coroutines.launch
 
 data class ChartDataPoint(
@@ -56,14 +57,19 @@ class MainViewModel(
     fun updateLuxFromSensor(lux: Float) {
         val now = System.currentTimeMillis()
         _currentLux.value = lux
-        _sampleBuffer.update { list ->
+        val updated = _sampleBuffer.updateAndGet { list ->
             val newPoint = ChartDataPoint(now, lux)
             val filtered = list.filter { now - it.timestamp <= MAX_BUFFER_MS }
-            (filtered + newPoint)
-                .sortedBy { it.timestamp }
-                .takeLast(MAX_POINTS)
+            // Samples normally arrive in order, so append in O(1). Keep a sort only
+            // for the rare case where the wall clock moves backwards mid-session.
+            val appended = if (filtered.isEmpty() || filtered.last().timestamp <= now) {
+                filtered + newPoint
+            } else {
+                (filtered + newPoint).sortedBy { it.timestamp }
+            }
+            appended.takeLast(MAX_POINTS)
         }
-        recomputeVisible(now)
+        applyVisibleWindow(updated, now)
     }
 
     /**
@@ -90,8 +96,12 @@ class MainViewModel(
     }
 
     private fun recomputeVisible(now: Long = System.currentTimeMillis()) {
+        applyVisibleWindow(_sampleBuffer.value, now)
+    }
+
+    private fun applyVisibleWindow(samples: List<ChartDataPoint>, now: Long) {
         val windowMs = _chartWindow.value.durationMs
-        val visible = _sampleBuffer.value.filter { now - it.timestamp <= windowMs }
+        val visible = samples.filter { now - it.timestamp <= windowMs }
         _realtimeChartData.value = visible
         _chartStats.value = ChartStats.from(visible)
     }

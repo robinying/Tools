@@ -1,6 +1,6 @@
 # Tools
 
-A unified Android utility app combining media tools, camera editing, ebook conversion, light metering, and face comparison into a single application. Built with a clean multi-module architecture and Jetpack Compose.
+A unified Android utility app combining media tools, camera editing, ebook conversion, light metering, face comparison, and storage benchmarking into a single application. Built with a clean multi-module architecture and Jetpack Compose.
 
 ## Features
 
@@ -51,6 +51,13 @@ Camera2 + OpenGL preview pipeline, multi-segment recording, and offline editors.
 - Snapshot save with Room database persistence
 - History view with swipe-to-delete
 
+### 💾 Storage Benchmark
+
+- Sequential write / read, random 4 KB read / write, and small-file throughput
+- Optional cache-eviction cold read and SQLite insert phase
+- Per-phase latency percentiles, throughput timeline chart, and rating
+- Room-backed history of the most recent runs
+
 ### 👤 Face Compare
 
 - Select two photos and compare face similarity
@@ -66,6 +73,7 @@ Camera2 + OpenGL preview pipeline, multi-segment recording, and offline editors.
       →  :feature:ebook    →  :core
       →  :feature:lightlux →  :core
       →  :feature:face     →  :core
+      →  :feature:storage  →  :core
 ```
 
 Features depend only on `:core`. Features do **not** depend on each other.
@@ -81,6 +89,7 @@ Features depend only on `:core`. Features do **not** depend on each other.
 | `:feature:ebook` | `com.robin.tools.feature.ebook` | EPUB → PDF |
 | `:feature:lightlux` | `com.robin.tools.feature.lightlux` | Light sensor + Room |
 | `:feature:face` | `com.robin.tools.feature.face` | Face similarity (ML Kit + TFLite) |
+| `:feature:storage` | `com.robin.tools.feature.storage` | Storage speed benchmark (IO engine + Room history) |
 
 ### Design System
 

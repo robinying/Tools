@@ -51,7 +51,7 @@ class BeautyFilter(resources: Resources) : GpuImageFilter(resources) {
         setUniform1f("params", params)
         val stepX = if (inputWidth > 0) 2f / inputWidth else 0.002f
         val stepY = if (inputHeight > 0) 2f / inputHeight else 0.002f
-        val location = GLES20.glGetUniformLocation(programId, "singleStepOffset")
+        val location = uniformLocation("singleStepOffset")
         if (location >= 0) {
             GLES20.glUniform2f(location, stepX, stepY)
         }

@@ -49,6 +49,13 @@ class CameraGlRenderer : GLSurfaceView.Renderer {
     private var sensorOrientation: Int = 90
     private var displayRotationDegrees: Int = 0
 
+    // Orientation of the UV buffer currently uploaded to [lastUvFilter]. Rebuilding a
+    // direct ByteBuffer every frame only to feed identical coordinates caused needless
+    // per-frame allocations in the render loop.
+    private var lastUvFilter: GpuImageFilter? = null
+    private var lastUvRotationDegrees: Int = Int.MIN_VALUE
+    private var lastUvMirror: Boolean = false
+
     /**
      * Extra CW content rotation on the FBO→screen pass (beyond SurfaceTexture).
      *
@@ -240,13 +247,7 @@ class CameraGlRenderer : GLSurfaceView.Renderer {
             val outputFilter =
                 if (currentFilterType == FilterType.NONE) displayFilter else currentEffectFilter
 
-            outputFilter.setTextureCoordinates(
-                TextureRotation.asFloatArray(
-                    rotationDegrees = contentRotationDegrees,
-                    flipHorizontal = isFrontCamera,
-                    flipVertical = false
-                )
-            )
+            applyDisplayTextureCoordinates(outputFilter)
             System.arraycopy(displayMatrix, 0, outputFilter.mvpMatrix, 0, 16)
             outputFilter.draw(camera2DTexture)
 
@@ -257,6 +258,31 @@ class CameraGlRenderer : GLSurfaceView.Renderer {
                 captureCb(readViewportBitmap())
             }
         }
+    }
+
+    /**
+     * Uploads display UVs only when the orientation or the target filter changed.
+     *
+     * Tracking the filter identity also covers filter swaps, whose fresh instance
+     * starts with the default texture coordinates.
+     */
+    private fun applyDisplayTextureCoordinates(filter: GpuImageFilter) {
+        if (filter === lastUvFilter &&
+            contentRotationDegrees == lastUvRotationDegrees &&
+            isFrontCamera == lastUvMirror
+        ) {
+            return
+        }
+        filter.setTextureCoordinates(
+            TextureRotation.asFloatArray(
+                rotationDegrees = contentRotationDegrees,
+                flipHorizontal = isFrontCamera,
+                flipVertical = false
+            )
+        )
+        lastUvFilter = filter
+        lastUvRotationDegrees = contentRotationDegrees
+        lastUvMirror = isFrontCamera
     }
 
     /**
@@ -274,26 +300,12 @@ class CameraGlRenderer : GLSurfaceView.Renderer {
             val h = viewportHeight
             val buf = ByteBuffer.allocateDirect(w * h * 4).order(ByteOrder.nativeOrder())
             GLES20.glReadPixels(0, 0, w, h, GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, buf)
-            val pixels = IntArray(w * h)
-            buf.asIntBuffer().get(pixels)
-            // GL is bottom-up + RGBA → ARGB + flip Y
-            val bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
-            for (y in 0 until h) {
-                for (x in 0 until w) {
-                    val px = pixels[y * w + x]
-                    // ABGR packed from RGBA bytes on little-endian
-                    val r = px and 0xff
-                    val g = (px shr 8) and 0xff
-                    val b = (px shr 16) and 0xff
-                    val a = (px shr 24) and 0xff
-                    pixels[(h - 1 - y) * w + x] = (a shl 24) or (r shl 16) or (g shl 8) or b
-                }
-            }
-            // Second pass: we overwrote while reading — redo cleanly
-            buf.rewind()
             val raw = IntArray(w * h)
             buf.asIntBuffer().get(raw)
+            // GL is bottom-up + RGBA → ARGB + flip Y. Reading into a separate array
+            // avoids overwriting pixels that have not been converted yet.
             val argb = IntArray(w * h)
+            val bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
             for (y in 0 until h) {
                 for (x in 0 until w) {
                     val px = raw[y * w + x]
@@ -313,6 +325,7 @@ class CameraGlRenderer : GLSurfaceView.Renderer {
     }
 
     fun release() {
+        lastUvFilter = null
         cameraFilter.destroy()
         currentEffectFilter.destroy()
         displayFilter.destroy()

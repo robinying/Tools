@@ -78,9 +78,7 @@ dependencies {
     implementation(libs.glide)
     implementation(libs.coil)
 
-    implementation(libs.lottie)
     implementation(libs.utilcodex)
-    implementation(libs.permissionx)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

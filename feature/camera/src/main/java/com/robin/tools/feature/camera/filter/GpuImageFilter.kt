@@ -24,6 +24,9 @@ abstract class GpuImageFilter(protected val resources: Resources) {
     private var mvpMatrixHandle: Int = -1
     private var textureHandle: Int = -1
 
+    /** Uniform locations are immutable per linked program; cache them instead of querying every frame. */
+    private val uniformLocations = HashMap<String, Int>()
+
     var mvpMatrix: FloatArray = FloatArray(16)
 
     init {
@@ -38,6 +41,7 @@ abstract class GpuImageFilter(protected val resources: Resources) {
         val fragmentSrc = getFragmentShader()
         glProgram = GlProgram(vertexSrc, fragmentSrc).apply { create() }
         programId = glProgram!!.programId
+        uniformLocations.clear()
 
         positionHandle = GLES20.glGetAttribLocation(programId, "vPosition")
         texCoordHandle = GLES20.glGetAttribLocation(programId, "vCoord")
@@ -92,24 +96,26 @@ abstract class GpuImageFilter(protected val resources: Resources) {
 
     open fun onDraw() {}
 
+    /** Look up a uniform location once per program and reuse it on subsequent frames. */
+    protected fun uniformLocation(name: String): Int =
+        uniformLocations.getOrPut(name) { GLES20.glGetUniformLocation(programId, name) }
+
     fun setUniform1f(name: String, value: Float) {
-        val location = GLES20.glGetUniformLocation(programId, name)
-        GLES20.glUniform1f(location, value)
+        GLES20.glUniform1f(uniformLocation(name), value)
     }
 
     fun setUniform3f(name: String, x: Float, y: Float, z: Float) {
-        val location = GLES20.glGetUniformLocation(programId, name)
-        GLES20.glUniform3f(location, x, y, z)
+        GLES20.glUniform3f(uniformLocation(name), x, y, z)
     }
 
     fun setUniformMatrix4fv(name: String, matrix: FloatArray) {
-        val location = GLES20.glGetUniformLocation(programId, name)
-        GLES20.glUniformMatrix4fv(location, 1, false, matrix, 0)
+        GLES20.glUniformMatrix4fv(uniformLocation(name), 1, false, matrix, 0)
     }
 
     open fun destroy() {
         glProgram?.release()
         glProgram = null
         programId = 0
+        uniformLocations.clear()
     }
 }
