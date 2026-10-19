@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="toolkit_back">返回</string>
+    <string name="toolkit_image_studio_title">图片工坊</string>
+    <string name="toolkit_image_studio_desc">格式转换、缩放、旋转、清除元数据或导出 PDF</string>
+    <string name="toolkit_qr_title">二维码</string>
+    <string name="toolkit_qr_desc">生成二维码，或从图片中识别二维码</string>
+    <string name="toolkit_ocr_title">文字识别</string>
+    <string name="toolkit_ocr_desc">在设备本地从照片中提取文字（中文与拉丁字母）</string>
+
+    <string name="toolkit_select_image">选择图片</string>
+    <string name="toolkit_reselect_image">重新选择</string>
+    <string name="toolkit_no_image_title">选择一张图片</string>
+    <string name="toolkit_no_image_desc">从相册选择图片后开始处理。</string>
+    <string name="toolkit_section_options">选项</string>
+    <string name="toolkit_section_result">结果</string>
+    <string name="toolkit_reading_exif">正在读取元数据…</string>
+    <string name="toolkit_saved">已保存：%1$s</string>
+    <string name="toolkit_failed">失败：%1$s</string>
+    <string name="toolkit_share">分享</string>
+    <string name="toolkit_copy">复制</string>
+
+    <string name="image_tool_convert">格式转换</string>
+    <string name="image_tool_convert_desc">将图片重新编码为 JPEG、PNG 或 WebP</string>
+    <string name="image_tool_resize">缩放</string>
+    <string name="image_tool_resize_desc">按指定百分比缩小图片</string>
+    <string name="image_tool_rotate">旋转</string>
+    <string name="image_tool_rotate_desc">将图片旋转 90、180 或 270 度</string>
+    <string name="image_tool_exif">元数据</string>
+    <string name="image_tool_exif_desc">查看 EXIF 信息，并可清除元数据保护隐私</string>
+    <string name="image_tool_pdf">图片转 PDF</string>
+    <string name="image_tool_pdf_desc">将图片封装为单页 PDF 文档</string>
+
+    <string name="image_format">格式</string>
+    <string name="image_format_jpeg">JPEG</string>
+    <string name="image_format_png">PNG</string>
+    <string name="image_format_webp">WebP</string>
+    <string name="image_quality_value">质量 %1$d</string>
+    <string name="image_scale_value">缩放 %1$d%%</string>
+    <string name="image_process">处理并保存</string>
+    <string name="image_strip_metadata">清除元数据并保存</string>
+    <string name="image_export_pdf">导出 PDF</string>
+    <string name="image_exif_empty">未找到元数据</string>
+    <string name="image_exif_note">清除元数据会重新编码为 JPEG，并移除相机、日期和 GPS 信息。</string>
+    <string name="image_pdf_note">PDF 页面与图片尺寸一致，保存在 Download/Tools 目录。</string>
+    <string name="image_width">宽度</string>
+    <string name="image_height">高度</string>
+    <string name="image_format_label">MIME 类型</string>
+    <string name="image_orientation">方向</string>
+    <string name="image_orientation_normal">正常</string>
+    <string name="image_make">相机厂商</string>
+    <string name="image_model">相机型号</string>
+    <string name="image_datetime">拍摄时间</string>
+    <string name="image_gps">GPS 位置</string>
+    <string name="image_value_none">—</string>
+    <string name="image_value_yes">有</string>
+    <string name="image_value_no">无</string>
+
+    <string name="qr_mode_generate">生成</string>
+    <string name="qr_mode_decode">识别图片</string>
+    <string name="qr_content">内容</string>
+    <string name="qr_content_hint">文本、网址或任意内容</string>
+    <string name="qr_generate_action">生成二维码</string>
+    <string name="qr_save_action">保存图片</string>
+    <string name="qr_results">识别结果</string>
+    <string name="qr_no_result">未找到二维码</string>
+    <string name="qr_decode_hint">选择包含二维码的图片。</string>
+
+    <string name="ocr_pick_title">选择文档照片</string>
+    <string name="ocr_pick_desc">识别在设备本地完成，结果可复制或分享。</string>
+    <string name="ocr_recognize">识别文字</string>
+    <string name="ocr_no_text">未识别到文字</string>
+    <string name="ocr_result_title">识别结果</string>
+</resources>

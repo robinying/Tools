@@ -112,4 +112,30 @@
     <string name="filter_cartoon">Cartoon</string>
     <string name="filter_sharpen">Sharpen</string>
     <string name="filter_sketch">Sketch</string>
+
+    <string name="audio_trim">Audio Trim</string>
+    <string name="audio_trim_desc">Cut an audio file to a precise time range.</string>
+    <string name="audio_trim_select">Select audio</string>
+    <string name="audio_trim_no_file">Choose an audio file</string>
+    <string name="audio_trim_range_eyebrow">RANGE</string>
+    <string name="audio_trim_range_title">Choose start and end</string>
+    <string name="audio_trim_range_value">%1$s – %2$s</string>
+    <string name="audio_trim_start_value">Start %1$s</string>
+    <string name="audio_trim_end_value">End %1$s</string>
+    <string name="audio_trim_action">Trim audio</string>
+    <string name="audio_trim_saved">Audio trimmed and saved</string>
+    <string name="audio_trim_failed">Trim failed: %1$s</string>
+
+    <string name="video_custom">Custom Compress</string>
+    <string name="video_custom_desc">Pick the output resolution and bitrate instead of a fixed quality preset.</string>
+    <string name="video_custom_select">Select video</string>
+    <string name="video_custom_no_file">Choose a video file</string>
+    <string name="video_custom_info">%1$d × %2$d · %3$d s</string>
+    <string name="video_custom_settings_eyebrow">ENCODING</string>
+    <string name="video_custom_settings_title">Resolution and bitrate</string>
+    <string name="video_custom_resolution">Resolution</string>
+    <string name="video_custom_bitrate">Bitrate %1$d kbps</string>
+    <string name="video_custom_action">Compress with custom settings</string>
+    <string name="video_custom_saved">Video compressed and saved</string>
+    <string name="video_custom_failed">Compression failed: %1$s</string>
 </resources>

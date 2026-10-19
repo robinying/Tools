@@ -111,4 +111,20 @@
     <string name="storage_unit_seconds">%1$s s</string>
     <string name="storage_duration_minutes_seconds">%1$d:%2$02d</string>
     <string name="storage_duration_hours_minutes_seconds">%1$d:%2$02d:%3$02d</string>
+    <string name="cleanup_title">Nettoyage du stockage</string>
+    <string name="cleanup_subtitle">Trouvez les fichiers volumineux et les doublons probables. La suppression reste confiée au gestionnaire de fichiers du système.</string>
+    <string name="cleanup_threshold">TAILLE MINIMALE</string>
+    <string name="cleanup_scan">Analyser le stockage</string>
+    <string name="cleanup_summary">%1$d fichiers volumineux · %2$d groupes de doublons</string>
+    <string name="cleanup_wasted">Espace dupliqué potentiel : %1$s</string>
+    <string name="cleanup_large_title">Fichiers volumineux</string>
+    <string name="cleanup_large_empty">Aucun fichier multimédia au-dessus du seuil.</string>
+    <string name="cleanup_duplicate_title">Groupes de doublons</string>
+    <string name="cleanup_duplicate_empty">Aucun doublon détecté par empreinte d\'échantillon.</string>
+    <string name="cleanup_duplicate_group">%1$d copies · %2$s chacune</string>
+    <string name="cleanup_open">Ouvrir</string>
+    <string name="cleanup_permission_needed">L\'accès en lecture aux médias est requis pour analyser les images et vidéos.</string>
+    <string name="storage_export_csv">Exporter en CSV</string>
+    <string name="storage_export_done">Enregistré : %1$s</string>
+    <string name="storage_export_failed">Échec de l\'export</string>
 </resources>

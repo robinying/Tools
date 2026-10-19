@@ -16,7 +16,9 @@ import androidx.core.app.NotificationCompat
 import com.robin.tools.feature.media.R
 import com.robin.tools.feature.media.data.*
 import com.robin.tools.feature.media.delegate.CompressionDelegateFactory
+import com.robin.tools.feature.media.delegate.AudioTrimDelegate
 import com.robin.tools.feature.media.delegate.ConcatDelegate
+import com.robin.tools.feature.media.delegate.VideoCompressionDelegate
 import kotlinx.coroutines.*
 
 class CompressionService : Service() {
@@ -31,6 +33,10 @@ class CompressionService : Service() {
         const val EXTRA_FILE_PATHS = "extra_file_paths"
         const val EXTRA_TYPE = "extra_type"
         const val EXTRA_LEVEL = "extra_level"
+        const val EXTRA_TRIM_START_MS = "extra_trim_start_ms"
+        const val EXTRA_TRIM_END_MS = "extra_trim_end_ms"
+        const val EXTRA_VIDEO_MIN_DIMENSION = "extra_video_min_dimension"
+        const val EXTRA_VIDEO_BITRATE_KBPS = "extra_video_bitrate_kbps"
 
         /**
          * Start processing without going through the system multi-select UI.
@@ -46,6 +52,40 @@ class CompressionService : Service() {
                 putStringArrayListExtra(EXTRA_FILE_PATHS, ArrayList(absolutePaths))
                 putExtra(EXTRA_TYPE, type.name)
                 putExtra(EXTRA_LEVEL, level.name)
+            }
+            androidx.core.content.ContextCompat.startForegroundService(context, intent)
+        }
+
+        /** Starts a custom video compression job. */
+        fun startCustomVideoCompression(
+            context: Context,
+            uri: Uri,
+            minDimension: Int,
+            bitrateKbps: Int
+        ) {
+            val intent = Intent(context, CompressionService::class.java).apply {
+                putParcelableArrayListExtra(EXTRA_URIS, arrayListOf(uri))
+                putExtra(EXTRA_TYPE, CompressionType.VIDEO_CUSTOM.name)
+                putExtra(EXTRA_LEVEL, CompressionLevel.MEDIUM.name)
+                putExtra(EXTRA_VIDEO_MIN_DIMENSION, minDimension)
+                putExtra(EXTRA_VIDEO_BITRATE_KBPS, bitrateKbps)
+            }
+            androidx.core.content.ContextCompat.startForegroundService(context, intent)
+        }
+
+        /** Starts an audio trim without going through the generic compression screen. */
+        fun startAudioTrim(
+            context: Context,
+            uri: Uri,
+            startMs: Long,
+            endMs: Long
+        ) {
+            val intent = Intent(context, CompressionService::class.java).apply {
+                putParcelableArrayListExtra(EXTRA_URIS, arrayListOf(uri))
+                putExtra(EXTRA_TYPE, CompressionType.AUDIO_TRIM.name)
+                putExtra(EXTRA_LEVEL, CompressionLevel.MEDIUM.name)
+                putExtra(EXTRA_TRIM_START_MS, startMs)
+                putExtra(EXTRA_TRIM_END_MS, endMs)
             }
             androidx.core.content.ContextCompat.startForegroundService(context, intent)
         }
@@ -105,7 +145,20 @@ class CompressionService : Service() {
         val type = CompressionType.valueOf(typeName)
         val level = CompressionLevel.valueOf(levelName)
 
-        startCompression(uris, type, level)
+        val trimStartMs = intent.getLongExtra(EXTRA_TRIM_START_MS, 0L)
+        val trimEndMs = intent.getLongExtra(EXTRA_TRIM_END_MS, Long.MAX_VALUE)
+        val videoMinDimension = intent.getIntExtra(EXTRA_VIDEO_MIN_DIMENSION, 0)
+        val videoBitrateKbps = intent.getIntExtra(EXTRA_VIDEO_BITRATE_KBPS, 0)
+
+        startCompression(
+            uris = uris,
+            type = type,
+            level = level,
+            trimStartMs = trimStartMs,
+            trimEndMs = trimEndMs,
+            videoMinDimension = videoMinDimension,
+            videoBitrateKbps = videoBitrateKbps
+        )
 
         return START_NOT_STICKY
     }
@@ -168,9 +221,17 @@ class CompressionService : Service() {
         notificationManager.notify(NOTIFICATION_ID, notification)
     }
 
-    private fun startCompression(uris: List<Uri>, type: CompressionType, level: CompressionLevel) {
+    private fun startCompression(
+        uris: List<Uri>,
+        type: CompressionType,
+        level: CompressionLevel,
+        trimStartMs: Long,
+        trimEndMs: Long,
+        videoMinDimension: Int,
+        videoBitrateKbps: Int
+    ) {
         isRunning = true
-        CompressionManager.startTask()
+        CompressionManager.startTask(type)
         
         serviceScope.launch {
             var successCount = 0
@@ -223,7 +284,13 @@ class CompressionService : Service() {
                         )
                     }
 
-                    val delegate = CompressionDelegateFactory.create(type)
+                    val delegate = when {
+                        type == CompressionType.AUDIO_TRIM ->
+                            AudioTrimDelegate(trimStartMs, trimEndMs)
+                        type == CompressionType.VIDEO_CUSTOM && videoMinDimension > 0 ->
+                            VideoCompressionDelegate(videoMinDimension, videoBitrateKbps)
+                        else -> CompressionDelegateFactory.create(type)
+                    }
                     val result = try {
                         delegate.process(this@CompressionService, uri, level, onProgress)
                     } catch (e: Exception) {

@@ -113,4 +113,10 @@
     <string name="filter_inkwell">Inkwell</string>
     <string name="filter_n1977">1977</string>
     <string name="filter_nashville">Nashville</string>
+
+    <string name="camera_guide_grid">Grid</string>
+    <string name="camera_guide_level">Level</string>
+    <string name="camera_timer_off">Off</string>
+    <string name="camera_timer_3">3s</string>
+    <string name="camera_timer_10">10s</string>
 </resources>

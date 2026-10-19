@@ -27,6 +27,24 @@ class CompressionViewModel(application: Application) : AndroidViewModel(applicat
         ContextCompat.startForegroundService(context, intent)
     }
 
+    fun startCustomVideoCompression(uri: Uri, minDimension: Int, bitrateKbps: Int) {
+        CompressionService.startCustomVideoCompression(
+            getApplication<Application>().applicationContext,
+            uri,
+            minDimension,
+            bitrateKbps
+        )
+    }
+
+    fun startAudioTrim(uri: Uri, startMs: Long, endMs: Long) {
+        CompressionService.startAudioTrim(
+            getApplication<Application>().applicationContext,
+            uri,
+            startMs,
+            endMs
+        )
+    }
+
     fun cancelCompression() {
         CompressionManager.cancelTask()
     }

@@ -36,4 +36,17 @@
     <string name="face_compare_feature_failed_right">右侧图片特征提取失败</string>
     <string name="face_compare_engine_deep">引擎：MobileFaceNet（设备端）</string>
     <string name="face_compare_engine_fallback">引擎：关键点几何（模型未加载）</string>
+
+    <string name="face_blur_title">人脸打码</string>
+    <string name="face_blur_desc">分享前自动检测人脸并进行马赛克或模糊处理。</string>
+    <string name="face_blur_mode">模式</string>
+    <string name="face_blur_mosaic">马赛克</string>
+    <string name="face_blur_soft">柔化模糊</string>
+    <string name="face_blur_strength">强度 %1$d</string>
+    <string name="face_blur_action">打码并保存</string>
+    <string name="face_blur_saved">已保存：%1$s</string>
+    <string name="face_blur_failed">失败：%1$s</string>
+    <string name="face_blur_empty_title">选择一张照片</string>
+    <string name="face_blur_empty_desc">检测到的每张人脸都会被遮挡。</string>
+    <string name="face_blur_share">分享</string>
 </resources>

@@ -106,4 +106,10 @@
     <string name="filter_inkwell">墨水瓶</string>
     <string name="filter_n1977">1977</string>
     <string name="filter_nashville">纳什维尔</string>
+
+    <string name="camera_guide_grid">网格</string>
+    <string name="camera_guide_level">水平仪</string>
+    <string name="camera_timer_off">关闭</string>
+    <string name="camera_timer_3">3 秒</string>
+    <string name="camera_timer_10">10 秒</string>
 </resources>

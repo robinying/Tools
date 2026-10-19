@@ -59,10 +59,15 @@ import java.util.ArrayList
 fun CompressionScreen(
     type: CompressionType,
     onBack: () -> Unit,
+    initialUri: String? = null,
     viewModel: CompressionViewModel = viewModel()
 ) {
     val context = LocalContext.current
-    var selectedUris by remember { mutableStateOf<List<Uri>>(emptyList()) }
+    var selectedUris by remember(initialUri) {
+        mutableStateOf(
+            initialUri?.let { uri -> listOf(Uri.parse(uri)) } ?: emptyList()
+        )
+    }
     var compressionLevel by remember { mutableStateOf(CompressionLevel.MEDIUM) }
     
     val taskState by viewModel.taskState.collectAsStateWithLifecycle()
@@ -126,10 +131,12 @@ fun CompressionScreen(
                                         CompressionType.REVERSE,
                                         CompressionType.CONCAT,
                                         CompressionType.CROP,
-                                        CompressionType.VOLUME_FADE -> "video/*"
+                                        CompressionType.VOLUME_FADE,
+                                        CompressionType.VIDEO_CUSTOM -> "video/*"
                                         CompressionType.GIF -> "image/gif"
                                         CompressionType.IMAGE -> "image/*"
-                                        CompressionType.EXTRACT_AUDIO -> "audio/*"
+                                        CompressionType.EXTRACT_AUDIO,
+                                        CompressionType.AUDIO_TRIM -> "audio/*"
                                     }
                                     val intent = Intent(Intent.ACTION_VIEW).apply {
                                         setDataAndType(Uri.parse(outputUri), mimeType)
@@ -181,6 +188,8 @@ fun CompressionScreen(
                     CompressionType.CONCAT -> context.getString(R.string.concat_video)
                     CompressionType.CROP -> context.getString(R.string.crop_aspect)
                     CompressionType.VOLUME_FADE -> context.getString(R.string.volume_fade)
+                    CompressionType.AUDIO_TRIM -> context.getString(R.string.audio_trim)
+                    CompressionType.VIDEO_CUSTOM -> context.getString(R.string.video_custom)
                 },
                 onBack = onBack,
                 backContentDescription = context.getString(R.string.back)

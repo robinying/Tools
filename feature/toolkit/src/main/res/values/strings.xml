@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="toolkit_back">Back</string>
+    <string name="toolkit_image_studio_title">Image Studio</string>
+    <string name="toolkit_image_studio_desc">Convert, resize, rotate, strip metadata, or export an image to PDF</string>
+    <string name="toolkit_qr_title">QR Code</string>
+    <string name="toolkit_qr_desc">Generate a QR code or decode one from an image</string>
+    <string name="toolkit_ocr_title">Text Recognition</string>
+    <string name="toolkit_ocr_desc">Extract text from a photo with on-device OCR (Chinese and Latin)</string>
+
+    <string name="toolkit_select_image">Select image</string>
+    <string name="toolkit_reselect_image">Reselect image</string>
+    <string name="toolkit_no_image_title">Choose an image</string>
+    <string name="toolkit_no_image_desc">Pick a photo from your library to start.</string>
+    <string name="toolkit_section_options">OPTIONS</string>
+    <string name="toolkit_section_result">RESULT</string>
+    <string name="toolkit_reading_exif">Reading metadata…</string>
+    <string name="toolkit_saved">Saved: %1$s</string>
+    <string name="toolkit_failed">Failed: %1$s</string>
+    <string name="toolkit_share">Share</string>
+    <string name="toolkit_copy">Copy</string>
+
+    <string name="image_tool_convert">Convert format</string>
+    <string name="image_tool_convert_desc">Re-encode the image as JPEG, PNG, or WebP</string>
+    <string name="image_tool_resize">Resize</string>
+    <string name="image_tool_resize_desc">Scale the image down to a chosen percentage</string>
+    <string name="image_tool_rotate">Rotate</string>
+    <string name="image_tool_rotate_desc">Rotate the image by 90, 180, or 270 degrees</string>
+    <string name="image_tool_exif">Metadata</string>
+    <string name="image_tool_exif_desc">Inspect EXIF fields and strip metadata for privacy</string>
+    <string name="image_tool_pdf">Image to PDF</string>
+    <string name="image_tool_pdf_desc">Wrap the image in a single-page PDF document</string>
+
+    <string name="image_format">Format</string>
+    <string name="image_format_jpeg">JPEG</string>
+    <string name="image_format_png">PNG</string>
+    <string name="image_format_webp">WebP</string>
+    <string name="image_quality_value">Quality %1$d</string>
+    <string name="image_scale_value">Scale %1$d%%</string>
+    <string name="image_process">Process and save</string>
+    <string name="image_strip_metadata">Strip metadata and save</string>
+    <string name="image_export_pdf">Export PDF</string>
+    <string name="image_exif_empty">No metadata found</string>
+    <string name="image_exif_note">Stripping re-encodes the image as JPEG and removes camera, date, and GPS tags.</string>
+    <string name="image_pdf_note">The PDF page matches the image size and is saved under Downloads/Tools.</string>
+    <string name="image_width">Width</string>
+    <string name="image_height">Height</string>
+    <string name="image_format_label">MIME type</string>
+    <string name="image_orientation">Orientation</string>
+    <string name="image_orientation_normal">Normal</string>
+    <string name="image_make">Camera make</string>
+    <string name="image_model">Camera model</string>
+    <string name="image_datetime">Date</string>
+    <string name="image_gps">GPS location</string>
+    <string name="image_value_none">—</string>
+    <string name="image_value_yes">Yes</string>
+    <string name="image_value_no">No</string>
+
+    <string name="qr_mode_generate">Generate</string>
+    <string name="qr_mode_decode">Decode image</string>
+    <string name="qr_content">Content</string>
+    <string name="qr_content_hint">Text, URL, or any payload</string>
+    <string name="qr_generate_action">Generate QR code</string>
+    <string name="qr_save_action">Save image</string>
+    <string name="qr_results">Decoded values</string>
+    <string name="qr_no_result">No QR code found</string>
+    <string name="qr_decode_hint">Pick an image that contains a QR code.</string>
+
+    <string name="ocr_pick_title">Choose a document photo</string>
+    <string name="ocr_pick_desc">Recognized text stays on the device and can be copied or shared.</string>
+    <string name="ocr_recognize">Recognize text</string>
+    <string name="ocr_no_text">No text found</string>
+    <string name="ocr_result_title">Recognized text</string>
+</resources>

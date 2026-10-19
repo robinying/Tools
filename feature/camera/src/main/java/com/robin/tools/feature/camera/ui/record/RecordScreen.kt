@@ -14,12 +14,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.SwitchCamera
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Undo
+import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -32,6 +34,10 @@ import com.robin.tools.feature.camera.R
 import com.robin.tools.feature.camera.filter.FilterType
 import com.robin.tools.feature.camera.filter.stringRes
 import com.robin.tools.feature.camera.opengl.CameraGlSurfaceView
+import com.robin.tools.feature.camera.ui.common.CameraGridOverlay
+import com.robin.tools.feature.camera.ui.common.CameraGuideChips
+import com.robin.tools.feature.camera.ui.common.CameraLevelOverlay
+import com.robin.tools.feature.camera.ui.common.rememberDeviceRollDegrees
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -43,6 +49,9 @@ fun RecordScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val configuration = LocalConfiguration.current
+    var showGrid by rememberSaveable { mutableStateOf(true) }
+    var showLevel by rememberSaveable { mutableStateOf(true) }
+    val rollDegrees = rememberDeviceRollDegrees()
 
     // Keep preview upright if display rotation changes while recording UI is open.
     LaunchedEffect(configuration.orientation) {
@@ -59,6 +68,27 @@ fun RecordScreen(
                 }
             },
             modifier = Modifier.fillMaxSize()
+        )
+
+        // Framing guides sit above the preview but below the controls.
+        if (showGrid) {
+            CameraGridOverlay(modifier = Modifier.fillMaxSize())
+        }
+        if (showLevel) {
+            CameraLevelOverlay(
+                rollDegrees = rollDegrees,
+                modifier = Modifier.fillMaxSize()
+            )
+        }
+
+        CameraGuideChips(
+            showGrid = showGrid,
+            showLevel = showLevel,
+            onToggleGrid = { showGrid = !showGrid },
+            onToggleLevel = { showLevel = !showLevel },
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(top = 100.dp, end = 16.dp)
         )
 
         // Top bar
@@ -160,7 +190,7 @@ fun RecordScreen(
                 enabled = uiState.segmentCount > 0 && !uiState.isRecording
             ) {
                 Icon(
-                    Icons.Default.Undo,
+                    Icons.AutoMirrored.Filled.Undo,
                     stringResource(R.string.record_delete_segment),
                     tint = if (uiState.segmentCount > 0) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.onBackground.copy(alpha = 0.3f),
                     modifier = Modifier.size(32.dp)

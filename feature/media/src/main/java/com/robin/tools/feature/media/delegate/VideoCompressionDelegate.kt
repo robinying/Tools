@@ -11,7 +11,10 @@ import com.robin.tools.feature.media.utils.FileUtils
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 
-class VideoCompressionDelegate : CompressionDelegate {
+class VideoCompressionDelegate(
+    private val customMinDimension: Int? = null,
+    private val customBitrateKbps: Int? = null
+) : CompressionDelegate {
     private val TAG = "VideoCompression"
 
     override suspend fun process(
@@ -48,10 +51,14 @@ class VideoCompressionDelegate : CompressionDelegate {
         }
 
         val minDim = if (inputWidth > 0 && inputHeight > 0) Math.min(inputWidth, inputHeight) else 720
-        val (targetMinDim, bitrate) = when (level) {
-            CompressionLevel.LOW -> 1080 to "4000k"
-            CompressionLevel.MEDIUM -> 720 to "2000k"
-            CompressionLevel.HIGH -> 480 to "750k"
+        val (targetMinDim, bitrate) = if (customMinDimension != null && customBitrateKbps != null) {
+            customMinDimension to "${customBitrateKbps}k"
+        } else {
+            when (level) {
+                CompressionLevel.LOW -> 1080 to "4000k"
+                CompressionLevel.MEDIUM -> 720 to "2000k"
+                CompressionLevel.HIGH -> 480 to "750k"
+            }
         }
 
         val scaleFactor = if (minDim > targetMinDim) targetMinDim.toFloat() / minDim else 1f

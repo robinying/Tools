@@ -1,6 +1,7 @@
 package com.robin.tools.feature.media.data
 
 import com.robin.tools.feature.media.delegate.AudioExtractDelegate
+import com.robin.tools.feature.media.delegate.AudioTrimDelegate
 import com.robin.tools.feature.media.delegate.CompressionDelegateFactory
 import com.robin.tools.feature.media.delegate.ConcatDelegate
 import com.robin.tools.feature.media.delegate.CropAspectDelegate
@@ -80,6 +81,21 @@ class CompressionDelegateFactoryTest {
     fun `create returns VolumeFadeDelegate for VOLUME_FADE`() {
         assertTrue(
             CompressionDelegateFactory.create(CompressionType.VOLUME_FADE) is VolumeFadeDelegate
+        )
+    }
+
+    @Test
+    fun `create returns VideoCompressionDelegate for VIDEO_CUSTOM`() {
+        assertTrue(
+            CompressionDelegateFactory.create(CompressionType.VIDEO_CUSTOM)
+                is VideoCompressionDelegate
+        )
+    }
+
+    @Test
+    fun `create returns AudioTrimDelegate for AUDIO_TRIM`() {
+        assertTrue(
+            CompressionDelegateFactory.create(CompressionType.AUDIO_TRIM) is AudioTrimDelegate
         )
     }
 }

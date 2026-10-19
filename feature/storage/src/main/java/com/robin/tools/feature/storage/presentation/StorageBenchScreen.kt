@@ -20,15 +20,18 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.robin.tools.core.media.MediaStoreSaver
 import com.robin.tools.core.ui.Dimension
 import com.robin.tools.core.ui.EmptyState
 import com.robin.tools.core.ui.ProgressBlock
@@ -40,6 +43,7 @@ import com.robin.tools.core.ui.StudioSurface
 import com.robin.tools.core.ui.StudioSurfaceTone
 import com.robin.tools.core.ui.ToolsTopAppBar
 import com.robin.tools.feature.storage.R
+import com.robin.tools.feature.storage.data.BenchmarkCsv
 import com.robin.tools.feature.storage.data.BenchmarkPhase
 import com.robin.tools.feature.storage.data.BenchmarkPreset
 import com.robin.tools.feature.storage.data.BenchmarkProgress
@@ -49,6 +53,9 @@ import com.robin.tools.feature.storage.data.MB
 import com.robin.tools.feature.storage.data.RandomIoMetric
 import com.robin.tools.feature.storage.data.RatingThresholds
 import com.robin.tools.feature.storage.data.StorageBenchViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
  * 存储速度测试主界面。
@@ -71,6 +78,8 @@ fun StorageBenchScreen(
 
     val isRunning = progress is BenchmarkProgress.Running
     val view = LocalView.current
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
     DisposableEffect(isRunning) {
         view.keepScreenOn = isRunning
         onDispose { view.keepScreenOn = false }
@@ -156,7 +165,28 @@ fun StorageBenchScreen(
 
             HistorySection(
                 entries = history,
-                onClear = viewModel::clearHistory
+                onClear = viewModel::clearHistory,
+                onExportCsv = {
+                    val csv = BenchmarkCsv.format(history)
+                    scope.launch {
+                        val result = withContext(Dispatchers.IO) {
+                            MediaStoreSaver.saveDocument(
+                                context = context,
+                                bytes = csv.toByteArray(),
+                                mimeType = "text/csv",
+                                fileName = "storage_bench_${System.currentTimeMillis()}.csv"
+                            )
+                        }
+                        android.widget.Toast.makeText(
+                            context,
+                            result.fold(
+                                { context.getString(R.string.storage_export_done, it.displayName) },
+                                { context.getString(R.string.storage_export_failed) }
+                            ),
+                            android.widget.Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
             )
 
             Spacer(Modifier.height(Dimension.xl))

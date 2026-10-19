@@ -40,6 +40,7 @@ import java.util.Locale
 fun HistorySection(
     entries: List<BenchmarkHistoryEntry>,
     onClear: () -> Unit,
+    onExportCsv: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var confirmClear by remember { mutableStateOf(false) }
@@ -62,6 +63,12 @@ fun HistorySection(
     }
 
     entries.forEach { entry -> HistoryCard(entry) }
+
+    StudioActionButton(
+        label = stringResource(R.string.storage_export_csv),
+        onClick = onExportCsv,
+        style = StudioActionStyle.SECONDARY
+    )
 
     StudioActionButton(
         label = stringResource(R.string.storage_history_clear),

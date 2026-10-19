@@ -11,12 +11,18 @@ object CompressionManager {
     @Volatile
     private var isCancelled = false
 
+    /** Type of the job currently running or most recently finished. */
+    @Volatile
+    var activeType: CompressionType? = null
+        private set
+
     fun updateState(state: CompressionTaskState) {
         _taskState.value = state
     }
 
-    fun startTask() {
+    fun startTask(type: CompressionType? = null) {
         isCancelled = false
+        activeType = type
     }
 
     fun cancelTask() {
@@ -28,5 +34,6 @@ object CompressionManager {
     fun reset() {
         _taskState.value = CompressionTaskState.Idle
         isCancelled = false
+        activeType = null
     }
 }

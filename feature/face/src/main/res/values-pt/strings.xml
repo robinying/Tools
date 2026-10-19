@@ -36,4 +36,16 @@
     <string name="face_compare_stage_desc">Escolha um par e execute a comparação no dispositivo.</string>
     <string name="face_compare_engine_deep">Mecanismo: MobileFaceNet (no dispositivo)</string>
     <string name="face_compare_engine_fallback">Mecanismo: geometria de pontos faciais (modelo não carregado)</string>
+    <string name="face_blur_title">Desfoque de rostos</string>
+    <string name="face_blur_desc">Detecte rostos e aplique mosaico ou desfoque antes de compartilhar.</string>
+    <string name="face_blur_mode">MODO</string>
+    <string name="face_blur_mosaic">Mosaico</string>
+    <string name="face_blur_soft">Desfoque suave</string>
+    <string name="face_blur_strength">Intensidade %1$d</string>
+    <string name="face_blur_action">Desfocar rostos e salvar</string>
+    <string name="face_blur_saved">Salvo: %1$s</string>
+    <string name="face_blur_failed">Falhou: %1$s</string>
+    <string name="face_blur_empty_title">Escolha uma foto</string>
+    <string name="face_blur_empty_desc">Cada rosto detectado será ocultado.</string>
+    <string name="face_blur_share">Compartilhar</string>
 </resources>

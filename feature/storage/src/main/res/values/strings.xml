@@ -114,4 +114,23 @@
     <string name="storage_unit_seconds">%1$s s</string>
     <string name="storage_duration_minutes_seconds">%1$d:%2$02d</string>
     <string name="storage_duration_hours_minutes_seconds">%1$d:%2$02d:%3$02d</string>
+
+    <string name="cleanup_title">Storage Cleanup</string>
+    <string name="cleanup_subtitle">Find large media files and suspected duplicates. Deleting is left to the system file manager.</string>
+    <string name="cleanup_threshold">MINIMUM FILE SIZE</string>
+    <string name="cleanup_scan">Scan storage</string>
+    <string name="cleanup_summary">%1$d large files · %2$d duplicate groups</string>
+    <string name="cleanup_wasted">Potential duplicate waste: %1$s</string>
+    <string name="cleanup_large_title">Large files</string>
+    <string name="cleanup_large_empty">No media files above the threshold.</string>
+    <string name="cleanup_duplicate_title">Duplicate groups</string>
+    <string name="cleanup_duplicate_empty">No duplicates found by sampled hash.</string>
+    <string name="cleanup_duplicate_group">%1$d copies · %2$s each</string>
+    <string name="cleanup_open">Open</string>
+
+    <string name="storage_export_csv">Export CSV</string>
+    <string name="storage_export_done">Saved: %1$s</string>
+    <string name="storage_export_failed">Export failed</string>
+
+    <string name="cleanup_permission_needed">Media read access is required to scan images and videos.</string>
 </resources>

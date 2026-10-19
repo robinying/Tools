@@ -36,4 +36,16 @@
     <string name="face_compare_stage_desc">Choisissez une paire, puis lancez la comparaison sur l’appareil.</string>
     <string name="face_compare_engine_deep">Moteur : MobileFaceNet (sur l’appareil)</string>
     <string name="face_compare_engine_fallback">Moteur : géométrie des points faciaux (modèle non chargé)</string>
+    <string name="face_blur_title">Flou des visages</string>
+    <string name="face_blur_desc">Détecte les visages et applique un mosaïque ou un flou avant le partage.</string>
+    <string name="face_blur_mode">MODE</string>
+    <string name="face_blur_mosaic">Mosaïque</string>
+    <string name="face_blur_soft">Flou doux</string>
+    <string name="face_blur_strength">Intensité %1$d</string>
+    <string name="face_blur_action">Flouter les visages et enregistrer</string>
+    <string name="face_blur_saved">Enregistré : %1$s</string>
+    <string name="face_blur_failed">Échec : %1$s</string>
+    <string name="face_blur_empty_title">Choisissez une photo</string>
+    <string name="face_blur_empty_desc">Chaque visage détecté sera masqué.</string>
+    <string name="face_blur_share">Partager</string>
 </resources>

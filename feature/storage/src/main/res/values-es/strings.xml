@@ -110,4 +110,20 @@
     <string name="storage_unit_seconds">%1$s s</string>
     <string name="storage_duration_minutes_seconds">%1$d:%2$02d</string>
     <string name="storage_duration_hours_minutes_seconds">%1$d:%2$02d:%3$02d</string>
+    <string name="cleanup_title">Limpieza de almacenamiento</string>
+    <string name="cleanup_subtitle">Encuentra archivos grandes y posibles duplicados. La eliminación se deja al administrador de archivos del sistema.</string>
+    <string name="cleanup_threshold">TAMAÑO MÍNIMO</string>
+    <string name="cleanup_scan">Analizar almacenamiento</string>
+    <string name="cleanup_summary">%1$d archivos grandes · %2$d grupos duplicados</string>
+    <string name="cleanup_wasted">Espacio duplicado potencial: %1$s</string>
+    <string name="cleanup_large_title">Archivos grandes</string>
+    <string name="cleanup_large_empty">No hay archivos multimedia por encima del umbral.</string>
+    <string name="cleanup_duplicate_title">Grupos duplicados</string>
+    <string name="cleanup_duplicate_empty">No se encontraron duplicados por hash de muestra.</string>
+    <string name="cleanup_duplicate_group">%1$d copias · %2$s cada una</string>
+    <string name="cleanup_open">Abrir</string>
+    <string name="cleanup_permission_needed">Se requiere acceso de lectura a medios para analizar imágenes y vídeos.</string>
+    <string name="storage_export_csv">Exportar CSV</string>
+    <string name="storage_export_done">Guardado: %1$s</string>
+    <string name="storage_export_failed">Error al exportar</string>
 </resources>

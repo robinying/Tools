@@ -31,4 +31,5 @@ include(":feature:lightlux")
 include(":feature:face")
 include(":feature:camera")
 include(":feature:storage")
+include(":feature:toolkit")
 

@@ -16,6 +16,8 @@ object CompressionDelegateFactory {
             CompressionType.CONCAT -> ConcatDelegate()
             CompressionType.CROP -> CropAspectDelegate()
             CompressionType.VOLUME_FADE -> VolumeFadeDelegate()
+            CompressionType.AUDIO_TRIM -> AudioTrimDelegate()
+            CompressionType.VIDEO_CUSTOM -> VideoCompressionDelegate()
         }
     }
 }

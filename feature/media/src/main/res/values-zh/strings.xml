@@ -112,4 +112,30 @@
     <string name="filter_cartoon">卡通化</string>
     <string name="filter_sharpen">锐化</string>
     <string name="filter_sketch">素描</string>
+
+    <string name="audio_trim">音频裁剪</string>
+    <string name="audio_trim_desc">将音频精确裁剪到指定时间段。</string>
+    <string name="audio_trim_select">选择音频</string>
+    <string name="audio_trim_no_file">选择一个音频文件</string>
+    <string name="audio_trim_range_eyebrow">范围</string>
+    <string name="audio_trim_range_title">设置起点与终点</string>
+    <string name="audio_trim_range_value">%1$s – %2$s</string>
+    <string name="audio_trim_start_value">起点 %1$s</string>
+    <string name="audio_trim_end_value">终点 %1$s</string>
+    <string name="audio_trim_action">裁剪音频</string>
+    <string name="audio_trim_saved">音频已裁剪并保存</string>
+    <string name="audio_trim_failed">裁剪失败：%1$s</string>
+
+    <string name="video_custom">自定义压缩</string>
+    <string name="video_custom_desc">手动选择输出分辨率与码率，而不是固定质量档位。</string>
+    <string name="video_custom_select">选择视频</string>
+    <string name="video_custom_no_file">选择一个视频文件</string>
+    <string name="video_custom_info">%1$d × %2$d · %3$d 秒</string>
+    <string name="video_custom_settings_eyebrow">编码</string>
+    <string name="video_custom_settings_title">分辨率与码率</string>
+    <string name="video_custom_resolution">分辨率</string>
+    <string name="video_custom_bitrate">码率 %1$d kbps</string>
+    <string name="video_custom_action">按自定义参数压缩</string>
+    <string name="video_custom_saved">视频已压缩并保存</string>
+    <string name="video_custom_failed">压缩失败：%1$s</string>
 </resources>

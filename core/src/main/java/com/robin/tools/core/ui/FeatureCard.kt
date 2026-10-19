@@ -45,7 +45,8 @@ fun FeatureCard(
     enabled: Boolean = true,
     accent: Color = MaterialTheme.colorScheme.primary,
     emphasis: FeatureCardEmphasis = FeatureCardEmphasis.STANDARD,
-    eyebrow: String? = null
+    eyebrow: String? = null,
+    trailing: (@Composable () -> Unit)? = null
 ) {
     val colorScheme = MaterialTheme.colorScheme
     val isPrimary = emphasis == FeatureCardEmphasis.PRIMARY
@@ -118,6 +119,9 @@ fun FeatureCard(
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis
                 )
+            }
+            if (trailing != null) {
+                trailing()
             }
             Spacer(Modifier.width(Dimension.xs))
             Icon(

@@ -111,4 +111,23 @@
     <string name="storage_unit_seconds">%1$s 秒</string>
     <string name="storage_duration_minutes_seconds">%1$d:%2$02d</string>
     <string name="storage_duration_hours_minutes_seconds">%1$d:%2$02d:%3$02d</string>
+
+    <string name="cleanup_title">存储清理</string>
+    <string name="cleanup_subtitle">查找大体积媒体文件和疑似重复文件。删除操作交由系统文件管理完成。</string>
+    <string name="cleanup_threshold">最小文件大小</string>
+    <string name="cleanup_scan">扫描存储</string>
+    <string name="cleanup_summary">%1$d 个大文件 · %2$d 组重复</string>
+    <string name="cleanup_wasted">疑似重复占用：%1$s</string>
+    <string name="cleanup_large_title">大文件</string>
+    <string name="cleanup_large_empty">没有超过阈值的大文件。</string>
+    <string name="cleanup_duplicate_title">重复分组</string>
+    <string name="cleanup_duplicate_empty">未通过采样哈希发现重复文件。</string>
+    <string name="cleanup_duplicate_group">%1$d 个副本 · 每个 %2$s</string>
+    <string name="cleanup_open">打开</string>
+
+    <string name="storage_export_csv">导出 CSV</string>
+    <string name="storage_export_done">已保存：%1$s</string>
+    <string name="storage_export_failed">导出失败</string>
+
+    <string name="cleanup_permission_needed">扫描图片和视频需要媒体读取权限。</string>
 </resources>

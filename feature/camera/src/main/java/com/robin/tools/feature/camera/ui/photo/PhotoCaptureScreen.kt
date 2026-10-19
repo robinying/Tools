@@ -16,6 +16,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.SwitchCamera
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Text
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -29,6 +30,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -38,8 +40,14 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.robin.tools.feature.camera.R
 import com.robin.tools.feature.camera.opengl.CameraGlSurfaceView
 import com.robin.tools.feature.camera.storage.GallerySaver
+import com.robin.tools.feature.camera.ui.common.CameraGridOverlay
+import com.robin.tools.feature.camera.ui.common.CameraGuideChips
+import com.robin.tools.feature.camera.ui.common.CameraLevelOverlay
+import com.robin.tools.feature.camera.ui.common.rememberDeviceRollDegrees
+import com.robin.tools.core.ui.TextOptionChip
 import com.robin.tools.feature.camera.ui.record.FilterSwipeSelector
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -54,6 +62,12 @@ fun PhotoCaptureScreen(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var capturing by remember { mutableStateOf(false) }
+    var countingDown by remember { mutableStateOf(false) }
+    var countdownValue by remember { mutableStateOf(0) }
+    var timerSeconds by remember { mutableStateOf(0) }
+    var showGrid by remember { mutableStateOf(true) }
+    var showLevel by remember { mutableStateOf(true) }
+    val rollDegrees = rememberDeviceRollDegrees()
 
     DisposableEffect(Unit) {
         onDispose { viewModel.releaseCamera() }
@@ -72,6 +86,35 @@ fun PhotoCaptureScreen(
             },
             modifier = Modifier.fillMaxSize()
         )
+
+        if (showGrid) {
+            CameraGridOverlay(modifier = Modifier.fillMaxSize())
+        }
+        if (showLevel) {
+            CameraLevelOverlay(
+                rollDegrees = rollDegrees,
+                modifier = Modifier.fillMaxSize()
+            )
+        }
+
+        CameraGuideChips(
+            showGrid = showGrid,
+            showLevel = showLevel,
+            onToggleGrid = { showGrid = !showGrid },
+            onToggleLevel = { showLevel = !showLevel },
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(top = 100.dp, end = 16.dp)
+        )
+
+        if (countingDown) {
+            Text(
+                text = countdownValue.toString(),
+                style = MaterialTheme.typography.displayLarge,
+                color = MaterialTheme.colorScheme.onBackground,
+                modifier = Modifier.align(Alignment.Center)
+            )
+        }
 
         Row(
             modifier = Modifier
@@ -108,6 +151,44 @@ fun PhotoCaptureScreen(
                 .padding(bottom = 140.dp)
         )
 
+        Row(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 210.dp),
+            horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(8.dp)
+        ) {
+            TextOptionChip(
+                selected = timerSeconds == 0,
+                onClick = { timerSeconds = 0 },
+                label = stringResource(R.string.camera_timer_off)
+            )
+            TextOptionChip(
+                selected = timerSeconds == 3,
+                onClick = { timerSeconds = 3 },
+                label = stringResource(R.string.camera_timer_3)
+            )
+            TextOptionChip(
+                selected = timerSeconds == 10,
+                onClick = { timerSeconds = 10 },
+                label = stringResource(R.string.camera_timer_10)
+            )
+        }
+
+        val capture: () -> Unit = {
+            capturing = true
+            viewModel.captureStill { bmp ->
+                scope.launch {
+                    val ok = if (bmp != null) {
+                        withContext(Dispatchers.IO) { savePhoto(context, bmp) }
+                    } else {
+                        false
+                    }
+                    capturing = false
+                    ToastMsg(context, ok)
+                }
+            }
+        }
+
         Box(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
@@ -115,17 +196,19 @@ fun PhotoCaptureScreen(
                 .size(80.dp)
                 .clip(CircleShape)
                 .background(MaterialTheme.colorScheme.onBackground.copy(alpha = 0.3f))
-                .clickable(enabled = !capturing && uiState.isReady) {
-                    capturing = true
-                    viewModel.captureStill { bmp ->
+                .clickable(enabled = !capturing && !countingDown && uiState.isReady) {
+                    if (timerSeconds == 0) {
+                        capture()
+                    } else {
                         scope.launch {
-                            val ok = if (bmp != null) {
-                                withContext(Dispatchers.IO) { savePhoto(context, bmp) }
-                            } else {
-                                false
+                            countingDown = true
+                            for (remaining in timerSeconds downTo 1) {
+                                countdownValue = remaining
+                                delay(1_000)
                             }
-                            capturing = false
-                            ToastMsg(context, ok)
+                            countdownValue = 0
+                            countingDown = false
+                            capture()
                         }
                     }
                 },

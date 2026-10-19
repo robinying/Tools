@@ -11,16 +11,23 @@ import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.MenuBook
-import androidx.compose.material.icons.filled.Face
-import androidx.compose.material.icons.filled.Image
-import androidx.compose.material.icons.filled.LightMode
-import androidx.compose.material.icons.filled.Speed
-import androidx.compose.material.icons.filled.Videocam
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.StarBorder
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.robin.tools.R
 import com.robin.tools.core.ui.Dimension
@@ -29,16 +36,50 @@ import com.robin.tools.core.ui.FeatureCardEmphasis
 import com.robin.tools.core.ui.StudioSectionHeader
 import com.robin.tools.core.ui.StudioSurface
 import com.robin.tools.core.ui.StudioSurfaceTone
+import com.robin.tools.tool.ToolCategory
+import com.robin.tools.tool.ToolEntry
+import com.robin.tools.tool.ToolRegistry
 
+/**
+ * Searchable home workbench.
+ *
+ * Tools come from [ToolRegistry]; favorites and recents are persisted by
+ * `ToolPreferences` in the activity and passed in as state.
+ */
 @Composable
 fun HomeScreen(
-    onMediaClick: () -> Unit,
-    onEbookClick: () -> Unit,
-    onLightLuxClick: () -> Unit,
-    onFaceCompareClick: () -> Unit,
-    onCameraClick: () -> Unit = {},
-    onStorageBenchClick: () -> Unit = {}
+    favorites: Set<String>,
+    recents: List<String>,
+    onToolClick: (ToolEntry) -> Unit,
+    onToggleFavorite: (ToolEntry) -> Unit
 ) {
+    val context = LocalContext.current
+    var query by rememberSaveable { mutableStateOf("") }
+
+    val allTools = ToolRegistry.tools
+    val filtered = remember(query, allTools) {
+        if (query.isBlank()) {
+            allTools
+        } else {
+            allTools.filter { tool ->
+                val haystack = buildString {
+                    append(context.getString(tool.titleRes))
+                    append(' ')
+                    append(context.getString(tool.descriptionRes))
+                    append(' ')
+                    append(tool.keywords.joinToString(" "))
+                }
+                haystack.contains(query.trim(), ignoreCase = true)
+            }
+        }
+    }
+    val favoriteTools = remember(favorites) {
+        allTools.filter { it.id in favorites }
+    }
+    val recentTools = remember(recents) {
+        recents.mapNotNull(ToolRegistry::byId)
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -50,65 +91,114 @@ fun HomeScreen(
         Spacer(Modifier.height(Dimension.lg))
         HomeHero()
 
-        StudioSectionHeader(
-            eyebrow = stringResource(R.string.home_section_create),
-            title = stringResource(R.string.home_create_title),
-            description = stringResource(R.string.home_create_desc),
-            accent = MaterialTheme.colorScheme.tertiary
-        )
-        FeatureCard(
-            title = stringResource(R.string.camera_title),
-            description = stringResource(R.string.camera_desc),
-            icon = Icons.Default.Videocam,
-            onClick = onCameraClick,
-            accent = MaterialTheme.colorScheme.tertiary,
-            emphasis = FeatureCardEmphasis.PRIMARY,
-            eyebrow = stringResource(R.string.home_primary_tool)
-        )
-        FeatureCard(
-            title = stringResource(R.string.media_editor_title),
-            description = stringResource(R.string.media_editor_desc),
-            icon = Icons.Default.Image,
-            onClick = onMediaClick,
-            accent = MaterialTheme.colorScheme.primary
+        OutlinedTextField(
+            value = query,
+            onValueChange = { query = it },
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true,
+            leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+            trailingIcon = {
+                if (query.isNotEmpty()) {
+                    IconButton(onClick = { query = "" }) {
+                        Icon(
+                            Icons.Default.Clear,
+                            contentDescription = stringResource(R.string.home_search_hint)
+                        )
+                    }
+                }
+            },
+            placeholder = { Text(stringResource(R.string.home_search_hint)) }
         )
 
-        StudioSectionHeader(
-            eyebrow = stringResource(R.string.home_section_utility),
-            title = stringResource(R.string.home_utility_title),
-            description = stringResource(R.string.home_utility_desc),
-            accent = MaterialTheme.colorScheme.secondary
-        )
-        FeatureCard(
-            title = stringResource(R.string.ebook_converter_title),
-            description = stringResource(R.string.ebook_converter_desc),
-            icon = Icons.AutoMirrored.Filled.MenuBook,
-            onClick = onEbookClick,
-            accent = MaterialTheme.colorScheme.primary
-        )
-        FeatureCard(
-            title = stringResource(R.string.light_meter_title),
-            description = stringResource(R.string.light_meter_desc),
-            icon = Icons.Default.LightMode,
-            onClick = onLightLuxClick,
-            accent = MaterialTheme.colorScheme.secondary
-        )
-        FeatureCard(
-            title = stringResource(R.string.face_compare_title),
-            description = stringResource(R.string.face_compare_desc),
-            icon = Icons.Default.Face,
-            onClick = onFaceCompareClick,
-            accent = MaterialTheme.colorScheme.tertiary
-        )
-        FeatureCard(
-            title = stringResource(R.string.storage_bench_title),
-            description = stringResource(R.string.storage_bench_desc),
-            icon = Icons.Default.Speed,
-            onClick = onStorageBenchClick,
-            accent = MaterialTheme.colorScheme.secondary
-        )
+        if (query.isNotBlank()) {
+            StudioSectionHeader(
+                eyebrow = stringResource(R.string.home_search_results),
+                title = stringResource(R.string.home_search_results)
+            )
+            if (filtered.isEmpty()) {
+                StudioSurface(tone = StudioSurfaceTone.OUTLINED) {
+                    Text(
+                        text = stringResource(R.string.home_search_empty, query),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            } else {
+                filtered.forEach { tool ->
+                    ToolCard(tool, isFavorite = tool.id in favorites, onToolClick, onToggleFavorite)
+                }
+            }
+        } else {
+            if (favoriteTools.isNotEmpty()) {
+                StudioSectionHeader(
+                    eyebrow = stringResource(R.string.home_section_favorites),
+                    title = stringResource(R.string.home_section_favorites)
+                )
+                favoriteTools.forEach { tool ->
+                    ToolCard(tool, isFavorite = true, onToolClick, onToggleFavorite)
+                }
+            }
+
+            if (recentTools.isNotEmpty()) {
+                StudioSectionHeader(
+                    eyebrow = stringResource(R.string.home_section_recent),
+                    title = stringResource(R.string.home_section_recent)
+                )
+                recentTools.forEach { tool ->
+                    ToolCard(tool, isFavorite = tool.id in favorites, onToolClick, onToggleFavorite)
+                }
+            }
+
+            ToolCategory.entries.forEach { category ->
+                val categoryTools = allTools.filter { it.category == category }
+                if (categoryTools.isNotEmpty()) {
+                    StudioSectionHeader(title = stringResource(category.labelRes))
+                    categoryTools.forEach { tool ->
+                        ToolCard(
+                            tool = tool,
+                            isFavorite = tool.id in favorites,
+                            onToolClick = onToolClick,
+                            onToggleFavorite = onToggleFavorite
+                        )
+                    }
+                }
+            }
+        }
+
         Spacer(Modifier.height(Dimension.xl))
     }
+}
+
+@Composable
+private fun ToolCard(
+    tool: ToolEntry,
+    isFavorite: Boolean,
+    onToolClick: (ToolEntry) -> Unit,
+    onToggleFavorite: (ToolEntry) -> Unit
+) {
+    FeatureCard(
+        title = stringResource(tool.titleRes),
+        description = stringResource(tool.descriptionRes),
+        icon = tool.icon,
+        onClick = { onToolClick(tool) },
+        emphasis = if (tool.id == "camera") FeatureCardEmphasis.PRIMARY else FeatureCardEmphasis.STANDARD,
+        eyebrow = if (tool.id == "camera") stringResource(R.string.home_primary_tool) else null,
+        trailing = {
+            IconButton(onClick = { onToggleFavorite(tool) }) {
+                Icon(
+                    imageVector = if (isFavorite) Icons.Default.Star else Icons.Default.StarBorder,
+                    contentDescription = stringResource(
+                        if (isFavorite) R.string.home_favorite_remove else R.string.home_favorite_add
+                    ),
+                    tint = if (isFavorite) {
+                        MaterialTheme.colorScheme.tertiary
+                    } else {
+                        MaterialTheme.colorScheme.onSurfaceVariant
+                    }
+                )
+            }
+        }
+    )
 }
 
 @Composable

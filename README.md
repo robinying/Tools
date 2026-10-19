@@ -1,6 +1,6 @@
 # Tools
 
-A unified Android utility app combining media tools, camera editing, ebook conversion, light metering, face comparison, and storage benchmarking into a single application. Built with a clean multi-module architecture and Jetpack Compose.
+A unified Android utility app combining media tools, camera editing, image/QR/OCR utilities, ebook conversion, light metering, face analysis, and storage benchmarking into a single application. Built with a clean multi-module architecture and Jetpack Compose.
 
 ## Features
 
@@ -11,6 +11,7 @@ Compression, conversion, and FFmpeg-powered video utilities. Long work runs in a
 | Tool | Description |
 |------|-------------|
 | **Video Compression** | Reduce video size with Low / Medium / High quality (FFmpeg) |
+| **Custom Compression** | Choose output resolution (480p/720p/1080p) and bitrate manually |
 | **Image Compression** | Compress images with JPEG quality control |
 | **GIF Conversion** | Video → animated GIF with quality options |
 | **Extract Audio** | Pull AAC/M4A audio track from video |
@@ -21,6 +22,7 @@ Compression, conversion, and FFmpeg-powered video utilities. Long work runs in a
 | **Merge Videos** | Join multiple clips in order (concat; re-encode fallback) |
 | **Crop Aspect** | Center crop to **1:1**, **9:16**, or **16:9** |
 | **Volume and Fade** | Volume 50% / 100% / 150% plus fade in/out |
+| **Audio Trim** | Cut an audio file to a precise start/end range |
 | **Image Filter** | Grayscale, Blur, Edge Detection, Cartoon, Sharpen, Sketch (OpenCV) |
 
 ### 📸 Camera
@@ -29,13 +31,26 @@ Camera2 + OpenGL preview pipeline, multi-segment recording, and offline editors.
 
 | Tool | Description |
 |------|-------------|
-| **Take Photo** | Still capture with live GPU filters; save to gallery |
-| **Record Video** | Multi-segment recording, countdown, beauty/color filters, flip camera |
+| **Take Photo** | Still capture with live GPU filters, grid/level guides, and 3s/10s timer; save to gallery |
+| **Record Video** | Multi-segment recording, countdown, beauty/color filters, flip camera, rule-of-thirds grid and horizon level |
 | **Edit Video** | Filters, text watermark, **stickers**, timed **subtitles** / **SRT import**, export with effects burn-in |
 | **Trim Video** | Trim range, rotate / orientation helpers |
 | **Select Cover** | Pick a cover frame from the video |
 | **Text to Video** | Solid-color text card → short H.264 MP4 (no audio) |
 | **Photo Slideshow** | Multi-photo → silent H.264 slideshow (seconds per image) |
+
+### 🖼️ Image Studio
+
+- Convert images between JPEG / PNG / WebP
+- Resize, rotate, and strip EXIF metadata
+- Export a photo as a single-page PDF
+- QR code generation and decoding from images
+- On-device text recognition (Chinese + Latin)
+
+### 🎵 Audio Trim
+
+- Pick an audio file and trim it to a precise start/end range
+- Re-encodes the result as AAC/M4A
 
 ### 📖 Ebook Converter
 
@@ -51,6 +66,13 @@ Camera2 + OpenGL preview pipeline, multi-segment recording, and offline editors.
 - Snapshot save with Room database persistence
 - History view with swipe-to-delete
 
+### 🧹 Storage Cleanup
+
+- Find media files above a configurable size threshold
+- Group suspected duplicates by size + sampled content hash
+- Export benchmark history as CSV
+- Read-only review; deletion stays with the system file manager
+
 ### 💾 Storage Benchmark
 
 - Sequential write / read, random 4 KB read / write, and small-file throughput
@@ -58,12 +80,16 @@ Camera2 + OpenGL preview pipeline, multi-segment recording, and offline editors.
 - Per-phase latency percentiles, throughput timeline chart, and rating
 - Room-backed history of the most recent runs
 
-### 👤 Face Compare
+### 👤 Face Tools
 
-- Select two photos and compare face similarity
-- On-device ML Kit face detection with landmark alignment
-- Cosine similarity scoring with visual result card
-- TFLite MobileFaceNet embedding when the model is present
+- **Face Compare** — select two photos, detect faces with ML Kit, and score cosine similarity (MobileFaceNet when the model is present)
+- **Face Blur** — detect every face and apply mosaic or soft blur for privacy
+
+### 🔎 Home, History, and Sharing
+
+- Searchable tool registry with favorites and recent tools
+- Task history (Room) for media, camera, ebook, and toolkit results
+- `ACTION_SEND` / `ACTION_VIEW` share targets route images, videos, audio, and text into compatible tools
 
 ## Architecture
 
@@ -74,6 +100,7 @@ Camera2 + OpenGL preview pipeline, multi-segment recording, and offline editors.
       →  :feature:lightlux →  :core
       →  :feature:face     →  :core
       →  :feature:storage  →  :core
+      →  :feature:toolkit  →  :core
 ```
 
 Features depend only on `:core`. Features do **not** depend on each other.
@@ -89,7 +116,8 @@ Features depend only on `:core`. Features do **not** depend on each other.
 | `:feature:ebook` | `com.robin.tools.feature.ebook` | EPUB → PDF |
 | `:feature:lightlux` | `com.robin.tools.feature.lightlux` | Light sensor + Room |
 | `:feature:face` | `com.robin.tools.feature.face` | Face similarity (ML Kit + TFLite) |
-| `:feature:storage` | `com.robin.tools.feature.storage` | Storage speed benchmark (IO engine + Room history) |
+| `:feature:storage` | `com.robin.tools.feature.storage` | Storage speed benchmark + cleanup scanner |
+| `:feature:toolkit` | `com.robin.tools.feature.toolkit` | Image studio, QR codes, on-device OCR |
 
 ### Design System
 
@@ -120,7 +148,7 @@ Shared tokens in `:core`:
 - **FFmpeg Kit** (local AAR) — video/audio tools
 - **OpenCV 4.12.0** (local AAR) — image filters
 - **Camera2 + GLES** — camera preview / export
-- **ML Kit + TensorFlow Lite** — face detection / embedding
+- **ML Kit + TensorFlow Lite** — face detection / embedding, barcode scanning, text recognition
 - **epublib + PDFBox Android** — ebook conversion
 
 ## Building

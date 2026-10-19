@@ -25,7 +25,11 @@ enum class CompressionType {
     /** Center crop to 1:1 / 9:16 / 16:9 */
     CROP,
     /** Volume + fade in/out */
-    VOLUME_FADE
+    VOLUME_FADE,
+    /** Trim an audio file to a time range */
+    AUDIO_TRIM,
+    /** Video compression with a user-chosen resolution and bitrate */
+    VIDEO_CUSTOM
 }
 
 enum class CompressionLevel(@StringRes val labelRes: Int) {
