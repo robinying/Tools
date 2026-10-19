@@ -12,7 +12,10 @@ sealed interface AppRoute {
     data object MediaMain : AppRoute
 
     @Serializable
-    data class ToolCategoryRoute(val category: String) : AppRoute
+    data class ToolCategoryRoute(
+        val category: String,
+        val group: String? = null
+    ) : AppRoute
 
     @Serializable
     data class Compression(

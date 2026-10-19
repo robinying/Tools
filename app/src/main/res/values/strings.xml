@@ -167,4 +167,13 @@
     <string name="home_browse_title">Categories</string>
     <string name="home_browse_desc">Pick a category to see its tools.</string>
     <string name="home_category_tool_count">%1$d tools</string>
+
+    <string name="media_group_compress">Compress and Convert</string>
+    <string name="media_group_compress_desc">Shrink video or images, convert formats, or make a GIF.</string>
+    <string name="media_group_audio">Audio</string>
+    <string name="media_group_audio_desc">Trim, merge, record, extract, remove, or adjust audio.</string>
+    <string name="media_group_video">Video Editing</string>
+    <string name="media_group_video_desc">Change speed, reverse, merge, crop, mix music, or overlay video.</string>
+    <string name="media_group_frames">Frames and Style</string>
+    <string name="media_group_frames_desc">Extract still frames or apply image filters.</string>
 </resources>

@@ -42,6 +42,33 @@ import com.robin.tools.R
 import com.robin.tools.feature.media.data.CompressionType
 import com.robin.tools.navigation.AppRoute
 
+enum class ToolGroup(
+    @StringRes val labelRes: Int,
+    @StringRes val descriptionRes: Int,
+    val icon: ImageVector
+) {
+    MEDIA_COMPRESS(
+        R.string.media_group_compress,
+        R.string.media_group_compress_desc,
+        Icons.Default.Transform
+    ),
+    MEDIA_AUDIO(
+        R.string.media_group_audio,
+        R.string.media_group_audio_desc,
+        Icons.Default.AudioFile
+    ),
+    MEDIA_VIDEO(
+        R.string.media_group_video,
+        R.string.media_group_video_desc,
+        Icons.Default.VideoLibrary
+    ),
+    MEDIA_FRAMES(
+        R.string.media_group_frames,
+        R.string.media_group_frames_desc,
+        Icons.Default.Collections
+    )
+}
+
 enum class ToolCategory(
     @StringRes val labelRes: Int,
     @StringRes val descriptionRes: Int,
@@ -78,7 +105,9 @@ data class ToolEntry(
     val category: ToolCategory,
     val route: AppRoute,
     /** Extra search terms, including Chinese aliases. */
-    val keywords: List<String> = emptyList()
+    val keywords: List<String> = emptyList(),
+    /** Optional second-level grouping used by large categories (Media). */
+    val group: ToolGroup? = null
 )
 
 /**
@@ -184,107 +213,127 @@ object ToolRegistry {
         ToolEntry(
             "video_compress", R.string.tool_video_compress_title, R.string.tool_video_compress_desc,
             Icons.Default.VideoLibrary, ToolCategory.MEDIA, AppRoute.Compression(CompressionType.VIDEO),
-            listOf("compress", "video", "压缩", "视频")
+            listOf("compress", "video", "压缩", "视频"),
+            group = ToolGroup.MEDIA_COMPRESS
         ),
         ToolEntry(
             "image_compress", R.string.tool_image_compress_title, R.string.tool_image_compress_desc,
             Icons.Default.Image, ToolCategory.MEDIA, AppRoute.Compression(CompressionType.IMAGE),
-            listOf("compress", "image", "压缩", "图片")
+            listOf("compress", "image", "压缩", "图片"),
+            group = ToolGroup.MEDIA_COMPRESS
         ),
         ToolEntry(
             "gif", R.string.tool_gif_title, R.string.tool_gif_desc,
             Icons.Default.Slideshow, ToolCategory.MEDIA, AppRoute.Compression(CompressionType.GIF),
-            listOf("gif", "animation", "动图")
+            listOf("gif", "animation", "动图"),
+            group = ToolGroup.MEDIA_COMPRESS
         ),
         ToolEntry(
             "transcode", R.string.tool_transcode_title, R.string.tool_transcode_desc,
             Icons.Default.Transform, ToolCategory.MEDIA, AppRoute.Compression(CompressionType.TRANSCODE),
-            listOf("mp4", "transcode", "转码", "格式")
+            listOf("mp4", "transcode", "转码", "格式"),
+            group = ToolGroup.MEDIA_COMPRESS
         ),
         ToolEntry(
             "speed", R.string.tool_speed_title, R.string.tool_speed_desc,
             Icons.Default.Speed, ToolCategory.MEDIA, AppRoute.Compression(CompressionType.SPEED),
-            listOf("speed", "slow", "fast", "变速", "倍速")
+            listOf("speed", "slow", "fast", "变速", "倍速"),
+            group = ToolGroup.MEDIA_VIDEO
         ),
         ToolEntry(
             "reverse", R.string.tool_reverse_title, R.string.tool_reverse_desc,
             Icons.Default.Replay, ToolCategory.MEDIA, AppRoute.Compression(CompressionType.REVERSE),
-            listOf("reverse", "倒放", "反向")
+            listOf("reverse", "倒放", "反向"),
+            group = ToolGroup.MEDIA_VIDEO
         ),
         ToolEntry(
             "concat", R.string.tool_concat_title, R.string.tool_concat_desc,
             Icons.AutoMirrored.Filled.CallMerge, ToolCategory.MEDIA,
             AppRoute.Compression(CompressionType.CONCAT),
-            listOf("merge", "join", "合并", "拼接")
+            listOf("merge", "join", "合并", "拼接"),
+            group = ToolGroup.MEDIA_VIDEO
         ),
         ToolEntry(
             "crop", R.string.tool_crop_title, R.string.tool_crop_desc,
             Icons.Default.Crop, ToolCategory.MEDIA, AppRoute.Compression(CompressionType.CROP),
-            listOf("crop", "aspect", "裁剪", "比例")
+            listOf("crop", "aspect", "裁剪", "比例"),
+            group = ToolGroup.MEDIA_VIDEO
         ),
         ToolEntry(
             "volume", R.string.tool_volume_title, R.string.tool_volume_desc,
             Icons.AutoMirrored.Filled.VolumeUp, ToolCategory.MEDIA,
             AppRoute.Compression(CompressionType.VOLUME_FADE),
-            listOf("volume", "fade", "音量", "淡入淡出")
+            listOf("volume", "fade", "音量", "淡入淡出"),
+            group = ToolGroup.MEDIA_AUDIO
         ),
         ToolEntry(
             "extract_audio", R.string.tool_extract_audio_title, R.string.tool_extract_audio_desc,
             Icons.Default.AudioFile, ToolCategory.MEDIA,
             AppRoute.Compression(CompressionType.EXTRACT_AUDIO),
-            listOf("audio", "extract", "音频", "提取")
+            listOf("audio", "extract", "音频", "提取"),
+            group = ToolGroup.MEDIA_AUDIO
         ),
         ToolEntry(
             "strip_audio", R.string.tool_strip_audio_title, R.string.tool_strip_audio_desc,
             Icons.AutoMirrored.Filled.VolumeOff, ToolCategory.MEDIA,
             AppRoute.Compression(CompressionType.STRIP_AUDIO),
-            listOf("mute", "remove audio", "静音", "去音频")
+            listOf("mute", "remove audio", "静音", "去音频"),
+            group = ToolGroup.MEDIA_AUDIO
         ),
         ToolEntry(
             "video_custom", R.string.tool_video_custom_title, R.string.tool_video_custom_desc,
             Icons.Default.Tune, ToolCategory.MEDIA, AppRoute.VideoCustomCompress(),
-            listOf("compress", "bitrate", "resolution", "压缩", "码率", "分辨率")
+            listOf("compress", "bitrate", "resolution", "压缩", "码率", "分辨率"),
+            group = ToolGroup.MEDIA_COMPRESS
         ),
         ToolEntry(
             "audio_concat", R.string.tool_audio_concat_title, R.string.tool_audio_concat_desc,
             Icons.Default.AudioFile, ToolCategory.MEDIA, AppRoute.AudioConcat(),
-            listOf("audio", "merge", "join", "音频", "拼接", "合并")
+            listOf("audio", "merge", "join", "音频", "拼接", "合并"),
+            group = ToolGroup.MEDIA_AUDIO
         ),
         ToolEntry(
             "audio_recorder", R.string.tool_audio_recorder_title, R.string.tool_audio_recorder_desc,
             Icons.Default.Mic, ToolCategory.MEDIA, AppRoute.AudioRecorder,
-            listOf("record", "microphone", "录音", "波形")
+            listOf("record", "microphone", "录音", "波形"),
+            group = ToolGroup.MEDIA_AUDIO
         ),
         ToolEntry(
             "video_bgm", R.string.tool_video_bgm_title, R.string.tool_video_bgm_desc,
             Icons.Default.MusicNote, ToolCategory.MEDIA, AppRoute.VideoBgm(),
-            listOf("music", "audio", "mix", "背景音乐", "混音")
+            listOf("music", "audio", "mix", "背景音乐", "混音"),
+            group = ToolGroup.MEDIA_VIDEO
         ),
         ToolEntry(
             "video_pip", R.string.tool_video_pip_title, R.string.tool_video_pip_desc,
             Icons.Default.PictureInPictureAlt, ToolCategory.MEDIA, AppRoute.VideoPip(),
-            listOf("pip", "overlay", "画中画", "叠加")
+            listOf("pip", "overlay", "画中画", "叠加"),
+            group = ToolGroup.MEDIA_VIDEO
         ),
         ToolEntry(
             "video_speed_custom", R.string.tool_video_speed_custom_title,
             R.string.tool_video_speed_custom_desc,
             Icons.Default.Speed, ToolCategory.MEDIA, AppRoute.VideoSpeedCustom(),
-            listOf("slow motion", "timelapse", "慢动作", "延时", "变速")
+            listOf("slow motion", "timelapse", "慢动作", "延时", "变速"),
+            group = ToolGroup.MEDIA_VIDEO
         ),
         ToolEntry(
             "frame_extract", R.string.tool_frame_extract_title, R.string.tool_frame_extract_desc,
             Icons.Default.Collections, ToolCategory.MEDIA, AppRoute.FrameExtract(),
-            listOf("frames", "cover", "抽帧", "封面", "静帧")
+            listOf("frames", "cover", "抽帧", "封面", "静帧"),
+            group = ToolGroup.MEDIA_FRAMES
         ),
         ToolEntry(
             "audio_trim", R.string.tool_audio_trim_title, R.string.tool_audio_trim_desc,
             Icons.Default.AudioFile, ToolCategory.MEDIA, AppRoute.AudioTrim(),
-            listOf("audio", "trim", "ringtone", "音频", "裁剪", "铃声")
+            listOf("audio", "trim", "ringtone", "音频", "裁剪", "铃声"),
+            group = ToolGroup.MEDIA_AUDIO
         ),
         ToolEntry(
             "filter", R.string.tool_filter_title, R.string.tool_filter_desc,
             Icons.Default.FilterAlt, ToolCategory.MEDIA, AppRoute.Filter,
-            listOf("filter", "opencv", "滤镜", "风格")
+            listOf("filter", "opencv", "滤镜", "风格"),
+            group = ToolGroup.MEDIA_FRAMES
         ),
         ToolEntry(
             "ebook", R.string.tool_ebook_title, R.string.tool_ebook_desc,
@@ -334,4 +383,12 @@ object ToolRegistry {
     )
 
     fun byId(id: String): ToolEntry? = tools.firstOrNull { it.id == id }
+
+    fun groupsFor(category: ToolCategory): List<ToolGroup> =
+        ToolGroup.entries.filter { group ->
+            tools.any { it.category == category && it.group == group }
+        }
+
+    fun toolsIn(category: ToolCategory, group: ToolGroup? = null): List<ToolEntry> =
+        tools.filter { it.category == category && (group == null || it.group == group) }
 }

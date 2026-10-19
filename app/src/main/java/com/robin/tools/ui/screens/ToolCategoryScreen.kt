@@ -17,9 +17,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.robin.tools.R
 import com.robin.tools.core.ui.Dimension
+import com.robin.tools.core.ui.FeatureCard
 import com.robin.tools.core.ui.StudioSectionHeader
 import com.robin.tools.core.ui.ToolsTopAppBar
 import com.robin.tools.tool.ToolCategory
+import com.robin.tools.tool.ToolGroup
 import com.robin.tools.tool.ToolEntry
 import com.robin.tools.tool.ToolRegistry
 
@@ -28,17 +30,28 @@ import com.robin.tools.tool.ToolRegistry
 @Composable
 fun ToolCategoryScreen(
     category: ToolCategory,
+    group: ToolGroup? = null,
     favorites: Set<String>,
+    onGroupClick: (ToolGroup) -> Unit,
     onToolClick: (ToolEntry) -> Unit,
     onToggleFavorite: (ToolEntry) -> Unit,
     onBack: () -> Unit
 ) {
-    val tools = ToolRegistry.tools.filter { it.category == category }
+    val categoryTools = ToolRegistry.tools.filter { it.category == category }
+    val groups = ToolRegistry.groupsFor(category)
+    val showGroups = group == null && groups.isNotEmpty()
+    val tools = if (group != null) {
+        categoryTools.filter { it.group == group }
+    } else {
+        categoryTools
+    }
+    val headerTitle = group?.labelRes ?: category.labelRes
+    val headerDescription = group?.descriptionRes ?: category.descriptionRes
 
     Scaffold(
         topBar = {
             ToolsTopAppBar(
-                title = stringResource(category.labelRes),
+                title = stringResource(headerTitle),
                 onBack = onBack,
                 backContentDescription = stringResource(R.string.app_back)
             )
@@ -54,16 +67,29 @@ fun ToolCategoryScreen(
         ) {
             StudioSectionHeader(
                 eyebrow = stringResource(R.string.home_category_tool_count, tools.size),
-                title = stringResource(category.labelRes),
-                description = stringResource(category.descriptionRes)
+                title = stringResource(headerTitle),
+                description = stringResource(headerDescription)
             )
-            tools.forEach { tool ->
-                ToolCard(
-                    tool = tool,
-                    isFavorite = tool.id in favorites,
-                    onToolClick = onToolClick,
-                    onToggleFavorite = onToggleFavorite
-                )
+            if (showGroups) {
+                groups.forEach { toolGroup ->
+                    val count = categoryTools.count { it.group == toolGroup }
+                    FeatureCard(
+                        title = stringResource(toolGroup.labelRes),
+                        description = stringResource(toolGroup.descriptionRes),
+                        icon = toolGroup.icon,
+                        eyebrow = stringResource(R.string.home_category_tool_count, count),
+                        onClick = { onGroupClick(toolGroup) }
+                    )
+                }
+            } else {
+                tools.forEach { tool ->
+                    ToolCard(
+                        tool = tool,
+                        isFavorite = tool.id in favorites,
+                        onToolClick = onToolClick,
+                        onToggleFavorite = onToggleFavorite
+                    )
+                }
             }
             Spacer(Modifier.height(Dimension.lg))
         }

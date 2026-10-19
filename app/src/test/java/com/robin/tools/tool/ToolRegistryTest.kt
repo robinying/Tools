@@ -31,6 +31,25 @@ class ToolRegistryTest {
     }
 
     @Test
+    fun everyMediaTool_belongsToAGroup() {
+        ToolRegistry.tools
+            .filter { it.category == ToolCategory.MEDIA }
+            .forEach { tool ->
+                assertTrue("Media tool ${tool.id} has no group", tool.group != null)
+            }
+    }
+
+    @Test
+    fun everyGroup_hasAtLeastOneTool() {
+        ToolGroup.entries.forEach { group ->
+            assertTrue(
+                "No tools in $group",
+                ToolRegistry.tools.any { it.group == group }
+            )
+        }
+    }
+
+    @Test
     fun byId_returnsRegisteredTool() {
         val first = ToolRegistry.tools.first()
         assertEquals(first, ToolRegistry.byId(first.id))

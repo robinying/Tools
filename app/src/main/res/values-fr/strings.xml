@@ -155,4 +155,12 @@
     <string name="home_browse_title">Catégories</string>
     <string name="home_browse_desc">Choisissez une catégorie pour voir ses outils.</string>
     <string name="home_category_tool_count">%1$d outils</string>
+    <string name="media_group_compress">Compresser et convertir</string>
+    <string name="media_group_compress_desc">Réduisez vidéos ou images, convertissez des formats ou créez un GIF.</string>
+    <string name="media_group_audio">Audio</string>
+    <string name="media_group_audio_desc">Découpez, fusionnez, enregistrez, extrayez, supprimez ou ajustez l\'audio.</string>
+    <string name="media_group_video">Montage vidéo</string>
+    <string name="media_group_video_desc">Changez la vitesse, inversez, fusionnez, recadrez, mixez de la musique ou incrustez une vidéo.</string>
+    <string name="media_group_frames">Images et style</string>
+    <string name="media_group_frames_desc">Extrayez des images fixes ou appliquez des filtres.</string>
 </resources>

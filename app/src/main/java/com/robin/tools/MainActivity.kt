@@ -90,6 +90,7 @@ import com.robin.tools.history.TaskHistoryRepository
 import com.robin.tools.history.TaskHistoryViewModel
 import com.robin.tools.navigation.AppRoute
 import com.robin.tools.tool.ToolCategory
+import com.robin.tools.tool.ToolGroup
 import com.robin.tools.tool.ToolPreferences
 import com.robin.tools.ui.screens.HomeScreen
 import com.robin.tools.ui.screens.ShareEntryScreen
@@ -208,10 +209,19 @@ private fun MainNavHost(sharedContent: MutableStateFlow<SharedPayload?>) {
                 val category = ToolCategory.entries
                     .firstOrNull { it.name == route.category }
                     ?: ToolCategory.CREATE
+                val group = route.group?.let { name ->
+                    ToolGroup.entries.firstOrNull { it.name == name }
+                }
                 SwipeBackContainer(onBack = { navController.popBackStack() }) {
                     ToolCategoryScreen(
                         category = category,
+                        group = group,
                         favorites = favorites,
+                        onGroupClick = { toolGroup ->
+                            navController.navigate(
+                                AppRoute.ToolCategoryRoute(category.name, toolGroup.name)
+                            )
+                        },
                         onToolClick = { tool ->
                             toolPreferences.recordRecent(tool.id)
                             navController.navigate(tool.route)

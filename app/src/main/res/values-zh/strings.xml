@@ -167,4 +167,13 @@
     <string name="home_browse_title">功能分类</string>
     <string name="home_browse_desc">选择分类查看对应工具。</string>
     <string name="home_category_tool_count">%1$d 个工具</string>
+
+    <string name="media_group_compress">压缩与转换</string>
+    <string name="media_group_compress_desc">压缩视频或图片、转换格式或制作 GIF。</string>
+    <string name="media_group_audio">音频</string>
+    <string name="media_group_audio_desc">裁剪、拼接、录制、提取、移除或调整音频。</string>
+    <string name="media_group_video">视频编辑</string>
+    <string name="media_group_video_desc">变速、倒放、合并、裁剪、混音或画中画。</string>
+    <string name="media_group_frames">画面与风格</string>
+    <string name="media_group_frames_desc">提取静帧或应用图片滤镜。</string>
 </resources>
